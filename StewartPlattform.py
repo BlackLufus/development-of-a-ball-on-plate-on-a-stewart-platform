@@ -1,0 +1,127 @@
+import math
+import numpy as np
+
+# https://www.opensimgear.org/calculators/stewart-platform/
+class StewartPlattform:
+    """
+    Stewart Plattform class to calculate the length of each leg of the Stewart Plattform
+    """
+
+    base_points = []
+    plattform_points = []
+    r = 10 # length of 
+    l = 20 # length of leg
+
+    def __init__(self, base_radius: int, base_angle: list, plattform_radius: int, plattform_angle: list):
+        """
+        Initialize the Stewart Plattform with base and plattform points
+
+        :param base_radius: radius of the base (mm)
+        :param base_angle: list of angle of the base (degree)
+        :param plattform_radius: radius of the plattform (mm)
+        :param plattform_angle: list of angle of the plattform (degree)
+        """
+        
+        base_points = []
+        for angle in base_angle:
+            Bi = [base_radius*math.cos(angle), base_radius*math.sin(angle), 0]
+            base_points.append(Bi)
+            # print("Bi: ", Bi)
+        self.base_points = base_points
+
+        plattform_points = []
+        for angle in plattform_angle:
+            Pi = [plattform_radius*math.cos(angle), plattform_radius*math.sin(angle), 0]
+            plattform_points.append(Pi)
+            # print("Pi: ", Pi)
+        self.plattform_points = plattform_points
+
+    def calculate(self, x: int, y: int, z: int, alpha: int, beta: int, gamma: int):
+        """
+        Calculate the length of each leg of the Stewart Plattform
+
+        :param x: translation in x direction (mm)
+        :param y: translation in y direction (mm)
+        :param z: translation in z direction (mm)
+        :param alpha: rotation around x axis (degree)
+        :param beta: rotation around y axis (degree)
+        :param gamma: rotation around z axis (degree)
+        :return: list of leg length\n
+        """
+        if (x < 0 or y < 0 or z < 0):
+            print("x, y, z should be positive")
+            return
+        elif (x > 200 or y > 200 or z > 200):
+            print("x, y, z should be less than 200")
+            return
+        elif (alpha < -45 or alpha > 45):
+            print(f"alpha should be between -45 and 45 (provided: {alpha})")
+            return
+        elif (beta < -45 or beta > 45):
+            print(f"beta should be between -45 and 45 (provided: {beta})")
+            return
+        elif (gamma < -45 or gamma > 45):
+            print(f"gamma should be between -45 and 45 (provided: {gamma})")
+            return
+
+        # Calculate translation vector
+        t = [x, y, z]
+        # print("translation vector: ", t)
+
+        alpha = math.radians(alpha)
+        beta = math.radians(beta)
+        gamma = math.radians(gamma)
+
+        # Calculate rotation matrix
+        Rx = np.array([[1, 0, 0], 
+                       [0, math.cos(alpha), -math.sin(alpha)], 
+                       [0, math.sin(alpha), math.cos(alpha)]])
+        # print("Rx: \n", Rx, "\n")
+        
+        Ry = np.array([[math.cos(beta), 0, math.sin(beta)], 
+                       [0, 1, 0], 
+                       [-math.sin(beta), 0, math.cos(beta)]])
+        # print("Ry: \n", Ry, "\n")
+        
+        Rz = np.array([[math.cos(gamma), -math.sin(gamma), 0], 
+                       [math.sin(gamma), math.cos(gamma), 0], 
+                       [0, 0, 1]])
+        # print("Rz: \n", Rz, "\n")
+
+        # R = Rz @ Ry @ Rx
+        R = np.dot(Rz, np.dot(Ry, Rx))
+        print("rotation matrix: \n", R, "\n")
+
+        # transform plattform points
+        Pb = []
+
+        for i in range(6):
+            Pb.append(np.dot(R, self.plattform_points[i]) + t)
+        
+        print("plattform points: \n", Pb, "\n")
+
+        # calculate leg length
+        v = []
+
+        for i in range(6):
+            v.append(Pb[i] - self.base_points[i])
+        
+        # print("vector: \n", v, "\n")
+        
+        # calculate leg length
+        l = []
+        for i in range(6):
+            l.append(np.linalg.norm(v[i]))
+
+        return l
+
+
+if __name__ == "__main__":
+    pass
+    stewart = StewartPlattform(1000, [0, 60, 120, 180, 240, 300], 1000, [0, 60, 120, 180, 240, 300])
+    l = stewart.calculate(0, 0, 200, 45, 45, 45)
+    if l != None:
+        for index, length in enumerate(l):
+            print("length of leg ", index, ": ", length)
+        
+
