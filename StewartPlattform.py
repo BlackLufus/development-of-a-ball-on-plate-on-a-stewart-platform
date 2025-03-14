@@ -24,16 +24,16 @@ class StewartPlattform:
         
         base_points = []
         for angle in base_angle:
-            angle = math.radians(angle)
-            Bi = [base_radius*math.cos(angle), base_radius*math.sin(angle), 0]
+            angle_rad = math.radians(angle)
+            Bi = [base_radius*math.cos(angle_rad), base_radius*math.sin(angle_rad), 0]
             base_points.append(Bi)
             # print("Bi: ", Bi)
         self.base_points = base_points
 
         plattform_points = []
         for angle in plattform_angle:
-            angle = math.radians(angle)
-            Pi = [plattform_radius*math.cos(angle), plattform_radius*math.sin(angle), 0]
+            angle_rad = math.radians(angle)
+            Pi = [plattform_radius*math.cos(angle_rad), plattform_radius*math.sin(angle_rad), 0]
             plattform_points.append(Pi)
             # print("Pi: ", Pi)
         self.plattform_points = plattform_points
