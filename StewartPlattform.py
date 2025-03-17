@@ -75,23 +75,25 @@ class StewartPlattform:
         gamma = math.radians(gamma)
 
         # Calculate rotation matrix
+        # roll
         Rx = np.array([[1, 0, 0], 
                        [0, math.cos(alpha), -math.sin(alpha)], 
                        [0, math.sin(alpha), math.cos(alpha)]])
         # print("Rx: \n", Rx, "\n")
-        
+        # pitch
         Ry = np.array([[math.cos(beta), 0, math.sin(beta)], 
                        [0, 1, 0], 
                        [-math.sin(beta), 0, math.cos(beta)]])
         # print("Ry: \n", Ry, "\n")
         
+        # yaw
         Rz = np.array([[math.cos(gamma), -math.sin(gamma), 0], 
                        [math.sin(gamma), math.cos(gamma), 0], 
                        [0, 0, 1]])
         # print("Rz: \n", Rz, "\n")
 
-        R = Rz @ Ry @ Rx
-        # R = np.dot(Rz, np.dot(Ry, Rx))
+        # R = Rz @ Ry @ Rx
+        R = np.dot(Rz, np.dot(Ry, Rx))
         if self.debug:
             print("rotation matrix: \n", R, "\n")
 

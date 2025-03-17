@@ -9,26 +9,26 @@ from StewartPlattform import StewartPlattform
 # Standard deviation for each angle so that the r-axis is horizontal
 # servo: angle deviation
 deviation = {
-    0: 0,  # Rechts
-    1: 10,  # Links
-    2: -30,  # Rechts
-    3: 0,  # Links
-    4: 10, # Rechts
-    5: -50   # Links
+    0: 7,  # Rechts
+    1: 5,  # Links
+    2: 3,  # Rechts
+    3: 8,  # Links
+    4: 7, # Rechts
+    5: 2   # Links
 }
 
 # Set the rotation angle for the Steward Plattform (between: -45 and 45)
 def setRotationAngle(servo, angle):
-    if angle >= 0 and angle <= 135 and servo in deviation:
-        minAngle = 921
-        maxAngle = 1780
-        temp = 1780 - 921
-        temp /= 90
-        temp *= angle
-        if servo % 2 == 0:
-            pwm.setServoPulse(servo, minAngle + temp + deviation[servo])
-        else:
-            pwm.setServoPulse(servo, maxAngle - temp - deviation[servo])
+    # min = 921
+    # max = 1780
+    # mean = max - (min / 2)
+    # step = mean / 90
+    if angle >= -90 and angle <= 90 and servo in deviation:
+        temp = (angle if servo % 2 == 0 else -angle)
+        temp += (deviation[servo] if servo % 2 == 0 else -deviation[servo]) # Add angle deviation
+        temp += 90 # Transform to normal angle
+        # print(temp)
+        pwm.setRotationAngle(servo, temp)
     else:
         print("Angle out of range")
 
@@ -60,17 +60,74 @@ def differentAngleServoTest(angleDict):
     for channel in range(6):
         setRotationAngle(channel, angleDict[channel])
 
-def angleServoTest():
-    stewart = StewartPlattform(100, [340, 20, 100, 140, 240, 280], 80, [350, 10, 110, 130, 250, 270])
-    leg_length_list = stewart.calculate(0, 0, 88, 25, 0, 0)
-    if leg_length_list != None:
-        for index, leg_length in enumerate(leg_length_list):
-            print("length of leg ", index, ": ", leg_length)
+def setAngle(x: float, y: float, z: float, alpha: float, beta: float, gamma: float):
+    stewart = StewartPlattform(100, [340, 20, 100, 140, 240, 280], 100, [350, 10, 110, 130, 250, 270])
+    leg_length_list = stewart.calculate(x, y, z, alpha, beta, gamma)
+    # if leg_length_list != None:
+        # for index, leg_length in enumerate(leg_length_list):
+        #     print("length of leg ", index, ": ", leg_length)
 
     angle_list = stewart.getAngles(40, 100, leg_length_list)
     for index, angle in enumerate(angle_list):
-        print("angle of servo ", index, ": ", angle)
+        # print("angle of servo ", index, ": ", angle)
         setRotationAngle(index, angle)
+
+def angleServoTest():
+    setAngle(0, 0, 94, -15, 15, 0)
+
+def longAngleServoTest():
+    setAngle(0, 0, 94, 0, 0, 0)
+    time.sleep(2)
+    steps = 0.1
+    period = 0.01
+    while True:
+        # setAngle(0, 0, 94, 15, 0, 0)
+        print("Step 1")
+        for i in np.arange(-15, 0, steps):
+            setAngle(0, 0, 94, 15, i, 0)
+            time.sleep(period)
+
+        # setAngle(0, 0, 94, 15, 15, 0)
+        print("Step 2")
+        for i in np.arange(0, 15, steps):
+            setAngle(0, 0, 94, 15, i, 0)
+            time.sleep(period)
+
+        # setAngle(0, 0, 94, 0, 15, 0)
+        print("Step 3")
+        for i in np.arange(15, 0, -steps):
+            setAngle(0, 0, 94, i, 15, 0)
+            time.sleep(period)
+
+        # setAngle(0, 0, 94, -15, 15, 0)
+        print("Step 4")
+        for i in np.arange(0, -15, -steps):
+            setAngle(0, 0, 94, i, 15, 0)
+            time.sleep(period)
+
+        # setAngle(0, 0, 94, -15, 0, 0)
+        print("Step 5")
+        for i in np.arange(15, 0, -steps):
+            setAngle(0, 0, 94, -15, i, 0)
+            time.sleep(period)
+
+        # setAngle(0, 0, 94, -15, -15, 0)
+        print("Step 6")
+        for i in np.arange(0, -15, -steps):
+            setAngle(0, 0, 94, -15, i, 0)
+            time.sleep(period)
+
+        # setAngle(0, 0, 94, 0, -15, 0)
+        print("Step 7")
+        for i in np.arange(-15, 0, steps):
+            setAngle(0, 0, 94, i, -15, 0)
+            time.sleep(period)
+
+        # setAngle(0, 0, 94, 15, -15, 0)
+        print("Step 8")
+        for i in np.arange(0, 15, steps):
+            setAngle(0, 0, 94, i, -15, 0)
+            time.sleep(period)
 
 if __name__ == '__main__':
     # try:
@@ -78,7 +135,10 @@ if __name__ == '__main__':
     pwm = PCA9685()
     pwm.setPWMFreq(50)
 
-    angleServoTest()
+    # for servo in range(6):
+    #     setRotationAngle(servo, 0)
+    # longAngleServoTest()
+    quickServoTest(0)
 
     # differentAngleServoTest({
     #     0: 24,
