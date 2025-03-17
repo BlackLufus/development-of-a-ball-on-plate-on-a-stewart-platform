@@ -79,7 +79,7 @@ def longAngleServoTest():
     setAngle(0, 0, 94, 0, 0, 0)
     time.sleep(2)
     steps = 0.1
-    period = 0.01
+    period = 0
     while True:
         # setAngle(0, 0, 94, 15, 0, 0)
         print("Step 1")
@@ -137,8 +137,12 @@ if __name__ == '__main__':
 
     # for servo in range(6):
     #     setRotationAngle(servo, 0)
-    # longAngleServoTest()
-    quickServoTest(0)
+
+    # Makes the platform dance
+    longAngleServoTest()
+
+    # Reset the platform to zero
+    # quickServoTest(0)
 
     # differentAngleServoTest({
     #     0: 24,
