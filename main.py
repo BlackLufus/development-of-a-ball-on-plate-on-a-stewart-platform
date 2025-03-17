@@ -72,9 +72,6 @@ def setAngle(x: float, y: float, z: float, alpha: float, beta: float, gamma: flo
         # print("angle of servo ", index, ": ", angle)
         setRotationAngle(index, angle)
 
-def angleServoTest():
-    setAngle(0, 0, 94, -15, 15, 0)
-
 def longAngleServoTest():
     setAngle(0, 0, 94, 0, 0, 0)
     time.sleep(2)
@@ -135,19 +132,20 @@ if __name__ == '__main__':
     pwm = PCA9685()
     pwm.setPWMFreq(50)
 
-    # for servo in range(6):
-    #     setRotationAngle(servo, 0)
+    # The platform will transform to a fix position
+    # setAngle(0, 0, 100, 0, 0, 0)
 
     # Makes the platform dance
-    longAngleServoTest()
+    # longAngleServoTest()
 
     # Reset the platform to zero
-    # quickServoTest(0)
+    quickServoTest(0)
 
+    # Manipulate each angle seperatly
     # differentAngleServoTest({
     #     0: 24,
     #     1: 83,
-    #     2: 9,
+    #     2: -20,
     #     3: 84,
     #     4: 5,
     #     5: 90
