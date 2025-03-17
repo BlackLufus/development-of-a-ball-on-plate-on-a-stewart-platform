@@ -6,13 +6,13 @@ class StewartPlattform:
     """
     Stewart Plattform class to calculate the length of each leg of the Stewart Plattform
     """
-
+    debug = False
     base_points = []
     plattform_points = []
     r = 10 # length of 
     l = 20 # length of leg
 
-    def __init__(self, base_radius: int, base_angle: list, plattform_radius: int, plattform_angle: list):
+    def __init__(self, base_radius: int, base_angle: list, plattform_radius: int, plattform_angle: list, debug: bool = False):
         """
         Initialize the Stewart Plattform with base and plattform points
 
@@ -38,7 +38,7 @@ class StewartPlattform:
             # print("Pi: ", Pi)
         self.plattform_points = plattform_points
 
-    def calculate(self, x: int, y: int, z: int, alpha: int, beta: int, gamma: int):
+    def calculate(self, x: float, y: float, z: float, alpha: float, beta: float, gamma: float):
         """
         Calculate the length of each leg of the Stewart Plattform
 
@@ -90,9 +90,10 @@ class StewartPlattform:
                        [0, 0, 1]])
         # print("Rz: \n", Rz, "\n")
 
-        # R = Rz @ Ry @ Rx
-        R = np.dot(Rz, np.dot(Ry, Rx))
-        print("rotation matrix: \n", R, "\n")
+        R = Rz @ Ry @ Rx
+        # R = np.dot(Rz, np.dot(Ry, Rx))
+        if self.debug:
+            print("rotation matrix: \n", R, "\n")
 
         # transform plattform points
         Pb = []
@@ -100,7 +101,8 @@ class StewartPlattform:
         for i in range(6):
             Pb.append(np.dot(R, self.plattform_points[i]) + t)
         
-        print("plattform points: \n", Pb, "\n")
+        if self.debug:
+            print("plattform points: \n", Pb, "\n")
 
         # calculate leg length
         v = []
@@ -142,12 +144,13 @@ class StewartPlattform:
                 raise ValueError(f"Beinlänge {L} liegt außerhalb des zulässigen Bereichs. Erlaubt: {abs(r - l)} <= L <= {r + l}")            
             
             # Calculate cos_theta to check if value is between -1 and 1
-            cos_theta = (math.pow(r, 2) + math.pow(L, 2) - math.pow(l, 2)) / (2 * r * L)
+            # cos_theta = (math.pow(r, 2) + math.pow(L, 2) - math.pow(l, 2)) / (2 * r * L)
+            cos_theta = (L - math.sqrt(math.pow(l, 2) - math.pow(r, 2))) / r
             if cos_theta < -1 or cos_theta > 1:
                 raise ValueError(f"Ungültiger Winkel für L={L}, r={r}, l={l}: cos_theta={cos_theta}")
             
             # Get the final degree and add it to list
-            theta = math.degrees(math.acos(cos_theta))
+            theta = math.degrees(math.asin(cos_theta))
             angles.append(theta)
         
         # return a list of all angels
