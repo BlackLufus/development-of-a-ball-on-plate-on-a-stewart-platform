@@ -59,7 +59,7 @@ for i, s in enumerate(sliders):
 	dummy2.midleft =  (10,15 + 30 * i)
 	txt.append((dummy1, dummy2))
 
-stewart = StewartPlattform(100, [340, 20, 100, 140, 240, 280], 100, [350, 10, 110, 130, 250, 270])
+stewart = StewartPlatform(100, [340, 20, 100, 140, 240, 280], 100, [350, 10, 110, 130, 250, 270])
 smh = ServoMotorHandler()
 
 # sliders["x-axis"][0].setValue(20.1) # just to learn

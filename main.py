@@ -35,7 +35,7 @@ def differentAngleServoTest(angleDict):
         smh.setRotationAngle(channel, angleDict[channel])
 
 def setAngle(x: float, y: float, z: float, alpha: float, beta: float, gamma: float):
-    stewart = StewartPlattform(100, [340, 20, 100, 140, 240, 280], 100, [350, 10, 110, 130, 250, 270])
+    stewart = StewartPlatform(100, [340, 20, 100, 140, 240, 280], 100, [350, 10, 110, 130, 250, 270])
     leg_length_list = stewart.calculate(x, y, z, alpha, beta, gamma)
     # if leg_length_list != None:
         # for index, leg_length in enumerate(leg_length_list):
