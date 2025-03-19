@@ -2,7 +2,7 @@ import math
 import numpy as np
 
 # https://www.opensimgear.org/calculators/stewart-platform/
-class StewartPlattform:
+class StewartPlatform:
     """
     Stewart Plattform class to calculate the length of each leg of the Stewart Plattform
     """
@@ -52,19 +52,19 @@ class StewartPlattform:
         """
         if (x < 0 or y < 0 or z < 0):
             print("x, y, z should be positive")
-            return
+            return None
         elif (x > 200 or y > 200 or z > 200):
             print("x, y, z should be less than 200")
-            return
+            return None
         elif (alpha < -45 or alpha > 45):
             print(f"alpha should be between -45 and 45 (provided: {alpha})")
-            return
+            return None
         elif (beta < -45 or beta > 45):
             print(f"beta should be between -45 and 45 (provided: {beta})")
-            return
+            return None
         elif (gamma < -45 or gamma > 45):
             print(f"gamma should be between -45 and 45 (provided: {gamma})")
-            return
+            return None
 
         # Calculate translation vector
         t = [x, y, z]
