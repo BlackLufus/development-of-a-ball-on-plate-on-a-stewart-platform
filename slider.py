@@ -1,3 +1,4 @@
+import traceback
 import pygame, pygame_widgets, pymunk
 from pygame_widgets.slider import Slider
 from pygame_widgets.textbox import TextBox
@@ -6,6 +7,18 @@ from pygame_widgets.dropdown import Dropdown
 import math
 from stewartPlatform import StewartPlatform
 from servoMotorHandler import ServoMotorHandler
+
+def updateSliderValue(slider):
+	value = slider['slider'].getValue()
+
+	min = slider['min']
+	max = slider['max']
+	
+	newValue = (max - min) / 100
+	newValue *= value
+	newValue += min
+
+	return newValue
 
 sin,cos = math.sin, math.cos
 WINDOWDIMS = (1200, 600)
@@ -16,44 +29,60 @@ font = pygame.font.Font('freesansbold.ttf', 12)
 clock=pygame.time.Clock()
 
 txt = []
+
 tb = lambda : TextBox(screen, 300, 0, 220, 20, fontSize=10)
+slider = lambda initial :  Slider(screen, 60, 0, 220, 10, min=0, max=100, initial=initial, step=.1)
 sliders = {
 	"x-axis": {
-		0: Slider(screen, 60, 0, 220, 10, min=0, max=100, initial=0, step=.1), 
-		1: tb(),
-		2: 0
+		'slider': slider(0), 
+		'textBox': tb(),
+		'min': 0,
+		'max': 100,
+		'value': 0
 	},
 	"y-axis": {
-		0: Slider(screen, 60, 0, 220, 10, min=0, max=100, initial=0, step=.1), 
-		1: tb(),
-		2: 0
+		'slider': slider(0), 
+		'textBox': tb(),
+		'min': 0,
+		'max': 100,
+		'value': 0
 	},
 	"z-axis": {
-		0: Slider(screen, 60, 0, 220, 10, min=0, max=100, initial=100, step=.1), 
-		1: tb(),
-		2: 100
+		'slider': slider(100), 
+		'textBox': tb(),
+		'min': 70,
+		'max': 100,
+		'value': 100
 	},
 	"roll": {
-		0: Slider(screen, 60, 0, 220, 10, min=0, max=100, initial=50, step=.1), 
-		1: tb(),
-		2: 50
+		'slider': slider(50), 
+		'textBox': tb(),
+		'min': -20,
+		'max': 20,
+		'value': 50
 	},
 	"pitch": {
-		0: Slider(screen, 60, 0, 220, 10, min=0, max=100, initial=50, step=.1), 
-		1: tb(),
-		2: 50
+		'slider': slider(50), 
+		'textBox': tb(),
+		'min': -20,
+		'max': 20,
+		'value': 50
 	},
 	"yaw": {
-		0: Slider(screen, 60, 0, 220, 10, min=0, max=100, initial=50, step=.1), 
-		1: tb(),
-		2: 50
+		'slider': slider(50), 
+		'textBox': tb(),
+		'min': -20,
+		'max': 20,
+		'value': 50
 	},
 }
 for i, s in enumerate(sliders):
-	sliders[s][1].setText(sliders[s][0].getValue())
-	sliders[s][1].disable()
-	sliders[s][0].moveY(10 + 30 * i)
-	sliders[s][1].moveY(10 + 30 * i)
+	value = updateSliderValue(sliders[s])
+	sliders[s]['textBox'].setText(value)
+	sliders[s]['value'] = value
+	sliders[s]['textBox'].disable()
+	sliders[s]['slider'].moveY(10 + 30 * i)
+	sliders[s]['textBox'].moveY(10 + 30 * i)
 	dummy1 = font.render(s, True, (0,0,0), (255, 255,255))
 	dummy2 = dummy1.get_rect()
 	dummy2.midleft =  (10,15 + 30 * i)
@@ -90,32 +119,18 @@ while run:
 		elif e.type == pygame.MOUSEMOTION:
 			for s in sliders:
 
-				value = sliders[s][0].getValue()
+				value = updateSliderValue(sliders[s])
 
-				if s == "x-axis" or s == "y-axis":
-					min = 0
-					max = 100
-				elif s == "z-axis":
-					min = 70
-					max = 100
-				else:
-					min = -20
-					max = 20
-				
-				temp = (max - min) / 100
-				temp *= value
-				temp += min
-
-				sliders[s][1].setText(temp)
-				sliders[s][2] = temp
-				print(s, ": ", temp)
+				sliders[s]['textBox'].setText(value)
+				sliders[s]['value'] = value
+				print(s, ": ", value)
 			# [sliders[s][1].setText(sliders[s][0].getValue()) for s in sliders]
 		elif e.type == pygame.MOUSEBUTTONDOWN:
 			if dropdown.getSelected() != mode:
 				print(mode, dropdown.getSelected())
 				mode = dropdown.getSelected()
 	screen.fill((255, 255, 255))
-	# [screen.blit(t[0], t[1]) for t in txt]
+	[screen.blit(t[0], t[1]) for t in txt]
 
 	# print(sliders['x-axis'][0].getValue(), 
 				     					# sliders['y-axis'][0].getValue(), 
@@ -124,12 +139,12 @@ while run:
 										# sliders['pitch'][0].getValue(),
 										# sliders['yaw'][0].getValue())
 	try:
-		leg_length_list = stewart.calculate(sliders['x-axis'][2], 
-											sliders['y-axis'][2], 
-											sliders['z-axis'][2], 
-											sliders['roll'][2], 
-											sliders['pitch'][2],
-											sliders['yaw'][2])
+		leg_length_list = stewart.calculate(sliders['x-axis']['value'], 
+											sliders['y-axis']['value'], 
+											sliders['z-axis']['value'], 
+											sliders['roll']['value'], 
+											sliders['pitch']['value'],
+											sliders['yaw']['value'])
 
 		# print(leg_length_list)
 		
@@ -137,7 +152,9 @@ while run:
 			angle_list = stewart.getAngles(40, 100, leg_length_list)
 			for index, angle in enumerate(angle_list):
 				smh.setRotationAngle(index, angle)
-	except:
+	except Exception as e:
+		text_surface = font.render(e.args[0], True, (0,0,0), (255, 255,255))
+		screen.blit(text_surface, (5, 15 + 30 * 7))
 		pass
 
 	# x = WINDOWDIMS[0] // 2 + sliders["x-axis"][0].getValue()
