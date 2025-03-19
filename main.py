@@ -5,6 +5,7 @@ import time
 import numpy as np
 from stewartPlatform import StewartPlatform
 from servoMotorHandler import ServoMotorHandler
+import math
 
 def servoTest():
     while True:
@@ -100,17 +101,39 @@ def longAngleServoTest():
             setAngle(0, 0, 94, i, -15, 0)
             time.sleep(period)
 
+def smoothCircleTest(radius=15, steps=100, period=0.01):
+    setAngle(0, 0, 94, 0, 0, 0)
+    time.sleep(2)
+
+    angles = np.linspace(0, 2 * math.pi, steps)
+
+    print(angles)
+
+    while True:
+        for theta in angles:
+            x_offset = radius * math.cos(theta)
+            # x_offset = 0
+            # x_offset = np.random.uniform(-10, 10)
+            y_offset = radius * math.sin(theta)
+            # y_offset = 0
+            # y_offset = np.random.uniform(-10, 10)
+            setAngle(0, 0, 94, x_offset, y_offset, 0)
+            time.sleep(period)
+
 if __name__ == '__main__':
     smh = ServoMotorHandler()
 
     # The platform will transform to a fix position
     # setAngle(0, 0, 100, 0, 0, 0)
 
+    # Smooth circly test
+    # smoothCircleTest(radius=15, steps=300, period=0.001)
+
     # Makes the platform dance
-    # longAngleServoTest()
+    longAngleServoTest()
 
     # Reset the platform to zero
-    quickServoTest(0)
+    # quickServoTest(0)
 
     # Manipulate each angle seperatly
     # differentAngleServoTest({
