@@ -8,13 +8,19 @@ class Nunchuk:
     _MEASUREMENT = 0x00
     _CALIBRATION = 0x20
 
+    _accel = {
+        'x': [],
+        'y': [],
+        'z': []
+    }
+
     def __init__(self) -> None:
         self.bus = smbus.SMBus(1)
         self.bus.write_byte_data(self._ADDRESS,0x40,0x00)
 
     def write(self, data_type):
         self.bus.write_byte(self._ADDRESS, data_type)
-        time.sleep(0.1)
+        time.sleep(0.001)
 
     def read(self, data_type):
         self.write(data_type)
@@ -28,8 +34,11 @@ class Nunchuk:
         self.joy_y = data[1]
 
         self.accel_x = (data[2] << 2) + ((data[5] >> 2) & 0x03)
+        self.accel_x_mean = self.calcAccelMean('x', self.accel_x)
         self.accel_y = (data[3] << 2) + ((data[5] >> 4) & 0x03)
+        self.accel_y_mean = self.calcAccelMean('y', self.accel_y)
         self.accel_z = (data[4] << 2) + ((data[5] >> 6) & 0x03)
+        self.accel_z_mean = self.calcAccelMean('z', self.accel_z)
         
         self.button_c = not (data[5] & 0x02)
         self.button_z = not (data[5] & 0x01)
@@ -64,6 +73,17 @@ class Nunchuk:
         checksum = (data[14] << 8) | data[15]
         
         print('checksum: %s' % (checksum))
+
+    def calcAccelMean(self, axis, value):
+        accel_list: list = self._accel[axis]
+        accel_list.append(value)
+        if accel_list.__len__() >= 8:
+            accel_list.pop(0)
+        return sum(accel_list) / len(accel_list)
+
+    def dump(self):
+        print('Jx: %s Jy: %s Ax: %s Ay: %s Az: %s Bc: %s Bz: %s' % (self.joy_x, self.joy_y, self.accel_x, self.accel_y, self.accel_z, self.button_c, self.button_z))
+
 
 if __name__ == '__main__':
     nc = Nunchuk()
