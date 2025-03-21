@@ -47,14 +47,14 @@ class Nunchuk:
         data = self.read(self._CALIBRATION)
 
         x_axis_0G = (data[0] << 2) + ((data[3] >> 2) & 0x03)
-        y_axis_0G = (data[1] << 2) + ((data[3] >> 2) & 0x03)
-        z_axis_0G = (data[2] << 2) + ((data[3] >> 2) & 0x03)
+        y_axis_0G = (data[1] << 2) + ((data[3] >> 4) & 0x03)
+        z_axis_0G = (data[2] << 2) + ((data[3] >> 6) & 0x03)
 
         print('x_axis_0G: %s, y_axis_0G: %s, z_axis_0G: %s' % (x_axis_0G, y_axis_0G, z_axis_0G))
 
         x_axis_1G = (data[4] << 2) + ((data[7] >> 2) & 0x03)
-        y_axis_1G = (data[5] << 2) + ((data[7] >> 2) & 0x03)
-        z_axis_1G = (data[6] << 2) + ((data[7] >> 2) & 0x03)
+        y_axis_1G = (data[5] << 2) + ((data[7] >> 4) & 0x03)
+        z_axis_1G = (data[6] << 2) + ((data[7] >> 6) & 0x03)
 
         print('x_axis_1G: %s, y_axis_1G: %s, z_axis_1G: %s' % (x_axis_1G, y_axis_1G, z_axis_1G))
 
