@@ -5,6 +5,7 @@ import time
 import numpy as np
 from stewartPlatform import StewartPlatform
 from servoMotorHandler import ServoMotorHandler
+from nunchuk import Nunchuk
 import math
 
 def servoTest():
@@ -120,17 +121,45 @@ def smoothCircleTest(radius=15, steps=100, period=0.01):
             setAngle(0, 0, 94, x_offset, y_offset, 0)
             time.sleep(period)
 
+def nunchukTest(radius=17, period=0.001):
+    nc = Nunchuk()
+
+    setAngle(0, 0, 94, 0, 0, 0)
+    time.sleep(1)
+
+    while True:
+        nc.measure()
+
+        # print(nc.joy_x)
+        # print(nc.joy_y)
+
+        x_offset = radius / 128 * (nc.joy_x - 128)
+        y_offset = radius / 128 * (nc.joy_y - 128) * (-1)
+
+        # print(x_offset)
+        # print(y_offset)
+
+        try:
+            setAngle(0, 0, 94, x_offset, y_offset, 0)
+        except:
+            pass
+
+        time.sleep(period)
+
 if __name__ == '__main__':
     smh = ServoMotorHandler()
 
     # The platform will transform to a fix position
     # setAngle(0, 0, 100, 0, 0, 0)
 
+    # Nnunchuck test
+    nunchukTest()
+
     # Smooth circly test
     # smoothCircleTest(radius=15, steps=300, period=0.001)
 
     # Makes the platform dance
-    longAngleServoTest()
+    # longAngleServoTest()
 
     # Reset the platform to zero
     # quickServoTest(0)
