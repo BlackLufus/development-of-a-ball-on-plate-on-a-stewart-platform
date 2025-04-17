@@ -8,7 +8,6 @@ import numpy as np
 import v0_vacuum_robot_env as v0_vacuum_robot_env
 
 from q_table import QTable
-from obervation_converter import ObservationConverter
 
 def run_q(episodes, is_training=True, render=False):
 
@@ -47,6 +46,6 @@ def run_q(episodes, is_training=True, render=False):
 
 
 if __name__ == "__main__":
-    # run_q(episodes=10_000, is_training=True, render=False)
+    run_q(episodes=10_000, is_training=True, render=False)
     run_q(episodes=10, is_training=False, render=True)
     
