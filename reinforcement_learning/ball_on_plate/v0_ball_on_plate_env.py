@@ -61,7 +61,7 @@ class BallOnPlateEnv(gym.Env):
             dtype=np.float32
         )
 
-        self.max_steps = 100
+        self.max_steps = 250
 
     def _get_state(self):
         obs = np.array([
@@ -99,9 +99,9 @@ class BallOnPlateEnv(gym.Env):
         self.steps += 1
 
         # Perform action and get some informations back
-        old_dist = np.linalg.norm(np.array(self.ball.target_pos) - np.array([self.ball.sx, self.ball.sy]))
+        # old_dist = np.linalg.norm(np.array(self.ball.target_pos) - np.array([self.ball.sx, self.ball.sy]))
         finish, isOnTarget, boarder_crossed = self.ball.perform_action(action)
-        new_dist = np.linalg.norm(np.array(self.ball.target_pos) - np.array([self.ball.sx, self.ball.sy]))
+        # new_dist = np.linalg.norm(np.array(self.ball.target_pos) - np.array([self.ball.sx, self.ball.sy]))
 
         # Basic rewards
         reward = -1

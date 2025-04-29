@@ -99,10 +99,11 @@ class BallOnPlate:
 
         # check if it is simulation mode
         if self.simulation_mode:
-            self.delta_t = 0.1
+            self.delta_t = self.np_random.uniform(0.01, 0.20)
         else:
             self.current_time = time.time()
             self.delta_t = self.current_time - self.last_time
+            print(self.delta_t)
             self.last_time = self.current_time
 
         # Set roll and pitch for rotation
