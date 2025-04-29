@@ -9,7 +9,7 @@ from os import path
     
 class BallOnPlate:
 
-    def __init__(self, target_pos: tuple[float, float] = None, fps=1, simulation_mode=True):
+    def __init__(self, fps=1, simulation_mode=True):
         self.screen_size = 512
 
         # Physikalische Parameter
@@ -22,9 +22,6 @@ class BallOnPlate:
         self.g = 9.81
         self.max_velocity = 0.15
         self.max_angle = 7.5
-
-        # Target
-        self.target_pos = target_pos
 
         # Set random state
         self.np_random = np.random.RandomState()
@@ -90,11 +87,10 @@ class BallOnPlate:
         self.vy = 0.0 # s/t
         self.sx = self.np_random.uniform(-self.plate_radius, self.plate_radius) # Position in Meter
         self.sy = self.np_random.uniform(-self.plate_radius, self.plate_radius) # Position in Meter
-        if self.target_pos == None:
-            self.target_pos = (
-                self.np_random.uniform(-self.plate_radius + self.boarder_distance, self.plate_radius - self.boarder_distance),
-                self.np_random.uniform(-self.plate_radius + self.boarder_distance, self.plate_radius - self.boarder_distance)
-            )
+        self.target_pos = (
+            self.np_random.uniform(-self.plate_radius + self.boarder_distance, self.plate_radius - self.boarder_distance),
+            self.np_random.uniform(-self.plate_radius + self.boarder_distance, self.plate_radius - self.boarder_distance)
+        )
         self.last_time = time.time()
 
     def perform_action(self, action) -> bool:
