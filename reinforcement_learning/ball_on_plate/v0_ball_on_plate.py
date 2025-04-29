@@ -99,11 +99,11 @@ class BallOnPlate:
 
         # check if it is simulation mode
         if self.simulation_mode:
-            self.delta_t = self.np_random.uniform(0.01, 0.20)
+            self.delta_t = self.np_random.uniform(0.001, 0.100)
         else:
             self.current_time = time.time()
             self.delta_t = self.current_time - self.last_time
-            print(self.delta_t)
+            # print(self.delta_t)
             self.last_time = self.current_time
 
         # Set roll and pitch for rotation
@@ -187,12 +187,12 @@ class BallOnPlate:
         self.window_surface.blit(text_img, text_pos)
 
         # Draw X-Axis (roll)
-        x_axis_img = self.action_font.render(f'X-Axis: {round(self.roll, 5)}', True, (0,0,0), (255,255,255))
+        x_axis_img = self.action_font.render(f'X-Axis: {np.round(self.roll, 2)}', True, (0,0,0), (255,255,255))
         x_axis_pos = (0, self.window_size[1] - self.action_info_height * 5)
         self.window_surface.blit(x_axis_img, x_axis_pos)
 
         # Draw Y-Axis (pitch)
-        y_axis_img = self.action_font.render(f'Y-Axis: {round(self.pitch, 5)}', True, (0,0,0), (255,255,255))
+        y_axis_img = self.action_font.render(f'Y-Axis: {np.round(self.pitch, 2)}', True, (0,0,0), (255,255,255))
         y_axis_pos = (0, self.window_size[1] - self.action_info_height * 4)
         self.window_surface.blit(y_axis_img, y_axis_pos)
 

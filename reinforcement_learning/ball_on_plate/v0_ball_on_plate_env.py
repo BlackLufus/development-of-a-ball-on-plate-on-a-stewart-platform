@@ -21,13 +21,13 @@ class BallOnPlateEnv(gym.Env):
     The robot can move in four directions: up, down, left, right.
     The robot receives a reward of +1 for picking up the target object and -1 for hitting the walls.
     """
-    metadata = {"render_modes": ["human"], "render_fps": 4}
+    metadata = {"render_modes": ["human"], "render_fps": 60, "simulation_mode": True}
 
     def __init__(self, render_mode=None):
         super().__init__()
         self.render_mode = render_mode
 
-        self.ball = bop.BallOnPlate(fps=self.metadata["render_fps"])
+        self.ball = bop.BallOnPlate(fps=self.metadata["render_fps"], simulation_mode=self.metadata["simulation_mode"])
         self.action_space = spaces.Box(
             low=np.array([
                 -self.ball.max_angle,
@@ -61,7 +61,7 @@ class BallOnPlateEnv(gym.Env):
             dtype=np.float32
         )
 
-        self.max_steps = 250
+        self.max_steps = 1000
 
     def _get_state(self):
         obs = np.array([
@@ -154,10 +154,7 @@ if __name__ == "__main__":
             done = terminated or truncated
 
             if env.render_mode == "human":
-                if type(action) == bop.BallOnPlateAction:
-                    print(bop.BallOnPlateAction(action))
-                else:
-                    print(action)
+                print(action)
                 print(f"Reward {reward}")
                 env.render()
         

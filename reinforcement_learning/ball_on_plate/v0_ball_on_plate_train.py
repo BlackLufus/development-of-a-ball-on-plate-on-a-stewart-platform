@@ -74,7 +74,7 @@ def train_sb3(env_id, dir, model="PPO", use_existing_model=None):
             )
     
     # Training mit 500.000 Schritten
-    STEPS_PER_ITERATION = 50_000
+    STEPS_PER_ITERATION = 5_000
 
     for _ in range(40):
         model.learn(
@@ -84,7 +84,11 @@ def train_sb3(env_id, dir, model="PPO", use_existing_model=None):
             reset_num_timesteps=False
         )
 
-def run_sb3(env_id, dir, model_name, model="PPO"):
+        model.save(f"./models/{dir}/{model_name}")
+
+        run_sb3(env_id, dir, model_name, model="PPO", episods=1)
+
+def run_sb3(env_id, dir, model_name, model="PPO", episods=10):
 
     env = gym.make(env_id)
 
@@ -104,26 +108,31 @@ def run_sb3(env_id, dir, model_name, model="PPO"):
             env=env
         )
 
-    for _ in range(10):
-    
+    for _ in range(episods):
+        count = 0
         # Run a test
         obs = env.reset()[0]
         env.render()
         terminated = False
         while True:
+            count += 1
             action, _ = model.predict(observation=obs, deterministic=True) # Turn on deterministic, so predict always returns the same behavior
             obs, _, terminated, truncated, _ = env.step(action)
 
             env.render()
 
             if terminated or truncated:
+                if terminated:
+                    print(f"Success (count: {count})")
+                else:
+                    print(f"Failed (count: {count})")
                 break
 
 
 if __name__ == "__main__":
     env_id = 'BallOnPlate-v0'
-    dir = "bop/0_6"
+    dir = "bop/0_8"
     model_name = "best_model.zip"
-    # train_sb3(env_id, dir, model="A2C")
+    train_sb3(env_id, dir, model="PPO")
     # train_sb3(env_id, model_dir, tensorboard_dir, use_existing_model=f"{model_dir}/{model_name}")
-    run_sb3(env_id, dir, model_name, model="A2C")
+    # run_sb3(env_id, dir, model_name, model="PPO")
