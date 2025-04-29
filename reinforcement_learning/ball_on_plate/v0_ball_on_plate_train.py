@@ -6,8 +6,8 @@ from stable_baselines3.common.callbacks import EvalCallback
 
 import v0_ball_on_plate_env
 
-def train_sb3(env_id, model_dir, tensorboard_dir, use_existing_model=None):
-    os.makedirs(model_dir, exist_ok=True)
+def train_sb3(env_id, dir, model="PPO", use_existing_model=None):
+    os.makedirs(f"./models/{dir}", exist_ok=True)
 
     env = gym.make(env_id)
 
@@ -18,7 +18,7 @@ def train_sb3(env_id, model_dir, tensorboard_dir, use_existing_model=None):
         n_eval_episodes=10,
         deterministic=True,
         render=False,
-        best_model_save_path=f"{model_dir}"
+        best_model_save_path=f"./models/{dir}"
     )
     
     if use_existing_model is not None:
@@ -26,23 +26,25 @@ def train_sb3(env_id, model_dir, tensorboard_dir, use_existing_model=None):
             use_existing_model,
             env,
         )
-    else:
-        # model = A2C(
-        #     "MlpPolicy",
-        #     env,
-        #     verbose=1,
-        #     tensorboard_log="./tensorboard/"
-        # )
-        # model = DQN(
-        #     "MlpPolicy",
-        #     env,
-        #     verbose=1,
-        #     learning_rate=3e-4,
-        #     gamma=0.99,
-        #     batch_size=64,
-        #     tensorboard_log="./tensorboard/"
-        # )
-        # PPO mit angepassten Hyperparametern
+    if model == "A2C":
+        model = A2C(
+            "MlpPolicy",
+            env,
+            verbose=1,
+            tensorboard_log=f"./tensorboard/{dir}",
+        )
+    elif model == "DQN":
+        model = DQN(
+            "MlpPolicy",
+            env,
+            verbose=1,
+            learning_rate=3e-4,
+            gamma=0.99,
+            batch_size=64,
+            tensorboard_log=f"./tensorboard/{dir}",
+        )
+    # PPO mit angepassten Hyperparametern
+    elif model == "PPO":
         model = PPO(
             "MlpPolicy",
             env,
@@ -52,7 +54,7 @@ def train_sb3(env_id, model_dir, tensorboard_dir, use_existing_model=None):
             n_steps=256,
             batch_size=64,
             ent_coef=0.01,
-            tensorboard_log=f"./tensorboard/bop",
+            tensorboard_log=f"./tensorboard/{dir}",
         )
     
     # Training mit 500.000 Schritten
@@ -66,12 +68,12 @@ def train_sb3(env_id, model_dir, tensorboard_dir, use_existing_model=None):
             reset_num_timesteps=False
         )
 
-def run_sb3(env_id, model_dir, model_name):
+def run_sb3(env_id, dir, model_name):
 
     env = gym.make(env_id)
 
     model = PPO.load(
-        f"{model_dir}/{model_name}",
+        f"./models/{dir}/{model_name}",
         env=env
     )
 
@@ -93,9 +95,8 @@ def run_sb3(env_id, model_dir, model_name):
 
 if __name__ == "__main__":
     env_id = 'BallOnPlate-v0'
-    model_dir = "./models/bop/0"
+    dir = "bop/0_3"
     model_name = "best_model.zip"
-    tensorboard_dir = "BOP_0"
-    train_sb3(env_id, model_dir, tensorboard_dir)
+    train_sb3(env_id, dir)
     # train_sb3(env_id, model_dir, tensorboard_dir, use_existing_model=f"{model_dir}/{model_name}")
-    # run_sb3(env_id, model_dir, model_name)
+    # run_sb3(env_id, dir, model_name)

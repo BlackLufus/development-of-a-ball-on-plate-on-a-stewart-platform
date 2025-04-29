@@ -6,33 +6,25 @@ import time
 import numpy as np
 import pygame
 from os import path
-
-class BallOnPlateAction(Enum):
-    PITCH_UP_ROLL_UP = 0
-    PITCH_UP_ROLL_NULL = 1
-    PITCH_UP_ROLL_DOWN = 2
-    PITCH_NULL_ROLL_UP = 3
-    PITCH_NULL_ROLL_NULL = 4
-    PITCH_NULL_ROLL_DOWN = 5
-    PITCH_DOWN_ROLL_UP = 6
-    PITCH_DOWN_ROLL_NULL = 7
-    PITCH_DOWN_ROLL_DOWN = 8
     
 class BallOnPlate:
 
-    def __init__(self, fps=1, simulation_mode=True):
+    def __init__(self, target_pos: tuple[float, float] = None, fps=1, simulation_mode=True):
         self.screen_size = 512
 
         # Physikalische Parameter
-        self.real_width = 0.3  # 30 cm in Metern
+        self.real_width = 0.3 # 30 cm in Metern
         self.plate_radius = self.real_width / 2
+        self.boarder_distance = 0.05
         self.pixels_per_meter = 512 / self.real_width  # 1706.6667 px/m
         
         # Gravity
         self.g = 9.81
-        
-        # Target position
-        self.target_pos = (0, 0) # In meters
+        self.max_velocity = 0.15
+        self.max_angle = 7.5
+
+        # Target
+        self.target_pos = target_pos
 
         # Set random state
         self.np_random = np.random.RandomState()
@@ -98,49 +90,28 @@ class BallOnPlate:
         self.vy = 0.0 # s/t
         self.sx = self.np_random.uniform(-self.plate_radius, self.plate_radius) # Position in Meter
         self.sy = self.np_random.uniform(-self.plate_radius, self.plate_radius) # Position in Meter
+        if self.target_pos == None:
+            self.target_pos = (
+                self.np_random.uniform(-self.plate_radius + self.boarder_distance, self.plate_radius - self.boarder_distance),
+                self.np_random.uniform(-self.plate_radius + self.boarder_distance, self.plate_radius - self.boarder_distance)
+            )
         self.last_time = time.time()
 
-    def perform_action(self, action:BallOnPlateAction) -> bool:
+    def perform_action(self, action) -> bool:
+        # Store last action
         self.last_action = action
+
+        # check if it is simulation mode
         if self.simulation_mode:
             self.delta_t = 0.1
         else:
             self.current_time = time.time()
             self.delta_t = self.current_time - self.last_time
             self.last_time = self.current_time
-        self.step = 0.02
-        
-        if action == BallOnPlateAction.PITCH_UP_ROLL_UP:
-            self.pitch += self.step
-            self.roll += self.step
-        elif action == BallOnPlateAction.PITCH_UP_ROLL_NULL:
-            self.pitch += self.step
-        elif action == BallOnPlateAction.PITCH_UP_ROLL_DOWN:
-            self.pitch += self.step
-            self.roll -= self.step
-        elif action == BallOnPlateAction.PITCH_NULL_ROLL_UP:
-            self.roll += self.step
-        elif action == BallOnPlateAction.PITCH_NULL_ROLL_NULL:
-            pass
-        elif action == BallOnPlateAction.PITCH_NULL_ROLL_DOWN:
-            self.roll -= self.step
-        elif action == BallOnPlateAction.PITCH_DOWN_ROLL_UP:
-            self.pitch -= self.step
-            self.roll += self.step
-        elif action == BallOnPlateAction.PITCH_DOWN_ROLL_NULL:
-            self.pitch -= self.step
-        elif action == BallOnPlateAction.PITCH_DOWN_ROLL_DOWN:
-            self.pitch -= self.step
-            self.roll -= self.step
-        
-        if self.roll > 15:
-            self.roll = 15
-        elif self.roll < -15:
-            self.roll = 15
-        if self.pitch > 15:
-            self.pitch = 15
-        elif self.pitch < -15:
-            self.pitch
+
+        # Set roll and pitch for rotation
+        self.roll = action[0]
+        self.pitch = action[1]
 
         # Calculate accelerate for x
         roll_theta = math.radians(self.roll)
@@ -156,7 +127,7 @@ class BallOnPlate:
         # Calculcate velocity for y
         self.vy = self.vy + self.ay * self.delta_t
 
-        # friction
+        # friction (This need to be fixed)
         friction = 0.9999
         self.vx *=friction
         self.vy *=friction
@@ -265,11 +236,14 @@ class BallOnPlate:
 
 if __name__ == "__main__":
 
-    ballOnPlate = BallOnPlate(fps=27)
+    ballOnPlate = BallOnPlate(fps=60, simulation_mode=False)
     ballOnPlate.render()
     while(True):
 
-        random_action = random.choice(list(BallOnPlateAction))
+        random_action = (
+            np.random.uniform(-ballOnPlate.max_angle, ballOnPlate.max_angle),
+            np.random.uniform(-ballOnPlate.max_angle, ballOnPlate.max_angle)
+        )
         print(f"Performing action: {random_action}")
 
         ballOnPlate.perform_action(random_action)

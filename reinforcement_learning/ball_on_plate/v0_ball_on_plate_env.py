@@ -28,24 +28,32 @@ class BallOnPlateEnv(gym.Env):
         self.render_mode = render_mode
 
         self.ball = bop.BallOnPlate(fps=self.metadata["render_fps"])
-        self.action_space = spaces.Discrete(len(bop.BallOnPlateAction))
-
-        self.plate_radius = 0.15  # 15cm
-        self.max_velocity = np.sqrt(2 * 9.81 * self.plate_radius)  # ~1.7 m/s
-        self.max_angle = np.deg2rad(15)  # 15° in radiant
+        self.action_space = spaces.Box(
+            low=np.array([
+                -self.ball.max_angle,
+                -self.ball.max_angle
+            ]),
+            high=np.array([
+                self.ball.max_angle,
+                self.ball.max_angle
+            ]),
+            shape=(2, ),
+            dtype=np.float32
+        ) 
+        # spaces.Discrete(len(bop.BallOnPlateAction))
 
         self.observation_space = spaces.Box(
             low=np.array([
-                -1.0, -1.0, 
                 -1.0, -1.0,
-                -self.max_angle, -self.max_angle,
-                0.0, 0.0,
+                -1.0, -1.0,
+                -self.ball.max_angle, -self.ball.max_angle,
+                -1.0, -1.0,
                 0.0
             ]),
             high=np.array([
                 1.0, 1.0,
                 1.0, 1.0,
-                self.max_angle, self.max_angle,
+                self.ball.max_angle, self.ball.max_angle,
                 1.0, 1.0,
                 1.0
             ]),
@@ -56,17 +64,18 @@ class BallOnPlateEnv(gym.Env):
         self.max_steps = 100
 
     def _get_state(self):
-        return np.array([
-            self.ball.sx / self.plate_radius,
-            self.ball.sy / self.plate_radius,
-            self.ball.vx / self.max_velocity,
-            self.ball.vy / self.max_velocity,
+        obs = np.array([
+            self.ball.sx / self.ball.plate_radius,
+            self.ball.sy / self.ball.plate_radius,
+            self.ball.vx / self.ball.max_velocity,
+            self.ball.vy / self.ball.max_velocity,
             np.deg2rad(self.ball.roll),
             np.deg2rad(self.ball.pitch),
-            self.ball.target_pos[0] / self.plate_radius,
-            self.ball.target_pos[1] / self.plate_radius,
+            self.ball.target_pos[0] / self.ball.plate_radius,
+            self.ball.target_pos[1] / self.ball.plate_radius,
             1.0 if self.ball.isOnTarget else 0.0
         ], dtype=np.float32)
+        return obs
     
     def reset(self, seed=None, options=None):
         super().reset(seed=seed)
@@ -91,7 +100,7 @@ class BallOnPlateEnv(gym.Env):
 
         # Perform action and get some informations back
         old_dist = np.linalg.norm(np.array(self.ball.target_pos) - np.array([self.ball.sx, self.ball.sy]))
-        finish, isOnTarget, boarder_crossed = self.ball.perform_action(bop.BallOnPlateAction(action))
+        finish, isOnTarget, boarder_crossed = self.ball.perform_action(action)
         new_dist = np.linalg.norm(np.array(self.ball.target_pos) - np.array([self.ball.sx, self.ball.sy]))
 
         # Basic rewards
@@ -127,9 +136,9 @@ if __name__ == "__main__":
     env = gym.make("BallOnPlate-v0", render_mode="human")
     
     # Use this to check our custom environment
-    # print("Check environment begin")
-    # check_env(env.unwrapped)
-    # print("Check environment end")
+    print("Check environment begin")
+    check_env(env.unwrapped)
+    print("Check environment end")
 
     for _ in range(10):
         
@@ -145,7 +154,10 @@ if __name__ == "__main__":
             done = terminated or truncated
 
             if env.render_mode == "human":
-                print(bop.BallOnPlateAction(action))
+                if type(action) == bop.BallOnPlateAction:
+                    print(bop.BallOnPlateAction(action))
+                else:
+                    print(action)
                 print(f"Reward {reward}")
                 env.render()
         
