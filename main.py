@@ -38,11 +38,11 @@ def differentAngleServoTest(angleDict):
 
 def setAngle(platform: StewartPlatform, x: float, y: float, z: float, alpha: float, beta: float, gamma: float):
     leg_length_list = platform.calculate(x, y, z, alpha, beta, gamma)
-    # if leg_length_list != None:
-        # for index, leg_length in enumerate(leg_length_list):
-        #     print("length of leg ", index, ": ", leg_length)
+    if leg_length_list != None:
+        for index, leg_length in enumerate(leg_length_list):
+            print("length of leg ", index, ": ", leg_length)
 
-    angle_list = platform.getAngles(40, 100, leg_length_list)
+    angle_list = platform.getAngles(15, 65, leg_length_list)
     for index, angle in enumerate(angle_list):
         # print("angle of servo ", index, ": ", angle)
         smh.setRotationAngle(index, angle)
@@ -102,9 +102,9 @@ def longAngleServoTest():
             setAngle(platform, 0, 0, 94, i, -15, 0)
             time.sleep(period)
 
-def smoothCircleTest(radius=15, steps=100, period=0.01):
-    platform = StewartPlatform(100, [340, 20, 100, 140, 240, 280], 100, [350, 10, 110, 130, 250, 270])
-    setAngle(platform, 0, 0, 94, 0, 0, 0)
+def smoothCircleTest(platform, radius=15, steps=100, period=0.01):
+    # platform = StewartPlatform(100, [340, 20, 100, 140, 240, 280], 100, [350, 10, 110, 130, 250, 270])
+    setAngle(platform, 0, 0, 59, 0, 0, 0)
     time.sleep(2)
 
     angles = np.linspace(0, 2 * math.pi, steps)
@@ -119,11 +119,10 @@ def smoothCircleTest(radius=15, steps=100, period=0.01):
             y_offset = radius * math.sin(theta)
             # y_offset = 0
             # y_offset = np.random.uniform(-10, 10)
-            setAngle(platform, 0, 0, 94, x_offset, y_offset, 0)
+            setAngle(platform, 0, 0, 62, x_offset, y_offset, 0)
             time.sleep(period)
 
-def nunchukTest(radius=15, period=0.001):
-    platform = StewartPlatform(100, [340, 20, 100, 140, 240, 280], 100, [350, 10, 110, 130, 250, 270])
+def nunchukTest(platform, radius=7.5, period=0.001):
     nc = Nunchuk()
 
     while True:
@@ -143,14 +142,13 @@ def nunchukTest(radius=15, period=0.001):
         # print(y_offset)
 
         try:
-            setAngle(platform, 0, 0, 90 if button_z else 100 if button_c else 94, x_offset, y_offset, 0)
+            setAngle(platform, 0, 0, 62, x_offset, y_offset, 0)
         except:
             pass
 
         time.sleep(period)
 
-def nunchukAccelerometerTest(radius=90, min_radius=-15, max_radius=15, period=0.01):
-    platform = StewartPlatform(100, [340, 20, 100, 140, 240, 280], 100, [350, 10, 110, 130, 250, 270])
+def nunchukAccelerometerTest(platform, radius=90, min_radius=-15, max_radius=15, period=0.01):
     nc = Nunchuk()
 
     while True:
@@ -169,24 +167,28 @@ def nunchukAccelerometerTest(radius=90, min_radius=-15, max_radius=15, period=0.
             y_offset = min_radius
 
         try:
-            setAngle(platform, 0, 0, 94, x_offset, y_offset, 0)
+            setAngle(platform, 0, 0, 62, x_offset, y_offset, 0)
         except:
             pass
         time.sleep(period)
 
 if __name__ == '__main__':
-    platform = StewartPlatform(100, [340, 20, 100, 140, 240, 280], 100, [350, 10, 110, 130, 250, 270])
+    platform = StewartPlatform(86, [342, 18, 102, 138, 222, 258], 86, [347, 13, 107, 133, 227, 253])
     smh = ServoMotorHandler()
 
+    # for i in range(0, 6):
+    #     smh.setRotationAngle(i, 0)
+
     # The platform will transform to a fix position
-    # setAngle(platform, 0, 0, 100, 0, 0, 0)
+    # setAngle(platform, 0, 0, 64, 0, 0, 0)
 
     # Nnunchuck test
-    nunchukTest()
-    # nunchukAccelerometerTest()
+    nunchukTest(platform)
+    # nunchukAccelerometerTestplatform
+    # nunchukAccelerometerTest(platform)
 
     # Smooth circly test
-    # smoothCircleTest(radius=15, steps=300, period=0.001)
+    # smoothCircleTest(platform=platform, radius=7.5, steps=300, period=0.001)
 
     # Makes the platform dance
     # longAngleServoTest()

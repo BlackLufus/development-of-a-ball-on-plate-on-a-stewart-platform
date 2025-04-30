@@ -8,9 +8,9 @@ class ServoMotorHandler:
     # Standard deviation for each angle so that the r-axis is horizontal
     # servo: angle deviation
     deviation = {
-        0: 7,  # Rechts
+        0: 8,  # Rechts
         1: 5,  # Links
-        2: 3,  # Rechts
+        2: 6,  # Rechts
         3: 8,  # Links
         4: 7, # Rechts
         5: 2   # Links
