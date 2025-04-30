@@ -21,7 +21,7 @@ class BallOnPlateEnv(gym.Env):
     The robot can move in four directions: up, down, left, right.
     The robot receives a reward of +1 for picking up the target object and -1 for hitting the walls.
     """
-    metadata = {"render_modes": ["human"], "render_fps": 60, "simulation_mode": True}
+    metadata = {"render_modes": ["human"], "render_fps": 60, "simulation_mode": False}
 
     def __init__(self, render_mode=None):
         super().__init__()

@@ -7,7 +7,7 @@ from stable_baselines3.common.callbacks import EvalCallback
 
 import v0_ball_on_plate_env
 
-def train_sb3(env_id, dir, model="PPO", use_existing_model=None):
+def train_sb3(env_id, dir, model="PPO", use_existing_model=None, device='cpu'):
     os.makedirs(f"./models/{dir}", exist_ok=True)
 
     env = gym.make(env_id)
@@ -26,7 +26,8 @@ def train_sb3(env_id, dir, model="PPO", use_existing_model=None):
         if use_existing_model is not None:
             model = A2C.load(
                 use_existing_model,
-                env
+                env,
+                device=device
             )
         else:
             model = A2C(
@@ -36,12 +37,14 @@ def train_sb3(env_id, dir, model="PPO", use_existing_model=None):
                 learning_rate=3e-4,
                 gamma=0.99,
                 tensorboard_log=f"./tensorboard/{dir}",
+                device=device
             )
     elif model == "DQN":
         if use_existing_model is not None:
             model = DQN(
                 use_existing_model,
-                env
+                env,
+                device=device
             )
         else:
             model = DQN(
@@ -52,13 +55,15 @@ def train_sb3(env_id, dir, model="PPO", use_existing_model=None):
                 gamma=0.99,
                 batch_size=64,
                 tensorboard_log=f"./tensorboard/{dir}",
+                device=device
             )
     # PPO mit angepassten Hyperparametern
     elif model == "PPO":
         if use_existing_model is not None:
             model = PPO(
                 use_existing_model,
-                env
+                env,
+                device=device
             )
         else:
             model = PPO(
@@ -71,6 +76,7 @@ def train_sb3(env_id, dir, model="PPO", use_existing_model=None):
                 batch_size=64,
                 ent_coef=0.01,
                 tensorboard_log=f"./tensorboard/{dir}",
+                device=device
             )
     
     # Training mit 500.000 Schritten
@@ -131,8 +137,8 @@ def run_sb3(env_id, dir, model_name, model="PPO", episods=10):
 
 if __name__ == "__main__":
     env_id = 'BallOnPlate-v0'
-    dir = "bop/0_8"
+    dir = "bop/0_9"
     model_name = "best_model.zip"
-    train_sb3(env_id, dir, model="PPO")
-    # train_sb3(env_id, model_dir, tensorboard_dir, use_existing_model=f"{model_dir}/{model_name}")
+    train_sb3(env_id, dir, model="PPO", device='auto')
+    # train_sb3(env_id, model_dir, tensorboard_dir, useopencl_existing_model=f"{model_dir}/{model_name}")
     # run_sb3(env_id, dir, model_name, model="PPO")
