@@ -48,11 +48,11 @@ sliders = {
 		'value': 0
 	},
 	"z-axis": {
-		'slider': slider(100), 
+		'slider': slider(50), 
 		'textBox': tb(),
-		'min': 70,
-		'max': 100,
-		'value': 100
+		'min': 60,
+		'max': 80,
+		'value': 70
 	},
 	"roll": {
 		'slider': slider(50), 
@@ -78,7 +78,8 @@ sliders = {
 }
 for i, s in enumerate(sliders):
 	value = updateSliderValue(sliders[s])
-	sliders[s]['textBox'].setText(value)
+	print(value)
+	sliders[s]['textBox'].setText(str(value))
 	sliders[s]['value'] = value
 	sliders[s]['textBox'].disable()
 	sliders[s]['slider'].moveY(10 + 30 * i)
@@ -121,7 +122,7 @@ while run:
 
 				value = updateSliderValue(sliders[s])
 
-				sliders[s]['textBox'].setText(value)
+				sliders[s]['textBox'].setText(str(value))
 				sliders[s]['value'] = value
 				print(s, ": ", value)
 			# [sliders[s][1].setText(sliders[s][0].getValue()) for s in sliders]
