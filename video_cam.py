@@ -1,5 +1,6 @@
 # https://www.geeksforgeeks.org/python-opencv-capture-video-from-camera/
 import asyncio
+from collections import deque
 import time
 import av
 import numpy as np
@@ -13,7 +14,7 @@ class CameraThreadWithAV:
             device_name = "Logitech BRIO", 
             options = {
                 "video_size": "1280x720",
-                "framerate": "60"
+                "framerate": "30"
             },
             # options = {
             #     "video_size": "1920x1080",
@@ -29,18 +30,25 @@ class CameraThreadWithAV:
         self.thread.start()
 
     def update(self):
-        fps_times = []
-        for frame in self.container.decode(video=0):
-            if not self.running:
-                break
-            self.img = frame.to_ndarray(format="bgr24")
-            self.frame_num += 1
+        # fps times (sliding window technique)
+        fps_times = deque()
+        try:
+            for frame in self.container.decode(video=0):
+                if not self.running:
+                    break
+                self.img = frame.to_ndarray(format="bgr24")
+                self.frame_num += 1
 
-            # Calculate fps
-            now = time.time()
-            fps_times.append(now)
-            fps_times = [t for t in fps_times if now - t < 1]
-            self.fps = len(fps_times)
+                # Calculate fps
+                now = time.monotonic()
+                fps_times.append(now)
+                while fps_times and (now - fps_times[0] > 1.0):
+                    fps_times.popleft()
+
+                self.fps = len(fps_times)
+        except:
+            print("Videoquelle beendet oder Fehler beim Lesen.")
+            self.running = False
     
     def read(self):
         if self.img is None:
@@ -57,6 +65,10 @@ class CameraThread:
         self.frame_num = 0
 
         self.cap = cv2.VideoCapture(cam_index, cv2.CAP_DSHOW)
+        self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
+        self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
+        self.cap.set(cv2.CAP_PROP_POS_FRAMES, 60)
+        self.cap.set(cv2.CAP_PROP_FPS, 60)
         self.ret, self.frame = self.cap.read()
         self.fps = 1
 
@@ -65,15 +77,18 @@ class CameraThread:
         self.thread.start()
 
     def update(self):
-        fps_times = []
+        fps_times = deque()
         while self.running:
             self.ret, self.frame = self.cap.read()
             self.frame_num += 1
 
             # Calculate fps
-            now = time.time()
+            now = time.monotonic()
             fps_times.append(now)
-            fps_times = [t for t in fps_times if now - t < 1]
+            
+            while fps_times and (now - fps_times[0] > 1):
+                fps_times.popleft()
+
             self.fps = len(fps_times)
 
     def read(self):
@@ -170,24 +185,24 @@ def get_frame_with_thread():
         cv2.destroyAllWindows()
 
 def get_frame_with_av_thread():
-    cam = CameraThreadWithAV()
+    cam = CameraThreadWithAV("Microsoft® LifeCam HD-3000")
 
     last_frame_num = cam.frame_num
     try:
-        while True:
+        while cam.running:
             if last_frame_num != cam.frame_num:
                 last_frame_num = cam.frame_num
 
-            frame, fps, frame_num = cam.read()
-            if frame is not None:
-                print(f"FPS: {fps} (num: {frame_num})")
+                frame, fps, frame_num = cam.read()
+                if frame is not None:
+                    print(f"FPS: {fps} (num: {frame_num})")
 
-                # Anzeige des Bildes
-                cv2.imshow("Threaded Camera", frame)
+                    # Anzeige des Bildes
+                    cv2.imshow("Threaded Camera", frame)
 
-                # Mit 'q' beenden
-                if cv2.waitKey(1) & 0xFF == ord('q'):
-                    break
+                    # Mit 'q' beenden
+                    if cv2.waitKey(1) & 0xFF == ord('q'):
+                        break
 
     finally:
         cam.stop()
