@@ -47,64 +47,61 @@ def setAngle(platform: StewartPlatform, x: float, y: float, z: float, alpha: flo
         # print("angle of servo ", index, ": ", angle)
         smh.setRotationAngle(index, angle)
 
-def longAngleServoTest():
-    platform = StewartPlatform(100, [340, 20, 100, 140, 240, 280], 100, [350, 10, 110, 130, 250, 270])
-    setAngle(platform, 0, 0, 94, 0, 0, 0)
+def longAngleServoTest(platfowm, radius=5.8, steps=0.1, period=0):
+    setAngle(platform, 0, 0, 62, 0, 0, 0)
     time.sleep(2)
-    steps = 0.1
-    period = 0
     while True:
-        # setAngle(0, 0, 94, 15, 0, 0)
+        # setAngle(0, 0, 62, 15, 0, 0)
         print("Step 1")
-        for i in np.arange(-15, 0, steps):
-            setAngle(platform, 0, 0, 94, 15, i, 0)
+        for i in np.arange(-radius, 0, steps):
+            setAngle(platform, 0, 0, 62, radius, i, 0)
             time.sleep(period)
 
-        # setAngle(0, 0, 94, 15, 15, 0)
+        # setAngle(0, 0, 62, 15, 15, 0)
         print("Step 2")
-        for i in np.arange(0, 15, steps):
-            setAngle(platform, 0, 0, 94, 15, i, 0)
+        for i in np.arange(0, radius, steps):
+            setAngle(platform, 0, 0, 62, radius, i, 0)
             time.sleep(period)
 
-        # setAngle(0, 0, 94, 0, 15, 0)
+        # setAngle(0, 0, 62, 0, 15, 0)
         print("Step 3")
-        for i in np.arange(15, 0, -steps):
-            setAngle(platform, 0, 0, 94, i, 15, 0)
+        for i in np.arange(radius, 0, -steps):
+            setAngle(platform, 0, 0, 62, i, radius, 0)
             time.sleep(period)
 
-        # setAngle(0, 0, 94, -15, 15, 0)
+        # setAngle(0, 0, 62, -15, 15, 0)
         print("Step 4")
-        for i in np.arange(0, -15, -steps):
-            setAngle(platform, 0, 0, 94, i, 15, 0)
+        for i in np.arange(0, -radius, -steps):
+            setAngle(platform, 0, 0, 62, i, radius, 0)
             time.sleep(period)
 
-        # setAngle(0, 0, 94, -15, 0, 0)
+        # setAngle(0, 0, 62, -15, 0, 0)
         print("Step 5")
-        for i in np.arange(15, 0, -steps):
-            setAngle(platform, 0, 0, 94, -15, i, 0)
+        for i in np.arange(radius, 0, -steps):
+            setAngle(platform, 0, 0, 62, -radius, i, 0)
             time.sleep(period)
 
-        # setAngle(0, 0, 94, -15, -15, 0)
+        # setAngle(0, 0, 62, -15, -15, 0)
         print("Step 6")
-        for i in np.arange(0, -15, -steps):
-            setAngle(platform, 0, 0, 94, -15, i, 0)
+        for i in np.arange(0, -radius, -steps):
+            setAngle(platform, 0, 0, 62, -radius, i, 0)
             time.sleep(period)
 
-        # setAngle(0, 0, 94, 0, -15, 0)
+        # setAngle(0, 0, 62, 0, -15, 0)
         print("Step 7")
-        for i in np.arange(-15, 0, steps):
-            setAngle(platform, 0, 0, 94, i, -15, 0)
+        for i in np.arange(-radius, 0, steps):
+            setAngle(platform, 0, 0, 62, i, -radius, 0)
             time.sleep(period)
 
-        # setAngle(0, 0, 94, 15, -15, 0)
+        # setAngle(0, 0, 62, 15, -15, 0)
         print("Step 8")
-        for i in np.arange(0, 15, steps):
-            setAngle(platform, 0, 0, 94, i, -15, 0)
+        for i in np.arange(0, radius, steps):
+            setAngle(platform, 0, 0, 62, i, -radius, 0)
             time.sleep(period)
 
-def smoothCircleTest(platform, radius=15, steps=100, period=0.01):
+def smoothCircleTest(platform, radius=6.5, steps=100, period=0.01):
     # platform = StewartPlatform(100, [340, 20, 100, 140, 240, 280], 100, [350, 10, 110, 130, 250, 270])
-    setAngle(platform, 0, 0, 59, 0, 0, 0)
+    setAngle(platform, 0, 0, 62, 0, 0, 0)
     time.sleep(2)
 
     angles = np.linspace(0, 2 * math.pi, steps)
@@ -183,18 +180,19 @@ if __name__ == '__main__':
     # setAngle(platform, 0, 0, 64, 0, 0, 0)
 
     # Nnunchuck test
-    nunchukTest(platform, 4)
+    nunchukTest(platform, 6.5)
+
     # nunchukAccelerometerTestplatform
-    # nunchukAccelerometerTest(platform)
+    # nunchukAccelerometerTest(platform, min_radius=-5.5, max_radius=5.5)
 
     # Smooth circly test
-    # smoothCircleTest(platform=platform, radius=7.5, steps=300, period=0.001)
+    # smoothCircleTest(platform=platform, radius=6.5, steps=200, period=0.01)
 
     # Makes the platform dance
-    # longAngleServoTest()
+    # longAngleServoTest(platform)
 
     # Reset the platform to zero
-    # quickServoTest(0)
+    # quickServoTest(40)
 
     # Manipulate each angle seperatly
     # differentAngleServoTest({
