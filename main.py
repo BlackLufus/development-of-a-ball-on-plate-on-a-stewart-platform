@@ -173,7 +173,7 @@ def nunchukAccelerometerTest(platform, radius=90, min_radius=-15, max_radius=15,
         time.sleep(period)
 
 if __name__ == '__main__':
-    platform = StewartPlatform(86, [342, 18, 102, 138, 222, 258], 86, [347, 13, 107, 133, 227, 253])
+    platform = StewartPlatform(86, [343, 17, 103, 137, 223, 257], 86, [347, 13, 107, 133, 227, 253])
     smh = ServoMotorHandler()
 
     # for i in range(0, 6):
@@ -183,7 +183,7 @@ if __name__ == '__main__':
     # setAngle(platform, 0, 0, 64, 0, 0, 0)
 
     # Nnunchuck test
-    nunchukTest(platform)
+    nunchukTest(platform, 4)
     # nunchukAccelerometerTestplatform
     # nunchukAccelerometerTest(platform)
 

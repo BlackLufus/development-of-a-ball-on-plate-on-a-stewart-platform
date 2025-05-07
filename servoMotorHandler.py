@@ -12,7 +12,7 @@ class ServoMotorHandler:
         1: 5,  # Links
         2: 6,  # Rechts
         3: 8,  # Links
-        4: 7, # Rechts
+        4: 10, # Rechts
         5: 2   # Links
     }
 

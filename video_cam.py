@@ -10,19 +10,30 @@ import threading
 
 class CameraThreadWithAV:
     def __init__(
-            self, 
-            device_name = "Logitech BRIO", 
+            self,
+            # Windows
+            # device_name = f"video={Logitech BRIO}", 
+            # options = {
+            #     "video_size": "1280x720",
+            #     "framerate": "30"
+            # },
+            # format = "dshow"
+
+            # Linux 
+            # Check which camera is connected
+            # > v4l2-ctl --list-device
+            # Check for available options
+            # > 4l2-ctl --device=/dev/video1 --list-formats-ext
+            device_name = "/dev/video1", 
             options = {
                 "video_size": "1280x720",
-                "framerate": "30"
+                "framerate": "20",
+                "input_format": "mjpeg"
             },
-            # options = {
-            #     "video_size": "1920x1080",
-            #     "framerate": "30"
-            # }
+            format = "v4l2"
         ):
         self.frame_num = 0
-        self.container = av.open(f"video={device_name}", options=options, format="dshow")
+        self.container = av.open(file=device_name, options=options, format=format)
         self.img = None
         
         self.running = True
@@ -64,15 +75,30 @@ class CameraThread:
     def __init__(self, cam_index=0):
         self.frame_num = 0
 
+        # Windows
         self.cap = cv2.VideoCapture(cam_index, cv2.CAP_DSHOW)
+
+        # Linux
+        self.cap = cv2.VideoCapture(cam_index, cv2.CAP_V4L2)
+        self.cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc('M', 'J', 'P', 'G'))
+
+        # Set resolution
         self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
         self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
-        self.cap.set(cv2.CAP_PROP_POS_FRAMES, 60)
+
+        # Set frames per second
         self.cap.set(cv2.CAP_PROP_FPS, 60)
+
+        # Read first image
         self.ret, self.frame = self.cap.read()
+
+        # Current fps
         self.fps = 1
 
+        # Is thread running
         self.running = True
+
+        # Setup and start thread
         self.thread = threading.Thread(target=self.update, daemon=True)
         self.thread.start()
 
@@ -157,7 +183,7 @@ def returnCameraIndexes():
     return arr
 
 def get_frame_with_thread():
-    cam = CameraThread(cam_index=0)
+    cam = CameraThread(cam_index=1)
     
     last_frame_num = cam.frame_num
     try:
@@ -185,7 +211,8 @@ def get_frame_with_thread():
         cv2.destroyAllWindows()
 
 def get_frame_with_av_thread():
-    cam = CameraThreadWithAV("Microsoft® LifeCam HD-3000")
+    # cam = CameraThreadWithAV("Microsoft® LifeCam HD-3000")
+    cam = CameraThreadWithAV()
 
     last_frame_num = cam.frame_num
     try:
@@ -206,12 +233,10 @@ def get_frame_with_av_thread():
 
     finally:
         cam.stop()
-            
-
 
 if __name__ == "__main__":
-    get_frame_with_av_thread()
-    # get_frame_with_thread()
+    # get_frame_with_av_thread()
+    get_frame_with_thread()
     # get_frame_as_stream(video_source=0)
     # print(returnCameraIndexes())
     # get_frame_with_delay()
