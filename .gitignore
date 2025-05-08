@@ -177,3 +177,4 @@ cython_debug/
 /tensorboard
 /models
 /temp
+/log

@@ -43,7 +43,7 @@ class Manager:
         self.setup_logger()
         self.logger.info("========================================")
         self.logger.info("Start programm StewartPlatform.")
-        self.logger.info("     -----     ")
+        self.logger.info("-----")
         atexit.register(self.__cleanup__)
 
     def __cleanup__(self):
@@ -88,28 +88,27 @@ class Manager:
         logger = logging.getLogger("StewartPlatform") # Get logger by name
         logger.setLevel(__log_level) # Set log level
 
-        # Prevent to add multiple handlers
-        if not self.logger:
+        # Logging formatter
+        formatter = logging.Formatter(
+            '[%(asctime)s] %(name)s %(levelname)s: %(message)s', 
+            datefmt='%H:%M:%S'
+        )
 
-            # Logging formatter
-            formatter = logging.Formatter(
-                '[%(asctime)s] %(name)s %(levelname)s: %(message)s', 
-                datefmt='%H:%M:%S'
-            )
+        # Logging to file
+        if not os.path.isdir(self.log_dir_path):
+            os.mkdir(self.log_dir_path)
+        log_filename = f"{datetime.now().strftime('%Y%m%d_%H%M%S')}.log" # Generate file name
+        log_filepath = os.path.join(self.log_dir_path, log_filename) # Get file path
+        fileHandler = logging.FileHandler(log_filepath) # Create an file handler
+        fileHandler.setLevel(__log_level) # Set log level
+        fileHandler.setFormatter(formatter) # Set formatter
+        logger.addHandler(fileHandler) # Add file handler to logger
 
-            # Logging to file
-            log_filename = f"{datetime.now().strftime('%Y%m%d_%H%M%S')}.log" # Generate file name
-            log_filepath = os.path.join(self.log_dir_path, log_filename) # Get file path
-            fileHandler = logging.FileHandler(log_filepath) # Create an file handler
-            fileHandler.setLevel(__log_level) # Set log level
-            fileHandler.setFormatter(formatter) # Set formatter
-            logger.addHandler(fileHandler) # Add file handler to logger
-
-            # Logging for console
-            streamHandler = logging.StreamHandler() # Create an stream handler
-            streamHandler.setLevel(__log_level) # Set log level
-            streamHandler.setFormatter(formatter) # set formatter
-            logger.addHandler(streamHandler) # Add stream handler to logger
+        # Logging for console
+        streamHandler = logging.StreamHandler() # Create an stream handler
+        streamHandler.setLevel(__log_level) # Set log level
+        streamHandler.setFormatter(formatter) # set formatter
+        logger.addHandler(streamHandler) # Add stream handler to logger
 
         # Set logger
         self.logger = logger
@@ -294,7 +293,8 @@ def main(
         radius: float,
         steps: int,
         period: float,
-        log_level: int
+        log_level: int,
+        log_dir: str,
 ) -> None:
     """
     Main function to execute different operational modes for the system.
@@ -317,7 +317,7 @@ def main(
         - If an invalid mode is provided, a message will prompt the user to use 
             the help option for available modes.
     """
-    manager = Manager(log_level)
+    manager = Manager(log_level, log_dir)
 
     if mode == 'nunchuck':
         manager.nunchukTest(radius, period)
@@ -407,6 +407,15 @@ if __name__ == '__main__':
         default=10,
         choices=[10, 20, 30, 40, 50],
     )
+    # Add an argument to set the logging dir for the application
+    parser.add_argument(
+        '-ld',
+        '--log_dir',
+        help='Specifies the logging dir for the application. ',
+        required=False,
+        type=str,
+        default='./log'
+    )
 
     # Parse the command-line arguments
     args = parser.parse_args()
@@ -418,5 +427,6 @@ if __name__ == '__main__':
         args.radius,
         args.steps,
         args.period,
-        args.log_level
+        args.log_level,
+        args.log_dir
     )
