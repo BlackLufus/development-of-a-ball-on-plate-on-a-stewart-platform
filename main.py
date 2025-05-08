@@ -5,16 +5,17 @@ import time
 
 import numpy as np
 
-from stewart_platform.nunchuk import Nunchuk
-from stewart_platform.servo_motor_handler import ServoMotorHandler
+# from stewart_platform.nunchuk import Nunchuk
+# from stewart_platform.servo_motor_handler import ServoMotorHandler
 from stewart_platform.stewart_platform import StewartPlatform
+from stewart_platform.reinforcement_learning.ball_on_plate.v0_ball_on_plate_train import run_sb3
 
 class Manager:
 
     def __init__(self, log_level):
         self.log_level = log_level
         self.platform = StewartPlatform(86, [343, 17, 103, 137, 223, 257], 86, [347, 13, 107, 133, 227, 253])
-        self.smh = ServoMotorHandler()
+        # self.smh = ServoMotorHandler()
 
     def setup_logger(self):
         __log_level = self.log_level
@@ -62,6 +63,7 @@ class Manager:
                 time.sleep(period)
             
     def nunchukTest(self, radius=7.5, period=0.001):
+        exit()
         nc = Nunchuk()
 
         while True:
@@ -86,49 +88,64 @@ class Manager:
                 pass
 
             time.sleep(period)
+    
+    def ballOnPlateTest(self, virtual=True):
+        env_id = 'BallOnPlate-v0'
+        dir = "bop/0_8"
+        model_name = "best_model.zip"
+        run_sb3(env_id, dir, model_name, model="PPO")
+
             
 def main(
-        nunchuck: bool,
-        quick_test: bool,
-        ball_on_plate: bool,
-        reinforcement_learning_mode: str,
+        mode: str,
+        reinforcement_learning_virtual: bool,
         radius: float,
         steps: int,
         period: float,
+        log_level: int
 ) -> None:
-    manager = Manager()
+    manager = Manager(log_level)
 
-    if nunchuck:
+    if mode == 'nunchuck':
         manager.nunchukTest(radius, period)
-    elif quick_test:
+    elif mode == 'quick_test':
         manager.quickTest(radius, steps, period)
-    elif ball_on_plate:
-        print("Ball-on-plate mode selected (not implemented yet).")
+    elif mode == 'ball_on_plate':
+        if not reinforcement_learning_virtual:
+            print("Ball-on-plate mode selected (not implemented yet).")
+        else:
+            manager.ballOnPlateTest()
     else:
         print("No mode selected. Use --help to see available options.")
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
-        prog='Stewart Platform',
-        description='It is a programm to control a stewart platform',
-        epilog='Test'
+        prog='Stewart Platform Controller',
+        description='A program to control a Stewart platform for various test modes and experiments.',
+        epilog='For more information, refer to the documentation or contact the developer.'
     )
     parser.add_argument(
-        '-h',
-        '--help',
-        help='Shows all available arguments',
-        required=False
+        '---help',
+        help='Displays all available arguments and their descriptions.',
+        action='help'
     )
     parser.add_argument(
-        '-m'
+        '-m',
         '--mode',
         required=True,
-        choices=['nunchuck', 'quick_test', 'ball_on_plate']
+        choices=['nunchuck', 'quick_test', 'ball_on_plate'],
+        help='Specifies the mode of operation for the Stewart platform. '
+             'Options are: '
+             '"nunchuck" to control the platform using a Nunchuk controller, '
+             '"quick_test" to perform a quick circular motion test, '
+             'or "ball_on_plate" to execute the ball-on-plate experiment.'
     )
     parser.add_argument(
         '-rfm',
         '--reinforcement_learning_mode',
-        help='Execute the ball on plate example in virtual or real environment',
+        help='Defines the environment for the ball-on-plate experiment. '
+             'Choose "virtual" to run the simulation in a virtual environment, '
+             'or "real" to execute it on the physical platform.',
         required=False,
         type=str,
         default='virtual',
@@ -137,36 +154,48 @@ if __name__ == '__main__':
     parser.add_argument(
         '-r',
         '--radius',
-        help='Radius',
+        help='Specifies the radius of the circular motion or offset range for the tests. '
+             'This value determines the extent of movement in the x and y directions.',
         required=False,
         type=float,
         default=6.5,
-    ),
+    )
     parser.add_argument(
         '-s',
         '--steps',
-        help='Steps',
+        help='Defines the number of steps for the circular motion in the quick test mode. '
+             'A higher number results in smoother motion.',
         required=False,
         type=int,
         default=100,
-    ),
+    )
     parser.add_argument(
         '-p',
         '--period',
-        help='Period',
+        help='Specifies the time interval (in seconds) between each step of the motion. '
+             'A smaller value results in faster motion.',
         required=False,
         type=float,
         default=0.05,
-    ),
+    )
+    parser.add_argument(
+        '-l',
+        '--log_level',
+        help='Specifies the logging level for the application. '
+             'Options include DEBUG, INFO, WARNING, ERROR, and CRITICAL.',
+        required=False,
+        type=int,
+        default=10,
+        choices=[10, 20, 30, 40, 50],
+    )
 
     args = parser.parse_args()
 
     main(
-        args.nunchuck,
-        args.quick_test,
-        args.ball_on_plate,
+        args.mode,
         args.reinforcement_learning_mode,
         args.radius,
         args.steps,
-        args.period
+        args.period,
+        args.log_level
     )

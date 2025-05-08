@@ -233,7 +233,7 @@ class BallOnPlate:
 
 if __name__ == "__main__":
 
-    ballOnPlate = BallOnPlate(fps=60, simulation_mode=False)
+    ballOnPlate = BallOnPlate(fps=20, simulation_mode=False)
     ballOnPlate.render()
     while(True):
 

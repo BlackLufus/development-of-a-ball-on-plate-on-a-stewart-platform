@@ -5,7 +5,7 @@ import numpy as np
 from stable_baselines3 import A2C, DQN, PPO
 from stable_baselines3.common.callbacks import EvalCallback
 
-import v0_ball_on_plate_env
+from stewart_platform.reinforcement_learning.ball_on_plate import v0_ball_on_plate_env
 
 def train_sb3(env_id, dir, model="PPO", use_existing_model=None, device='cpu'):
     os.makedirs(f"./models/{dir}", exist_ok=True)
@@ -96,7 +96,7 @@ def train_sb3(env_id, dir, model="PPO", use_existing_model=None, device='cpu'):
 
 def run_sb3(env_id, dir, model_name, model="PPO", episods=10):
 
-    env = gym.make(env_id)
+    env = gym.make(env_id, simulation_mode=False)
 
     if model == "A2C":
         model = A2C.load(

@@ -4,14 +4,14 @@ from gymnasium.envs.registration import register
 from gymnasium.utils.env_checker import check_env
 
 
-import v0_ball_on_plate as bop
+from stewart_platform.reinforcement_learning.ball_on_plate import v0_ball_on_plate as bop
 import numpy as np
 
 gym.registry.clear()
 
 register(
     id="BallOnPlate-v0",
-    entry_point="v0_ball_on_plate_env:BallOnPlateEnv",
+    entry_point="stewart_platform.reinforcement_learning.ball_on_plate.v0_ball_on_plate_env:BallOnPlateEnv",
 )
 
 class BallOnPlateEnv(gym.Env):
@@ -21,13 +21,13 @@ class BallOnPlateEnv(gym.Env):
     The robot can move in four directions: up, down, left, right.
     The robot receives a reward of +1 for picking up the target object and -1 for hitting the walls.
     """
-    metadata = {"render_modes": ["human"], "render_fps": 60, "simulation_mode": False}
+    metadata = {"render_modes": ["human"]}
 
-    def __init__(self, render_mode=None):
+    def __init__(self, render_mode=None, render_fps=60, simulation_mode=True):
         super().__init__()
         self.render_mode = render_mode
 
-        self.ball = bop.BallOnPlate(fps=self.metadata["render_fps"], simulation_mode=self.metadata["simulation_mode"])
+        self.ball = bop.BallOnPlate(fps=render_fps, simulation_mode=simulation_mode)
         self.action_space = spaces.Box(
             low=np.array([
                 -self.ball.max_angle,
@@ -133,7 +133,7 @@ class BallOnPlateEnv(gym.Env):
         self.ball.render()
     
 if __name__ == "__main__":
-    env = gym.make("BallOnPlate-v0", render_mode="human")
+    env = gym.make("BallOnPlate-v0", render_mode="human", simulation_mode=True)
     
     # Use this to check our custom environment
     print("Check environment begin")
