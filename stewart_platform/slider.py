@@ -5,8 +5,8 @@ from pygame_widgets.textbox import TextBox
 from pygame_widgets.dropdown import Dropdown
 #import time
 import math
-from stewartPlatform import StewartPlatform
-from servoMotorHandler import ServoMotorHandler
+from stewart_platform.stewart_platform import StewartPlatform
+from stewart_platform.servo_motor_handler import ServoMotorHandler
 
 def updateSliderValue(slider):
 	value = slider['slider'].getValue()

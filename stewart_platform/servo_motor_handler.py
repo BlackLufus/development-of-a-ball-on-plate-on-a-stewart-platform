@@ -1,7 +1,9 @@
-from PCA9685 import PCA9685
+import logging
+from stewart_platform.PCA9685 import PCA9685
 
 class ServoMotorHandler:
-    def __init__(self) -> None:
+    def __init__(self, logger=None) -> None:
+        self.logger = logger or logging.getLogger("StewartPlatform.ServoMotorHander")
         self.pwm = PCA9685()
         self.pwm.setPWMFreq(50)
 
@@ -29,4 +31,4 @@ class ServoMotorHandler:
             # print(temp)
             self.pwm.setRotationAngle(servo, temp)
         else:
-            print("Angle out of range")
+            self.logger.error("Angle out of range")

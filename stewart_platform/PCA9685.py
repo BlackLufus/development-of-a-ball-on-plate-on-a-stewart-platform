@@ -1,5 +1,6 @@
 #!/usr/bin/python
 
+import logging
 import time
 import math
 import smbus
@@ -28,25 +29,23 @@ class PCA9685:
   __ALLLED_OFF_H       = 0xFD
 
 
-  def __init__(self, address=0x40, debug=False):
+  def __init__(self, logger=None, address=0x40):
+    self.logger = logger or logging.getLogger("StewartPlatform.PCA9685")
     self.bus = smbus.SMBus(1)
     self.address = address
-    self.debug = debug
-    if (self.debug):
-      print("Reseting PCA9685")
+    self.logger.debug("Reseting PCA9685")
     self.write(self.__MODE1, 0x00)
 	
   def write(self, reg, value):
     "Writes an 8-bit value to the specified register/address"
     self.bus.write_byte_data(self.address, reg, value)
     if (self.debug):
-      print("I2C: Write 0x%02X to register 0x%02X" % (value, reg))
+      self.logger.debug("I2C: Write 0x%02X to register 0x%02X" % (value, reg))
 	  
   def read(self, reg):
     "Read an unsigned byte from the I2C device"
     result = self.bus.read_byte_data(self.address, reg)
-    if (self.debug):
-      print("I2C: Device 0x%02X returned 0x%02X from reg 0x%02X" % (self.address, result & 0xFF, reg))
+    self.logger.debug("I2C: Device 0x%02X returned 0x%02X from reg 0x%02X" % (self.address, result & 0xFF, reg))
     return result
 	
   def setPWMFreq(self, freq):
@@ -55,12 +54,10 @@ class PCA9685:
     prescaleval /= 4096.0       # 12-bit
     prescaleval /= float(freq)
     prescaleval -= 1.0
-    if (self.debug):
-      print("Setting PWM frequency to %d Hz" % freq)
-      print("Estimated pre-scale: %d" % prescaleval)
+    self.logger.debug("Setting PWM frequency to %d Hz" % freq)
+    self.logger.debug("Estimated pre-scale: %d" % prescaleval)
     prescale = math.floor(prescaleval + 0.5)
-    if (self.debug):
-      print("Final pre-scale: %d" % prescale)
+    self.logger.debug("Final pre-scale: %d" % prescale)
 
     oldmode = self.read(self.__MODE1)
     newmode = (oldmode & 0x7F) | 0x10        # sleep
@@ -77,8 +74,7 @@ class PCA9685:
     self.write(self.__LED0_ON_H+4*channel, on >> 8)
     self.write(self.__LED0_OFF_L+4*channel, off & 0xFF)
     self.write(self.__LED0_OFF_H+4*channel, off >> 8)
-    if (self.debug):
-      print("channel: %d  LED_ON: %d LED_OFF: %d" % (channel,on,off))
+    self.logger.debug("channel: %d  LED_ON: %d LED_OFF: %d" % (channel,on,off))
 	  
   def setServoPulse(self, channel, pulse):
     "Sets the Servo Pulse,The PWM frequency must be 50HZ"
@@ -90,7 +86,7 @@ class PCA9685:
         temp = Angle * (2000 / 180) + 501
         self.setServoPulse(channel, temp)
     else:
-        print("Angle out of range")
+        self.logger.error("Angle out of range")
     
   def exit_PCA9685(self):
     self.write(self.__MODE2, 0x00)

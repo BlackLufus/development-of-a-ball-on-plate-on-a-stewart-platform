@@ -1,6 +1,7 @@
 # https://www.geeksforgeeks.org/python-opencv-capture-video-from-camera/
 import asyncio
 from collections import deque
+import logging
 import time
 import av
 import numpy as np
@@ -24,6 +25,7 @@ class CameraThreadWithAV:
             # > v4l2-ctl --list-device
             # Check for available options
             # > 4l2-ctl --device=/dev/video1 --list-formats-ext
+            logger = None,
             device_name = "/dev/video1", 
             options = {
                 "video_size": "1280x720",
@@ -39,6 +41,7 @@ class CameraThreadWithAV:
         self.running = True
         self.thread = threading.Thread(target=self.update, daemon=True)
         self.thread.start()
+        self.logger = logger or logging.getLogger("StewartPlatform.VideoCapture")
 
     def update(self):
         # fps times (sliding window technique)
@@ -58,7 +61,7 @@ class CameraThreadWithAV:
 
                 self.fps = len(fps_times)
         except:
-            print("Videoquelle beendet oder Fehler beim Lesen.")
+            self.logger.error("Videoquelle beendet oder Fehler beim Lesen.")
             self.running = False
     
     def read(self):

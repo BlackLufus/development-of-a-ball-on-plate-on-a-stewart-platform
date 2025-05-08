@@ -1,3 +1,4 @@
+import logging
 import math
 import numpy as np
 
@@ -12,7 +13,7 @@ class StewartPlatform:
     r = 10 # length of 
     l = 20 # length of leg
 
-    def __init__(self, base_radius: int, base_angle: list, plattform_radius: int, plattform_angle: list, debug: bool = False):
+    def __init__(self, base_radius: int, base_angle: list, plattform_radius: int, plattform_angle: list, logger=None):
         """
         Initialize the Stewart Plattform with base and plattform points
 
@@ -38,6 +39,8 @@ class StewartPlatform:
             # print("Pi: ", Pi)
         self.plattform_points = plattform_points
 
+        self.logger = logger or logging.getLogger("StewartPlatform.StewartPlatform")
+
     def calculate(self, x: float, y: float, z: float, alpha: float, beta: float, gamma: float):
         """
         Calculate the length of each leg of the Stewart Plattform
@@ -51,19 +54,19 @@ class StewartPlatform:
         :return: list of leg length\n
         """
         if (x < 0 or y < 0 or z < 0):
-            print("x, y, z should be positive")
+            self.logger.error("x, y, z should be positive")
             return None
         elif (x > 200 or y > 200 or z > 200):
-            print("x, y, z should be less than 200")
+            self.logger.error("x, y, z should be less than 200")
             return None
         elif (alpha < -45 or alpha > 45):
-            print(f"alpha should be between -45 and 45 (provided: {alpha})")
+            self.logger.error(f"alpha should be between -45 and 45 (provided: {alpha})")
             return None
         elif (beta < -45 or beta > 45):
-            print(f"beta should be between -45 and 45 (provided: {beta})")
+            self.logger.error(f"beta should be between -45 and 45 (provided: {beta})")
             return None
         elif (gamma < -45 or gamma > 45):
-            print(f"gamma should be between -45 and 45 (provided: {gamma})")
+            self.logger.error(f"gamma should be between -45 and 45 (provided: {gamma})")
             return None
 
         # Calculate translation vector
@@ -95,7 +98,7 @@ class StewartPlatform:
         # R = Rz @ Ry @ Rx
         R = np.dot(Rz, np.dot(Ry, Rx))
         if self.debug:
-            print("rotation matrix: \n", R, "\n")
+            self.logger.debug("rotation matrix: \n", R, "\n")
 
         # transform plattform points
         Pb = []
@@ -104,7 +107,7 @@ class StewartPlatform:
             Pb.append(np.dot(R, self.plattform_points[i]) + t)
         
         if self.debug:
-            print("plattform points: \n", Pb, "\n")
+            self.logger.debug("plattform points: \n", Pb, "\n")
 
         # calculate leg length
         v = []

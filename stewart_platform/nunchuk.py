@@ -1,3 +1,4 @@
+import logging
 import smbus
 import time
 import math
@@ -14,7 +15,8 @@ class Nunchuk:
         'z': []
     }
 
-    def __init__(self) -> None:
+    def __init__(self, logger=None) -> None:
+        self.logger = logger or logging.getLogger("StewartPlatform.Nunchuk")
         self.bus = smbus.SMBus(1)
         self.bus.write_byte_data(self._ADDRESS,0x40,0x00)
 
@@ -50,29 +52,29 @@ class Nunchuk:
         y_axis_0G = (data[1] << 2) + ((data[3] >> 4) & 0x03)
         z_axis_0G = (data[2] << 2) + ((data[3] >> 6) & 0x03)
 
-        print('x_axis_0G: %s, y_axis_0G: %s, z_axis_0G: %s' % (x_axis_0G, y_axis_0G, z_axis_0G))
+        self.logger.debug('x_axis_0G: %s, y_axis_0G: %s, z_axis_0G: %s' % (x_axis_0G, y_axis_0G, z_axis_0G))
 
         x_axis_1G = (data[4] << 2) + ((data[7] >> 2) & 0x03)
         y_axis_1G = (data[5] << 2) + ((data[7] >> 4) & 0x03)
         z_axis_1G = (data[6] << 2) + ((data[7] >> 6) & 0x03)
 
-        print('x_axis_1G: %s, y_axis_1G: %s, z_axis_1G: %s' % (x_axis_1G, y_axis_1G, z_axis_1G))
+        self.logger.debug('x_axis_1G: %s, y_axis_1G: %s, z_axis_1G: %s' % (x_axis_1G, y_axis_1G, z_axis_1G))
 
         joy_x_axis_max = data[8]
         joy_x_axis_min = data[9]
         joy_x_axis_center = data[10]
 
-        print('joy_x_axis_max: %s, joy_x_axis_min: %s, joy_x_axis_center: %s' % (joy_x_axis_max, joy_x_axis_min, joy_x_axis_center))
+        self.logger.debug('joy_x_axis_max: %s, joy_x_axis_min: %s, joy_x_axis_center: %s' % (joy_x_axis_max, joy_x_axis_min, joy_x_axis_center))
 
         joy_y_axis_max = data[11]
         joy_y_axis_min = data[12]
         joy_y_axis_center = data[13]
 
-        print('joy_y_axis_max: %s, joy_y_axis_min: %s, joy_y_axis_center: %s' % (joy_y_axis_max, joy_y_axis_min, joy_y_axis_center))
+        self.logger.debug('joy_y_axis_max: %s, joy_y_axis_min: %s, joy_y_axis_center: %s' % (joy_y_axis_max, joy_y_axis_min, joy_y_axis_center))
 
         checksum = (data[14] << 8) | data[15]
         
-        print('checksum: %s' % (checksum))
+        self.logger.debug('checksum: %s' % (checksum))
 
     def calcAccelMean(self, axis, value):
         accel_list: list = self._accel[axis]
@@ -82,7 +84,7 @@ class Nunchuk:
         return sum(accel_list) / len(accel_list)
 
     def dump(self):
-        print('Jx: %s Jy: %s Ax: %s Ay: %s Az: %s Bc: %s Bz: %s' % (self.joy_x, self.joy_y, self.accel_x, self.accel_y, self.accel_z, self.button_c, self.button_z))
+        self.logger.debug('Jx: %s Jy: %s Ax: %s Ay: %s Az: %s Bc: %s Bz: %s' % (self.joy_x, self.joy_y, self.accel_x, self.accel_y, self.accel_z, self.button_c, self.button_z))
 
 
 if __name__ == '__main__':
