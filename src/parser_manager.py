@@ -108,7 +108,8 @@ class ParserManager:
         parser = argparse.ArgumentParser(
             prog='StewartPlatform',
             description='Stewart Platform control program for various test modes and experiments.',
-            epilog='Example: %(prog)s -l 10 -ld ./log --run set'
+            epilog='Example: %(prog)s -l 10 -ld ./log --run set',
+            add_help=False
         )
         # Add a mode argument to specify the operational mode
         parser.add_argument(

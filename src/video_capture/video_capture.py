@@ -34,6 +34,10 @@ class CameraThreadWithAV:
             # },
             # format = "v4l2"
         ):
+        self.logger = logger or logging.getLogger("StewartPlatform.VideoCapture")
+        self.logger.debug(device_name)
+        self.logger.debug(options)
+        self.logger.debug(format)
         self.frame_num = 0
         self.container = av.open(file=device_name, options=options, format=format)
         self.img = None
@@ -41,7 +45,6 @@ class CameraThreadWithAV:
         self.running = True
         self.thread = threading.Thread(target=self.update, daemon=True)
         self.thread.start()
-        self.logger = logger or logging.getLogger("StewartPlatform.VideoCapture")
 
     def update(self):
         # fps times (sliding window technique)

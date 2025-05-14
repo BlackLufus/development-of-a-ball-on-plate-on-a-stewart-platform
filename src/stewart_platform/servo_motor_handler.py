@@ -1,6 +1,6 @@
 import logging
-from stewart_platform.PCA9685.PCA9685 import PCA9685
-from stewart_platform.stewart_platform import StewartPlatform
+from src.stewart_platform.PCA9685.PCA9685 import PCA9685
+from src.stewart_platform.stewart_platform import StewartPlatform
 
 class ServoMotorHandler:
     def __init__(self, logger=None) -> None:
@@ -23,11 +23,11 @@ class ServoMotorHandler:
             leg_length_list = platform.calculate(x, y, z, alpha, beta, gamma)
             if leg_length_list != None:
                 for index, leg_length in enumerate(leg_length_list):
-                    self.logger.debug("length of leg ", index, ": ", leg_length)
+                    self.logger.debug(f"length of leg {index}: {leg_length}")
 
             angle_list = platform.getAngles(15, 65, leg_length_list)
             for index, angle in enumerate(angle_list):
-                self.logger.debug("angle of servo ", index, ": ", angle)
+                self.logger.debug(f"angle of servo {index}: {angle}")
                 self.setRotationAngle(index, angle)
 
     # Set the rotation angle for the Steward Plattform (between: -45 and 45)

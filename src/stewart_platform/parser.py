@@ -25,37 +25,37 @@ class SetParser:
             epilog='Example: %(prog)s --x 0.5 --y 0.5 --z 0.5 --roll 0.1 --pitch 0.2 --yaw 0.3',
         )
         parser.add_argument(
-            '--x',
+            '-x',
             help='Set the x position of the Stewart platform',
             required=True,
             type=float
         )
         parser.add_argument(
-            '--y',
+            '-y',
             help='Set the y position of the Stewart platform',
             required=True,
             type=float
         )
         parser.add_argument(
-            '--z',
+            '-z',
             help='Set the z position of the Stewart platform',
             required=True,
             type=float
         )
         parser.add_argument(
-            '--roll',
+            '-roll',
             help='Set the roll angle of the Stewart platform',
             required=True,
             type=float
         )
         parser.add_argument(
-            '--pitch',
+            '-pitch',
             help='Set the pitch angle of the Stewart platform',
             required=True,
             type=float
         )
         parser.add_argument(
-            '--yaw',
+            '-yaw',
             help='Set the yaw angle of the Stewart platform',
             required=True,
             type=float
@@ -168,7 +168,7 @@ class CircleParser:
         if smooth:
 
             # Start the circular motion test
-            angles = np.linspace(0, 2 * math.pi, steps)
+            angles = np.linspace(0, 2 * math.pi, int(steps))
 
             # Set the radius of the circle
             while True:

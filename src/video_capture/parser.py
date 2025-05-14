@@ -22,7 +22,7 @@ class VideoCaptureParserLinux:
             help='Set the device name',
             required=False,
             type=str,
-            default='/dev/video1'
+            default='/dev/video0'
         )
         parser.add_argument(
             '-r',
