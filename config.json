@@ -1,0 +1,24 @@
+{
+    "name": "stewart_platform",
+    "description": "A Stewart platform is a type of parallel manipulator that consists of a fixed base and a movable platform connected by six linear actuators. The actuators are arranged in a specific configuration to provide precise control over the position and orientation of the platform in three-dimensional space.",
+    "settings": {
+        "base_radius": 86,
+        "base_angle": [
+            343,
+            17,
+            103,
+            137,
+            223,
+            257
+        ],
+        "platform_radius": 86,
+        "platform_angle": [
+            347,
+            13,
+            107,
+            133,
+            227,
+            253
+        ]
+    }
+}
