@@ -1,0 +1,36 @@
+div#options_menu {
+    background-color: antiquewhite;
+    width: 320px;
+}
+
+div#options_menu > header {
+    display: flex;
+    justify-content: center;
+    margin: 0;
+    padding: 0 10px;
+    background-color: var(--menu-header-background-color);
+    text-align: center;
+    font-size: 24px;
+    border-bottom: 5px solid var(--menu-border-color);
+}
+
+div#options_menu > header > h1 {
+    position: relative;
+    display: inline-block;
+    margin: 0;
+    font-family: var(--primary-font-family);
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--secondary-color);
+    padding: 20px 0;
+}
+
+div#options_menu > header > h1::before {
+    position: absolute;
+    content: "";
+    margin: 35px auto auto auto;
+    width: 100%;
+    height: 5px;
+    border-radius: 48%;
+    background-color: var(--preferred-color);
+}

@@ -1,0 +1,81 @@
+/* Themesettings */
+:root {
+    --primary-font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+
+    /* Bevorzugte Farbe */
+    --preferred-color: #1976D2; /* Ein etwas dunkleres Blau, das besser im hellen Modus lesbar ist */
+
+    /* Primärfarben */
+    --primary-color: #000; /* Schwarz, damit es auf einem hellen Hintergrund gut lesbar ist */
+    --secondary-color: #222; /* Dunkles Grau für Texte und Elemente mit etwas weniger Gewicht */
+    --third-color: #444; /* Etwas helleres Grau für Sekundärtexte */
+    --fourth-color: #666; /* Für dezentere Texte */
+    --fifth-color: #888; /* Noch helleres Grau */
+    --sixth-color: #aaa; /* Noch heller, aber immer noch sichtbar auf einem hellen Hintergrund */
+
+    /* Hintergrundfarben */
+    --primary-background-color: #f9f9f9; /* Sehr helles Grau statt dunklem Hintergrund */
+    --secondary-background-color: #eeeeee; /* Ein leicht dunkleres Grau */
+    --third-background-color: #cccccc; /* Helleres Grau */
+    --fourth-background-color: #ffffff; /* Reines Weiß als zusätzliche Hintergrundfarbe */
+
+    /* Randfarbe */
+    --primary-border-color: #ccc; /* Hellgrauer Rand, passend zum hellen Hintergrund */
+
+    --primary-dialog-background-color: #fffc;
+    --secondary-dialog-background-color: #eee8;
+    --third-dialog-background-color: #ddd8;
+
+    /* Menüfarben */
+    --menu-background-color: #ffffff88; /* Halbtransparenter Weißton für das Menü */
+    --menu-header-background-color: #f0f0f088; /* Halbtransparenter heller Ton für den Header */
+    --menu-section-background-color: #dcdcdc; /* Sehr helles Grau für den Menübereich */
+    --menu-list-item-background-color: #fafafabb; /* Fast weiß für Listenelemente */
+    --menu-list-item-hover-background-color: #ebebebaa;
+    --menu-list-item-active-background-color: #dcdcdcaa;
+    --menu-footer-background-color: #e0e0e0cc; /* Leicht transparentes hellgrau für den Footer */
+    --menu-box-shadow-color: #bbbbbb; /* Hellgrauer Schatten für das Menü */
+    --menu-border-color: #dddddd; /* Hellgrauer Rand für das Menü */
+
+    /* Farben für Knoten und Kanten */
+    --node-color: #d32f2f; /* Heller Rotton, damit er auf hellen Hintergründen sichtbar bleibt */
+    --node-color-selected: green; /* Leuchtendes Rot für ausgewählte Knoten */
+    --edge-color: #1976d2; /* Passendes, kräftiges Blau für die Kanten */
+}
+
+[data-theme="dark"] {
+    --primary-font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+
+    --preferred-color: #2196F3;
+    
+    --primary-color: #fff;
+    --secondary-color: #ddd;
+    --third-color: #bbb;
+    --fourth-color: #888;
+    --fifth-color: #555;
+    --sixth-color: #333;
+
+    --primary-background-color: #242424;
+    --secondary-background-color: #333;
+    --third-background-color: #666;
+    --fourth-background-color: #ddd;
+
+    --primary-border-color: #333;
+
+    --primary-dialog-background-color: #000c;
+    --secondary-dialog-background-color: #222e;
+    --third-dialog-background-color: #444e;
+
+    --menu-background-color: #252525aa;
+    --menu-header-background-color: #4448;
+    --menu-section-background-color: #0005;
+    --menu-list-item-background-color: #777b;
+    --menu-list-item-hover-background-color: #888a;
+    --menu-list-item-active-background-color: #999a;
+    --menu-footer-background-color: #3338;
+    --menu-box-shadow-color: #8884;
+    --menu-border-color: #555;
+
+    --node-color: #ff0000;
+    --edge-color: #0000ff;
+}
