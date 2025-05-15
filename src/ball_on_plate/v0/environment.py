@@ -23,11 +23,11 @@ class BallOnPlateEnv(gym.Env):
     """
     metadata = {"render_modes": ["human"]}
 
-    def __init__(self, render_mode=None, render_fps=60, simulation_mode=True):
+    def __init__(self, render_mode=None, render_fps=60, simulation_mode=True, show_display=True):
         super().__init__()
         self.render_mode = render_mode
 
-        self.ball = bop.BallOnPlate(fps=render_fps, simulation_mode=simulation_mode)
+        self.ball = bop.BallOnPlate(fps=render_fps, simulation_mode=simulation_mode, show_display=show_display)
         self.action_space = spaces.Box(
             low=np.array([
                 -self.ball.max_angle,

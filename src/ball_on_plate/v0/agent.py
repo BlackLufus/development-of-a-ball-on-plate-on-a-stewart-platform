@@ -1,15 +1,21 @@
+from datetime import datetime
 from enum import Enum
 import math
+import os
 import random
 import sys
 import time
 import numpy as np
 import pygame
 from os import path
+
+# In Bytearray oder Bild umwandeln
+import io
+from PIL import Image
     
 class BallOnPlate:
 
-    def __init__(self, fps=1, simulation_mode=True):
+    def __init__(self, fps=1, simulation_mode=True, show_display=True):
         self.screen_size = 512
 
         # Physikalische Parameter
@@ -30,10 +36,13 @@ class BallOnPlate:
 
         self.fps = fps
         self.simulation_mode = simulation_mode
+        self.show_display = show_display
         self.last_action = None
         self._init_pygame()
     
     def _init_pygame(self):
+        if not self.show_display:
+            os.environ["SDL_VIDEODRIVER"] = "dummy"
         pygame.init() # initialize pygame
         pygame.display.init() # Initialize the display module
 
@@ -211,10 +220,21 @@ class BallOnPlate:
         position_pos = (0, self.window_size[1] - self.action_info_height * 1)
         self.window_surface.blit(position_img, position_pos)
 
-        pygame.display.update()
+        # Draw Target Position
+        if self.show_display:
+            pygame.display.update()
+        # Save image
+        else:
+            # Screenshot als Surface holen
+            screenshot_surface = pygame.display.get_surface()
+
+            # In Bytearray oder Bild umwandeln
+            image_str = pygame.image.tostring(screenshot_surface, 'RGB')
+            image = Image.frombytes('RGB', screenshot_surface.get_size(), image_str)
+            image.save(f'test_image/{datetime.now().strftime("%Y%m%d-%H%M%S%f")}.png')
                 
         # Limit frames per second
-        self.clock.tick(self.fps)  
+        self.clock.tick(self.fps)
 
     def _process_events(self):
         # Process user events, key presses
