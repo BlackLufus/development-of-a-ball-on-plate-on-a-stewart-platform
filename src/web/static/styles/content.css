@@ -1,0 +1,98 @@
+html, body {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    height: 100vh;
+    width: 100vw;
+    background-color: var(--primary-background-color);
+}
+
+body {
+    display: flex;
+    margin: 0px auto;
+}
+
+.wrapper {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    overflow: hidden;
+}
+
+header {
+    display: flex;
+    justify-content: center;
+    margin: 0;
+    padding: 0 10px;
+    background-color: var(--menu-header-background-color);
+    text-align: center;
+    font-size: 24px;
+    border-bottom: 5px solid var(--menu-border-color);
+}
+header > h1 {
+    position: relative;
+    display: inline-block;
+    margin: 0;
+    font-family: var(--primary-font-family);
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--secondary-color);
+    padding: 20px 0;
+}
+
+header > h1::before {
+    position: absolute;
+    content: "";
+    margin: 35px auto auto auto;
+    width: 100%;
+    height: 5px;
+    border-radius: 48%;
+    background-color: var(--preferred-color);
+}
+
+main#main {
+    flex: 1;
+    padding: 10px 12px 10px 12px;
+    text-align: center; 
+}
+
+.playground {
+    position: relative;
+    height: 100%;
+    border: 2px solid var(--menu-border-color);
+    border-radius: 8px;
+    background-color: var(--secondary-background-color);
+}
+
+.playground::before  {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    content: "Playground";
+    padding: 5px 10px;
+    font-family: var(--primary-font-family);
+    font-size: 30px;
+    z-index: 1;
+    color: var(--third-background-color);
+}
+
+footer {
+    height: 80px;
+    padding: 5px 0;
+    background-color: var(--menu-footer-background-color);
+    border-top: 5px solid var(--menu-border-color);
+}
+
+footer > div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+footer > div > p {
+    text-align: center;
+    font-family: var(--primary-font-family);
+    font-size: 24px;
+    color: var(--secondary-color);
+}
