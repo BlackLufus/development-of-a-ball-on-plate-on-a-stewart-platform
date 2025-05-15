@@ -7,10 +7,11 @@
     <link rel="stylesheet" href="styles/content.css">
     <link rel="stylesheet" href="styles/nav.css">
     <link rel="stylesheet" href="styles/options.css">
+    <link rel="stylesheet" href="styles/frame.css">
     <title>Document</title>
 </head>
 <body>
-    <nav>
+    <nav id="nav">
         <header>
             <h1>Menü</h1>
         </header>
@@ -21,6 +22,20 @@
                         Allgemein
                     </label>
                 </section>
+            </li>
+            <li>
+                <label class="switch">
+                    <input id="dark-mode" type="checkbox">
+                    <div class="slider round"></div>
+                    <div class="switch-box">
+                        <div class="switch-text switch-on-text">
+                            Dark Mode (aktiviert)
+                        </div>
+                        <div class="switch-text switch-off-text">
+                            Dark Mode (deaktiviert)
+                        </div>
+                    </div>
+                </label>
             </li>
             <li>
                 <div id="element_1" class="button-text">
@@ -104,8 +119,13 @@
         </header>
         <main id="main">
             <div id="playground" class="playground">
-                <svg id="svg-container" class="svg-playground" xmlns="http://www.w3.org/2000/svg" version="1.1">
-                </svg>
+                <div class="frame">
+                    <div class="frame_header">
+                        <span class="frame_title">Titel</span>
+                        <button class="frame_close"></button>
+                    </div>
+                    <div class="frame_content"></div>
+                </div>
             </div>
         </main>
         <footer>
@@ -116,5 +136,6 @@
             </div>
         </footer>
     </div>
+    <script type="module" src="scripts/main.js"></script>
 </body>
 </html>

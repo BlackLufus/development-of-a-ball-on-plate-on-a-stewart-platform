@@ -104,6 +104,108 @@ nav > ul > li > div > label {
     font-size: 22px;
 }
 
+.switch {
+    position: relative;
+    display: flex;
+    width: 350px;
+    height: 60px;
+}
+
+.switch input { 
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: relative;
+    cursor: pointer;
+    margin: auto 10px;
+    width: 60px;
+    height: 34px;
+    background-color: var(--fifth-color);
+    -webkit-transition: .4s;
+    transition: .4s;
+}
+
+/* The white bobble */
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 24px;
+    width: 24px;
+    left: 4px;
+    bottom: 5px;
+    background-color: var(--primary-color);
+    -webkit-transition: .75s;
+    transition: .75s;
+}
+
+input:checked + .slider {
+    background-color: var(--preferred-color);
+}
+
+input:focus + .slider {
+    box-shadow: 0 0 5px var(--preferred-color);
+}
+
+input:checked + .slider:before {
+    transition: .4s;
+    left: 29px;
+    height: 28px;
+    width: 28px;
+    bottom: 3px;
+}
+
+input:disabled + .slider::before {
+    background-color: var(--fourth-color);
+}
+
+.slider.round {
+    border-radius: 34px;
+}
+
+.slider.round:before {
+    border-radius: 50%;
+}
+
+.switch-box {
+    display: flex;
+    flex-direction: column;
+    margin: auto 0;
+}
+
+.switch-info {
+    z-index: 10;
+    position: absolute;
+    content: "";
+    right: 5px;
+    top: 15px;
+    height: 30px;
+    max-width: 30px;
+    max-width: 0;
+    border-radius: 20px;
+    background-color: var(--fifth-color);
+}
+
+.switch-info:hover {
+    background-color: var(--fourth-color);
+}
+
+.switch-text {
+    font-family: var(--primary-font-family);
+    font-size: 22px;
+    color: var(--primary-color);
+}
+
+input:not(:checked) ~ .switch-box .switch-on-text {
+    display: none;
+}
+
+input:checked ~ .switch-box .switch-off-text {
+    display: none;
+}
+
 .button-text {
     display: flex;
     justify-content: center;
