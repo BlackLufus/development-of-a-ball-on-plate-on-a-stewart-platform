@@ -1,17 +1,37 @@
 import Frame from "../frame.js";
 import ImageStream from "./elements/image_stream.js";
 
-class BallOnPlate {
+class BallOnPlate extends Frame {
+    address: string;
+    port: number;
+    api_end_point: string;
+    socket?: WebSocket;
+    image_stream?: ImageStream;
     
-    constructor(address, port, api_end_point) {
+    /**
+     * Creates a BallOnPlate frame
+     * @param {string} address 
+     * @param {number} port 
+     * @param {string} api_end_point 
+     */
+    constructor(address: string, port: number, api_end_point: string) {
+        const container = document.createElement('div');
+
+        super("Ball On Plate", container, () => this.terminate());
+
         this.address = address;
         this.port = port;
         this.api_end_point = api_end_point;
-        this.__connect();
-        this.__build();
+
+        this.build(container);
+        this.connect();
     }
 
-    __connect() {
+    /**
+     * Connects to an API enpoint
+     * @returns {void}
+     */
+    private connect(): void {
         this.socket = new WebSocket(`ws://${this.address}:${this.port}/${this.api_end_point}`);
 
         // Connection opened
@@ -26,35 +46,32 @@ class BallOnPlate {
 
                 const img = new Image();
                 img.onload = () => {
-                    this.image_stream.drawFrame(img);
+                    this.image_stream?.drawFrame(img);
                 }
                 img.src = URL.createObjectURL(blob);
             }
         });
 
         this.socket.addEventListener("close", (event) => {
-            this.frame.dispose();
+            this.dispose();
         });
 
         this.socket.addEventListener("error", (event) => {
             console.log(`Socket Errer: ${event}`);
-            this.frame.dispose();
+            this.dispose();
         });
     }
 
-    __build() {
-        const container = document.createElement('div');
-        this.frame = new Frame("Live Cam", container, this.terminate);
-
+    private build(container: HTMLElement): void {
         this.image_stream = new ImageStream(512, 632);
         container.appendChild(this.image_stream.canvas);
     }
 
-    terminate = () => {
+    private terminate = () => {
         if (this.socket) {
             console.log("Connection closed");
             this.socket.close();
-            this.socket = null;
+            this.socket = undefined;
         }
     }
 }

@@ -4,12 +4,12 @@ class EventListener {
     static listeners = [];
 
     // This is a static method that adds an event listener to the element
-    static addEventListener(element, type, callback, oneTimeEvent = false, id = undefined, options = null) {
+    static addEventListener(element, type, callback, oneTimeEvent = false, id, options) {
         this.listeners.push(new EventListener(element, type, callback, oneTimeEvent, id, options));
     }
 
     // This is a static method that removes all the event listeners
-    static removeAllListeners(id = undefined) {
+    static removeAllListeners(id) {
         //const num = this.listeners.length;
         for (let i = 0; i < this.listeners.length; i++) {
             if (id === undefined || this.listeners[i].id === id) {
@@ -22,7 +22,7 @@ class EventListener {
     }
 
     // This is the constructor for the EventListener class
-    constructor(element, type, callback, oneTimeEvent = false, id = undefined, options = null) {
+    constructor(element, type, callback, oneTimeEvent = false, id, options) {
         this.element = element;
         this.type = type;
         this.callback = callback;

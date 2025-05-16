@@ -14,6 +14,9 @@ def index(path=None):
         return send_from_directory("static", "index.html")
     else:
         return send_from_directory("static", path)
+    
+def start_flask():
+    app.run(port=6750)
 
 async def run_ball_on_plate_handler(websocket):
     from src.ball_on_plate.task import RunBallOnPlate
@@ -47,5 +50,6 @@ async def main():
 if __name__ == '__main__':
     # Start the API Server
     # api.run(host="0.0.0.0", port=7750)
+    flask_thread = threading.Thread(target=start_flask, daemon=True)
+    flask_thread.start()
     asyncio.run(main())
-    app.run(port=6500)

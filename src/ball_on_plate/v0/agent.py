@@ -235,7 +235,7 @@ class BallOnPlate:
             frame = np.frombuffer(image_str, dtype=np.uint8).reshape((h, w, 3))
 
             # JPEG-Komprimierung
-            success, encoded_image = cv2.imencode('.png', frame)
+            success, encoded_image = cv2.imencode('.jpg', frame, [int(cv2.IMWRITE_JPEG_QUALITY), 50])
             if success:
                 self.raw_image_event(encoded_image.tobytes())
             # image.save(f'test_image/{datetime.now().strftime("%Y%m%d-%H%M%S%f")}.png')

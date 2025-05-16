@@ -14,6 +14,7 @@
     width: 100%;
     height: 28px;
     user-select: none;
+    backdrop-filter: blur(4px);
 }
 
 .frame_title {
@@ -41,7 +42,7 @@
 .frame_close::before, .frame_close::after {
     position: absolute;
     top: 14px;
-    right: 11px;
+    right: 15px;
     content: "";
     padding: 0 7px;
     height: 2px;
@@ -59,5 +60,5 @@
 }
 
 .frame_content {
-    min-height: 100px;
+    background-color: var(--third-background-color);
 }

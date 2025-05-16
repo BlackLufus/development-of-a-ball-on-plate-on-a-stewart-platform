@@ -1,23 +1,25 @@
 import EventListener from "../EventListener.js";
 import Point from "../point.js";
-import UI from "../ui.js";
 
 class Frame {
 
     static id = 0;
 
-    frame = undefined;
-    header = undefined;
+    private frame: HTMLDivElement;
+    private header: HTMLDivElement;
+    private terminateEvent?: () => void;
     id = Frame.id++;
     kill = null;
+    private dragOffsetX: number = 0;
+    private dragOffsetY: number = 0;
 
     /**
-     * 
+     * Basic Frame for all content Objects
      * @param {string} titleText 
      * @param {HTMLElement} contentElement 
      * @param {method} terminate 
      */
-    constructor(titleText, contentElement, terminate) {
+    constructor(titleText: string, contentElement?: HTMLElement, terminateEvent?: () => void) {
         const frame = document.createElement('div');
         frame.className = 'frame';
 
@@ -39,22 +41,26 @@ class Frame {
         contentWrapper.className = "frame_content";
         if (contentElement instanceof HTMLElement) {
             contentWrapper.appendChild(contentElement);
-        } else {
+        } else if (contentElement) {
             contentWrapper.textContent = contentElement; // fallback, falls kein Element
         }
         frame.appendChild(contentWrapper);
 
         this.frame = frame;
         this.header = header;
-        this.terminate = terminate;
+        this.terminateEvent = terminateEvent;
         this.addEventListeners();
     }
 
-    addEventListeners() {
+    /**
+     * Sets all necessary event listeners
+     * @returns {void}
+     */
+    private addEventListeners(): void {
         EventListener.addEventListener(
             this.header,
             'mousedown',
-            (rootEvent) => {
+            (rootEvent: any) => {
 
                 // 🟡 Offset merken
                 this.dragOffsetX = rootEvent.clientX - this.frame.offsetLeft;
@@ -63,12 +69,13 @@ class Frame {
                 EventListener.addEventListener(
                     document,
                     'mousemove',
-                    (e) => {
+                    (e: any) => {
+                        const mouseEvent = e as MouseEvent;
                         const rawPoint = new Point(
-                            e.clientX - this.dragOffsetX,
-                            e.clientY - this.dragOffsetY
+                            mouseEvent.clientX - this.dragOffsetX,
+                            mouseEvent.clientY - this.dragOffsetY
                         );
-                        const clampedPoint = this.getNodeMenuPosition(rawPoint);
+                        const clampedPoint = this.getFramePosition(rawPoint);
                         this.frame.style.left = `${clampedPoint.x}px`;
                         this.frame.style.top = `${clampedPoint.y}px`;
                     },
@@ -80,7 +87,7 @@ class Frame {
                 EventListener.addEventListener(
                     window,
                     'mouseup',
-                    (e) => {
+                    () => {
                         console.log("awd");
                         EventListener.removeAllListeners(`frame-${this.id}-mousemove`);
                     },
@@ -90,7 +97,7 @@ class Frame {
                 EventListener.addEventListener(
                     window,
                     'blur',
-                    (e) => {
+                    () => {
                         console.log("awd");
                         EventListener.removeAllListeners(`frame-${this.id}-mousemove`);
                     },
@@ -103,9 +110,17 @@ class Frame {
         );
     }
 
-    getNodeMenuPosition(point) {
+    /**
+     * Gets the current position from the frame
+     * @param {Point} point 
+     * @returns {Point}
+     */
+    private getFramePosition(point: Point): Point {
 
         const playground = document.getElementById('playground');
+        if (!playground) {
+            return point;
+        }
         if (point.x < 0) {
             point.x = 0;
         }
@@ -121,16 +136,11 @@ class Frame {
         return point;
     }
 
-    setPosition(x, y) {
-        this.x = parseInt(x);
-        this.y = parseInt(y);
-        if (this.frame != undefined) {
-            this.frame.style.left = `${this.x}px`;
-            this.frame.style.top = `${this.y}px`;
-        }
-    }
-
-    show() {
+    /**
+     * Shows the current frame
+     * @returns {void}
+     */
+    public show(): void {
         if (this.frame != undefined) {
             const playground = document.getElementById('playground');
             if (playground) {
@@ -141,10 +151,14 @@ class Frame {
         }
     }
 
-    dispose() {
+    /**
+     * Dispose a frame, removes it from playground and removes all event listeners
+     * @returns {void}
+     */
+    public dispose(): void {
         if (this.frame != undefined) {
-            if (this.terminate) {
-                this.terminate();
+            if (this.terminateEvent) {
+                this.terminateEvent();
             }
             this.frame.remove()
             EventListener.removeAllListeners(`frame-${this.id}`);
