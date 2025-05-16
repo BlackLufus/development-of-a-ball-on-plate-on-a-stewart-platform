@@ -1,3 +1,5 @@
+import BallOnPlate from './window/content/ball_on_plate.js';
+import LiveCam from './window/content/live_cam.js';
 import Frame from './window/frame.js';
 
 const darkModeSwitch = document.getElementById('dark-mode');
@@ -7,8 +9,20 @@ darkModeSwitch.addEventListener('change', function() {
 
 const element1 = document.getElementById('element_1');
 element1.addEventListener('click', () => {
-    const frame = new Frame('Hallo', "null");
+    const frame = new Frame('Hallo', "null", null);
     frame.show()
+});
+
+const video_cam = document.getElementById('video_cam');
+video_cam.addEventListener('click', () => {
+    const live_cam = new LiveCam("localhost", 6500, "video_cam");
+    live_cam.frame.show();
+});
+
+const ball_on_plate = document.getElementById('ball_on_plate');
+ball_on_plate.addEventListener('click', () => {
+    const live_cam = new BallOnPlate("localhost", 6500, "run_ball_on_plate");
+    live_cam.frame.show();
 });
 
 class UI {
@@ -20,32 +34,6 @@ class UI {
     static updateDarkMode() {
         document.documentElement.setAttribute('data-theme', darkModeSwitch.checked ? 'dark' : 'light');
     }
-
-    // Funktion, um die Position relativ zum Container abzufragen
-        static getRelativePosition(inputX, inputY, radius = 20) {
-            //console.log(inputX, inputY);
-            // Get offset of the container (left, top)
-            //console.log(rect);
-            //return { x: inputX - 20, y: inputY - 20 };
-            //console.log(`inputX: ${inputX}, inputY: ${inputY}`);
-            //console.log(`left: ${container.offsetLeft}, top: ${container.offsetTop}`);
-            let x = parseInt(inputX);
-            let y = parseInt(inputY);
-            if (x < 10) {
-                x = 10;
-            }
-            else if (x > playground.offsetWidth - (radius * 2) - 10) {
-                x = playground.offsetWidth - (radius * 2) - 10;
-            }
-            if (y < 10) {
-                y = 10;
-            }
-            else if (y > playground.offsetHeight - (radius * 2) - 20) {
-                y = playground.offsetHeight - (radius * 2) - 20;
-            }
-            //console.log(`x: ${x}, y: ${y}`);
-            return { x: x, y: y};
-        }
 }
 
 export default UI;

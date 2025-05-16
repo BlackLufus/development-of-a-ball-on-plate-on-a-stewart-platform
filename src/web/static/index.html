@@ -8,6 +8,8 @@
     <link rel="stylesheet" href="styles/nav.css">
     <link rel="stylesheet" href="styles/options.css">
     <link rel="stylesheet" href="styles/frame.css">
+    <link rel="stylesheet" href="styles/content/live_cam.css">
+    <link rel="stylesheet" href="styles/content/element/image_strean.css">
     <title>Document</title>
 </head>
 <body>
@@ -43,13 +45,13 @@
                 </div>
             </li>
             <li>
-                <div id="element_2"  class="button-text">
-                    <span>Element 2</span>
+                <div id="video_cam"  class="button-text">
+                    <span>Video Cam</span>
                 </div>
             </li>
             <li>
-                <div id="element_3"  class="button-text">
-                    <span>Element 3</span>
+                <div id="ball_on_plate"  class="button-text">
+                    <span>Ball On Plate</span>
                 </div>
             </li>
             <li>
@@ -124,7 +126,13 @@
                         <span class="frame_title">Titel</span>
                         <button class="frame_close"></button>
                     </div>
-                    <div class="frame_content"></div>
+                    <div class="frame_content">
+                        <div class="live_cam">
+                            <canvas class="image_strean">
+                                
+                            </canvas>
+                        </div>
+                    </div>
                 </div>
             </div>
         </main>

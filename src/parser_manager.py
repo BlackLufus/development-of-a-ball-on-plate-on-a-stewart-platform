@@ -248,26 +248,26 @@ class ParserManager:
                 self.setup_logger()
                 model.run(self.logger)
         elif self.operation == 'ball_on_plate':
-                from src.ball_on_plate.parser import RunBallOnPlateParser
-                model = RunBallOnPlateParser()
-                model.parser()
+                from src.ball_on_plate.task import RunBallOnPlate
+                model = RunBallOnPlate()
+                model.parse()
                 self.setup_logger()
                 model.run(self.logger)
         elif self.operation == 'train_ball_on_plate':
-                from src.ball_on_plate.parser import TrainBallOnPlateParser
-                model = TrainBallOnPlateParser()
-                model.parser()
+                from src.ball_on_plate.task import TrainBallOnPlate
+                model = TrainBallOnPlate()
+                model.parse()
                 self.setup_logger()
                 model.run(self.logger)
         elif self.operation == 'video_capture_linux':
-                from src.video_capture.parser import VideoCaptureParserLinux
-                model = VideoCaptureParserLinux()
-                model.parser()
+                from src.video_capture.task import VideoCaptureLinux
+                model = VideoCaptureLinux()
+                model.parse()
                 self.setup_logger()
                 model.run(self.logger)
         elif self.operation == 'video_capture_windows':
-                from src.video_capture.parser import VideoCaptureParserWindows
-                model = VideoCaptureParserWindows()
-                model.parser()
+                from src.video_capture.task import VideoCaptureWindows
+                model = VideoCaptureWindows()
+                model.parse()
                 self.setup_logger()
                 model.run(self.logger)

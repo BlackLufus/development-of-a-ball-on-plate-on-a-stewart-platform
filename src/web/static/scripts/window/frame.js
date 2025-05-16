@@ -9,8 +9,15 @@ class Frame {
     frame = undefined;
     header = undefined;
     id = Frame.id++;
+    kill = null;
 
-    constructor(titleText, contentElement) {
+    /**
+     * 
+     * @param {string} titleText 
+     * @param {HTMLElement} contentElement 
+     * @param {method} terminate 
+     */
+    constructor(titleText, contentElement, terminate) {
         const frame = document.createElement('div');
         frame.className = 'frame';
 
@@ -39,6 +46,7 @@ class Frame {
 
         this.frame = frame;
         this.header = header;
+        this.terminate = terminate;
         this.addEventListeners();
     }
 
@@ -135,6 +143,9 @@ class Frame {
 
     dispose() {
         if (this.frame != undefined) {
+            if (this.terminate) {
+                this.terminate();
+            }
             this.frame.remove()
             EventListener.removeAllListeners(`frame-${this.id}`);
         }

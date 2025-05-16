@@ -5,6 +5,7 @@ import os
 import random
 import sys
 import time
+import cv2
 import numpy as np
 import pygame
 from os import path
@@ -15,7 +16,7 @@ from PIL import Image
     
 class BallOnPlate:
 
-    def __init__(self, fps=1, simulation_mode=True, show_display=True):
+    def __init__(self, fps=1, simulation_mode=True, raw_image_event=None):
         self.screen_size = 512
 
         # Physikalische Parameter
@@ -36,12 +37,12 @@ class BallOnPlate:
 
         self.fps = fps
         self.simulation_mode = simulation_mode
-        self.show_display = show_display
+        self.raw_image_event = raw_image_event
         self.last_action = None
         self._init_pygame()
     
     def _init_pygame(self):
-        if not self.show_display:
+        if self.raw_image_event:
             os.environ["SDL_VIDEODRIVER"] = "dummy"
         pygame.init() # initialize pygame
         pygame.display.init() # Initialize the display module
@@ -221,7 +222,7 @@ class BallOnPlate:
         self.window_surface.blit(position_img, position_pos)
 
         # Draw Target Position
-        if self.show_display:
+        if not self.raw_image_event:
             pygame.display.update()
         # Save image
         else:
@@ -230,8 +231,15 @@ class BallOnPlate:
 
             # In Bytearray oder Bild umwandeln
             image_str = pygame.image.tostring(screenshot_surface, 'RGB')
-            image = Image.frombytes('RGB', screenshot_surface.get_size(), image_str)
-            image.save(f'test_image/{datetime.now().strftime("%Y%m%d-%H%M%S%f")}.png')
+            w, h = screenshot_surface.get_size()
+            frame = np.frombuffer(image_str, dtype=np.uint8).reshape((h, w, 3))
+
+            # JPEG-Komprimierung
+            success, encoded_image = cv2.imencode('.png', frame)
+            if success:
+                self.raw_image_event(encoded_image.tobytes())
+            # image.save(f'test_image/{datetime.now().strftime("%Y%m%d-%H%M%S%f")}.png')
+            
                 
         # Limit frames per second
         self.clock.tick(self.fps)

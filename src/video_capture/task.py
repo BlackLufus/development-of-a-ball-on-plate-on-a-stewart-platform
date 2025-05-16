@@ -4,11 +4,11 @@ import logging
 import cv2
 
 
-class VideoCaptureParserLinux:
+class VideoCaptureLinux():
     """
     A class to handle Video Capture on Linux.
     """
-    def parser(self, parser=None):
+    def parse(self, parser=None):
         parser = argparse.ArgumentParser(
             parents=[parser] if parser else [],
             prog='Set',
@@ -41,9 +41,17 @@ class VideoCaptureParserLinux:
             default=20
         )
 
-        self.args, _ = parser.parse_known_args()
+        args, _ = parser.parse_known_args()
+        self.device_name = args.device_name
+        self.resolution = args.resolution
+        self.framerate = args.framerate
 
-    def run(self, logger):        
+    def manual(self, device_name, resolution, framerate):
+        self.device_name = device_name
+        self.resolution = resolution
+        self.framerate = framerate
+
+    def __build(self, logger):
         from src.video_capture.video_capture import CameraThreadWithAV
 
         logger = logger or logging.getLogger(__name__)
@@ -60,6 +68,11 @@ class VideoCaptureParserLinux:
             logger=logger
         )
 
+        return logger, cam
+
+    def run(self, logger, send_data = None):
+        logger, cam = self.__build(logger)
+
         last_frame_num = cam.frame_num
         try:
             while cam.running:
@@ -70,21 +83,46 @@ class VideoCaptureParserLinux:
                     if frame is not None:
                         logger.debug(f"FPS: {fps} (num: {frame_num})")
 
-                        # Anzeige des Bildes
-                        cv2.imshow("Threaded Camera", frame)
+                        if send_data:
+                            send_data(frame)
+                        else:
+                            # Anzeige des Bildes
+                            cv2.imshow("Threaded Camera", frame)
 
-                        # Mit 'q' beenden
-                        if cv2.waitKey(1) & 0xFF == ord('q'):
-                            break
+                            # Mit 'q' beenden
+                            if cv2.waitKey(1) & 0xFF == ord('q'):
+                                break
 
         finally:
             cam.stop()
+    
+    async def run_async(self, logger, ws):
+        logger, cam = self.__build(logger)
 
-class VideoCaptureParserWindows:
+        last_frame_num = cam.frame_num
+        try:
+            while cam.running:
+                if last_frame_num != cam.frame_num:
+                    last_frame_num = cam.frame_num
+
+                    frame, fps, frame_num = cam.read()
+                    if frame is not None:
+                        logger.debug(f"FPS: {fps} (num: {frame_num})")
+
+                        success, encoded_image = cv2.imencode('.jpg', frame, [int(cv2.IMWRITE_JPEG_QUALITY), 80])
+                        if success:
+                            await ws.send(encoded_image.tobytes())
+        except Exception as e:
+            logger.debug(e)
+            pass
+        finally:
+            cam.stop()
+
+class VideoCaptureWindows:
     """
     A class to handle Video Capture on Windows.
     """
-    def parser(self, parser=None):
+    def parse(self, parser=None):
         parser = argparse.ArgumentParser(
             parents=[parser] if parser else [],
             prog='Set',
@@ -117,24 +155,37 @@ class VideoCaptureParserWindows:
             default=20
         )
 
-        self.args, _ = parser.parse_known_args()
+        args, _ = parser.parse_known_args()
+        self.device_name = args.device_name
+        self.resolution = args.resolution
+        self.framerate = args.framerate
 
-    def run(self, logger):        
+    def manual(self, device_name, resolution, framerate):
+        self.device_name = device_name
+        self.resolution = resolution
+        self.framerate = framerate
+
+    def __build(self, logger):
         from src.video_capture.video_capture import CameraThreadWithAV
 
         logger = logger or logging.getLogger(__name__)
 
         # Initialize the video capture
         cam = CameraThreadWithAV(
-            device_name=f"video={self.args.device_name}",
+            device_name=f"video={self.device_name}",
             options={
-                "video_size": self.args.resolution,
-                "framerate": str(self.args.framerate),
+                "video_size": self.resolution,
+                "framerate": str(self.framerate),
                 "input_format": "mjpeg"
             },
             format="dshow",
             logger=logger
         )
+
+        return logger, cam
+
+    def run(self):
+        logger, cam = self.__build(logger)
 
         last_frame_num = cam.frame_num
         try:
@@ -155,3 +206,26 @@ class VideoCaptureParserWindows:
 
         finally:
             cam.stop()
+
+    async def run_async(self, logger, ws):
+        logger, cam = self.__build(logger)
+
+        last_frame_num = cam.frame_num
+        try:
+            while cam.running:
+                if last_frame_num != cam.frame_num:
+                    last_frame_num = cam.frame_num
+
+                    frame, fps, frame_num = cam.read()
+                    if frame is not None:
+                        logger.debug(f"FPS: {fps} (num: {frame_num})")
+
+                        success, encoded_image = cv2.imencode('.jpg', frame, [int(cv2.IMWRITE_JPEG_QUALITY), 80])
+                        if success:
+                            await ws.send(encoded_image.tobytes())
+        except Exception as e:
+            logger.debug(e)
+            pass
+        finally:
+            cam.stop()
+

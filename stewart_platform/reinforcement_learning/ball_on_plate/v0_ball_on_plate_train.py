@@ -2,14 +2,13 @@ import os
 import time
 import gymnasium as gym
 import numpy as np
-import logging
 from stable_baselines3 import A2C, DQN, PPO
 from stable_baselines3.common.callbacks import EvalCallback
 
-from src.ball_on_plate.v0 import environment
+from stewart_platform.reinforcement_learning.ball_on_plate.v0_ball_on_plate_env import v0_ball_on_plate_env
 
-def train_sb3(env_id, id, sb3_model="PPO", use_existing_model=None, device='cpu', sequential_execution=False, iterations = 40, steps_per_iteration=5_000, logger=None):
-    os.makedirs(f"./models/bop/{id}", exist_ok=True)
+def train_sb3(env_id, dir, model="PPO", use_existing_model=None, device='cpu'):
+    os.makedirs(f"./models/{dir}", exist_ok=True)
 
     env = gym.make(env_id)
 
@@ -20,10 +19,10 @@ def train_sb3(env_id, id, sb3_model="PPO", use_existing_model=None, device='cpu'
         n_eval_episodes=10,
         deterministic=True,
         render=False,
-        best_model_save_path=f"./models/bop/{id}"
+        best_model_save_path=f"./models/{dir}"
     )
 
-    if sb3_model == "a2c":
+    if model == "A2C":
         if use_existing_model is not None:
             model = A2C.load(
                 use_existing_model,
@@ -37,10 +36,10 @@ def train_sb3(env_id, id, sb3_model="PPO", use_existing_model=None, device='cpu'
                 verbose=1,
                 learning_rate=3e-4,
                 gamma=0.99,
-                tensorboard_log=f"./tensorboard/bop/{id}",
+                tensorboard_log=f"./tensorboard/{dir}",
                 device=device
             )
-    elif sb3_model == "dqn":
+    elif model == "DQN":
         if use_existing_model is not None:
             model = DQN(
                 use_existing_model,
@@ -55,11 +54,11 @@ def train_sb3(env_id, id, sb3_model="PPO", use_existing_model=None, device='cpu'
                 learning_rate=3e-4,
                 gamma=0.99,
                 batch_size=64,
-                tensorboard_log=f"./tensorboard/bop/{id}",
+                tensorboard_log=f"./tensorboard/{dir}",
                 device=device
             )
     # PPO mit angepassten Hyperparametern
-    elif sb3_model == "ppo":
+    elif model == "PPO":
         if use_existing_model is not None:
             model = PPO(
                 use_existing_model,
@@ -76,50 +75,46 @@ def train_sb3(env_id, id, sb3_model="PPO", use_existing_model=None, device='cpu'
                 n_steps=256,
                 batch_size=64,
                 ent_coef=0.01,
-                tensorboard_log=f"./tensorboard/bop/{id}",
+                tensorboard_log=f"./tensorboard/{dir}",
                 device=device
             )
+    
+    # Training mit 500.000 Schritten
+    STEPS_PER_ITERATION = 5_000
 
-    for _ in range(iterations):
+    for _ in range(40):
         model.learn(
-            total_timesteps=steps_per_iteration,
+            total_timesteps=STEPS_PER_ITERATION,
             callback=eval_callback,
             progress_bar=True,
             reset_num_timesteps=False
         )
 
-        model.save(f"./models/bop/{id}/{model_name}")
+        model.save(f"./models/{dir}/{model_name}")
 
-        if sequential_execution:
-            run_sb3(env_id, dir, model_name, model="PPO", episods=1, simulation_mode=True, render_fps=60)
+        run_sb3(env_id, dir, model_name, model="PPO", episods=1)
 
+def run_sb3(env_id, dir, model_name, model="PPO", episods=10):
 
-def run_sb3(env_id, id, model_name, sb3_model, device='cpu', iterations=10, simulation_mode=False, render_fps=32, logger: logging=None, raw_image_event=None):
-    logger = logger or logging.getLogger(__name__)
+    env = gym.make(env_id)
 
-    env = gym.make(env_id, simulation_mode=simulation_mode, render_fps=render_fps, raw_image_event=raw_image_event)
-
-    if sb3_model == "a2c":
+    if model == "A2C":
         model = A2C.load(
-            f"./models/bop/{id}/{model_name}",
-            env=env,
-            device=device
+            f"./models/{dir}/{model_name}",
+            env=env
         )
-    elif sb3_model == "dqn":
+    elif model == "DQN":
         model = DQN.load(
-            f"./models/bop/{id}/{model_name}",
-            env=env,
-            device=device
+            f"./models/{dir}/{model_name}",
+            env=env
         )
-    elif sb3_model == "ppo":
+    elif model == "PPO":
         model = PPO.load(
-            f"./models/bop/{id}/{model_name}",
-            env=env,
-            device=device
+            f"./models/{dir}/{model_name}",
+            env=env
         )
 
-    logger.debug(iterations)
-    for _ in range(iterations):
+    for _ in range(episods):
         count = 0
         # Run a test
         obs = env.reset()[0]
@@ -134,9 +129,9 @@ def run_sb3(env_id, id, model_name, sb3_model, device='cpu', iterations=10, simu
 
             if terminated or truncated:
                 if terminated:
-                    logger.debug(f"Success (count: {count})")
+                    print(f"Success (count: {count})")
                 else:
-                    logger.debug(f"Failed (count: {count})")
+                    print(f"Failed (count: {count})")
                 break
 
 
@@ -144,6 +139,6 @@ if __name__ == "__main__":
     env_id = 'BallOnPlate-v0'
     dir = "bop/0_9"
     model_name = "best_model.zip"
-    # train_sb3(env_id, dir, model="PPO", device='cpu', iterations=100, steps_per_iteration=10_000)
+    train_sb3(env_id, dir, model="PPO", device='auto')
     # train_sb3(env_id, model_dir, tensorboard_dir, useopencl_existing_model=f"{model_dir}/{model_name}")
-    run_sb3(env_id, dir, model_name, model="ppo")
+    # run_sb3(env_id, dir, model_name, model="PPO")
