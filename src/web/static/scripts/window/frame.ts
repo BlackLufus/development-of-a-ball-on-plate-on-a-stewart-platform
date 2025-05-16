@@ -69,11 +69,10 @@ class Frame {
                 EventListener.addEventListener(
                     document,
                     'mousemove',
-                    (e: any) => {
-                        const mouseEvent = e as MouseEvent;
+                    (e: MouseEvent) => {
                         const rawPoint = new Point(
-                            mouseEvent.clientX - this.dragOffsetX,
-                            mouseEvent.clientY - this.dragOffsetY
+                            e.clientX - this.dragOffsetX,
+                            e.clientY - this.dragOffsetY
                         );
                         const clampedPoint = this.getFramePosition(rawPoint);
                         this.frame.style.left = `${clampedPoint.x}px`;
@@ -88,7 +87,6 @@ class Frame {
                     window,
                     'mouseup',
                     () => {
-                        console.log("awd");
                         EventListener.removeAllListeners(`frame-${this.id}-mousemove`);
                     },
                     true,
@@ -98,7 +96,6 @@ class Frame {
                     window,
                     'blur',
                     () => {
-                        console.log("awd");
                         EventListener.removeAllListeners(`frame-${this.id}-mousemove`);
                     },
                     true,
