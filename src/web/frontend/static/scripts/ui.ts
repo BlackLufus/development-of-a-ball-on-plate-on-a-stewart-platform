@@ -1,6 +1,7 @@
 import BallOnPlate from './window/content/ball_on_plate.js';
 import VideoCam from './window/content/video_cam.js';
 import Frame from './window/frame.js';
+import WebSocketHandler from './websocket_handler.js';
 
 const darkModeSwitch = document.getElementById('dark-mode');
 if (darkModeSwitch) {
@@ -20,7 +21,7 @@ if (element1) {
 const video_cam = document.getElementById('video_cam');
 if (video_cam) {
     video_cam.addEventListener('click', () => {
-        const live_cam = new VideoCam("localhost", 6500, "video_cam");
+        const live_cam = new VideoCam();
         live_cam.show();
     });
 }
@@ -36,6 +37,7 @@ if (ball_on_plate) {
 class UI {
 
     static init(): void {
+        WebSocketHandler.instance(`${window.location.host}/ws`).connect();
     }
 
     // Function to update the dark mode

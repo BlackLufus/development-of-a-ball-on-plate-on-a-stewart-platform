@@ -1,4 +1,6 @@
 import argparse
+import json
+import base64
 import logging
 
 import cv2
@@ -207,7 +209,7 @@ class VideoCaptureWindows:
         finally:
             cam.stop()
 
-    async def run_async(self, logger, ws):
+    async def run_async(self, logger, send):
         logger, cam = self.__build(logger)
 
         last_frame_num = cam.frame_num
@@ -222,9 +224,11 @@ class VideoCaptureWindows:
 
                         success, encoded_image = cv2.imencode('.jpg', frame, [int(cv2.IMWRITE_JPEG_QUALITY), 80])
                         if success:
-                            await ws.send(encoded_image.tobytes())
+                            await send('video_cam', True, base64.b64encode(encoded_image.tobytes()))
+                                # encoded_image.tobytes())
         except Exception as e:
             logger.debug(e)
+            await send('video_cam', False, e)
             pass
         finally:
             cam.stop()

@@ -3,13 +3,12 @@ import Point from "../point.js";
 
 class Frame {
 
-    static id = 0;
+    private static id = 0;
 
     private frame: HTMLDivElement;
     private header: HTMLDivElement;
     private terminateEvent?: () => void;
-    id = Frame.id++;
-    kill = null;
+    protected id = Frame.id++;
     private dragOffsetX: number = 0;
     private dragOffsetY: number = 0;
 
@@ -17,7 +16,7 @@ class Frame {
      * Basic Frame for all content Objects
      * @param {string} titleText 
      * @param {HTMLElement} contentElement 
-     * @param {method} terminate 
+     * @param {method} terminateEvent 
      */
     constructor(titleText: string, contentElement?: HTMLElement, terminateEvent?: () => void) {
         const frame = document.createElement('div');

@@ -1,6 +1,5 @@
 .image_stream {
-    image-resolution: 300dpi;
+    display: block;
     width: 600px;
     height: 400px;
-    margin: 0;
 }

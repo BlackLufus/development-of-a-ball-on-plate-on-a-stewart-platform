@@ -178,7 +178,7 @@ cython_debug/
 /models
 /temp
 /log
-/src/web/static/scripts/js/
+/src/web/frontend/static/scripts/js/
 
 # Node
 /node_modules

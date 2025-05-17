@@ -1,15 +1,15 @@
 import Frame from "../frame.js";
 import ImageStream from "./elements/image_stream.js";
 
-class VideoCam extends Frame {
-    private address: string;
-    private port: number;
-    private api_end_point: string;
-    private socket?: WebSocket;
-    private image_stream?: ImageStream;
+class BallOnPlate extends Frame {
+    address: string;
+    port: number;
+    api_end_point: string;
+    socket?: WebSocket;
+    image_stream?: ImageStream;
     
     /**
-     * Creates a VideoCam frame
+     * Creates a BallOnPlate frame
      * @param {string} address 
      * @param {number} port 
      * @param {string} api_end_point 
@@ -17,14 +17,23 @@ class VideoCam extends Frame {
     constructor(address: string, port: number, api_end_point: string) {
         const container = document.createElement('div');
 
-        super("Live Cam", container, () => this.terminate());
+        super("Ball On Plate", container, () => this.terminate());
 
         this.address = address;
         this.port = port;
         this.api_end_point = api_end_point;
 
-        this.build(container)
+        this.build(container);
         this.connect();
+
+        console.log("send task");
+        this.socket?.send(JSON.stringify({
+            'task_id': 'video_cam',
+            'settings': {
+                'resolution': '1280x720',
+                'fps': 30
+            }
+        }));
     }
 
     /**
@@ -35,7 +44,7 @@ class VideoCam extends Frame {
         this.socket = new WebSocket(`ws://${this.address}:${this.port}/${this.api_end_point}`);
 
         // Connection opened
-        this.socket.addEventListener("open", (event) => {
+        this.socket.addEventListener("open", () => {
             console.log("Stream is open");
         });
 
@@ -62,20 +71,12 @@ class VideoCam extends Frame {
         });
     }
 
-    /**
-     * Builds content
-     * @param {HTMLDivElement} container 
-     * @returns {void}
-     */
-    private build(container: HTMLDivElement): void {
-        this.image_stream = new ImageStream(600, 400);
+    private build(container: HTMLElement): void {
+        this.image_stream = new ImageStream(512, 632);
+        container.style.maxHeight = "632px";
         container.appendChild(this.image_stream.canvas);
     }
 
-    /**
-     * A function to terminate all connections
-     * @returns {void}
-     */
     private terminate = () => {
         if (this.socket) {
             console.log("Connection closed");
@@ -85,4 +86,4 @@ class VideoCam extends Frame {
     }
 }
 
-export default VideoCam;
+export default BallOnPlate;

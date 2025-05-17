@@ -1,0 +1,6 @@
+.live_cam {
+    display: block;
+    max-height: calc(height - 4);
+    width: 100%; /* oder feste Breite */
+    height: auto; /* proportional skalieren */
+}
