@@ -1,11 +1,10 @@
+import WebSocketHandler, { State, TASK_ID } from "../../websocket_handler.js";
 import Frame from "../frame.js";
 import ImageStream from "./elements/image_stream.js";
 
 class BallOnPlate extends Frame {
-    address: string;
-    port: number;
-    api_end_point: string;
-    socket?: WebSocket;
+
+    private static instance?: BallOnPlate;
     image_stream?: ImageStream;
     
     /**
@@ -14,26 +13,19 @@ class BallOnPlate extends Frame {
      * @param {number} port 
      * @param {string} api_end_point 
      */
-    constructor(address: string, port: number, api_end_point: string) {
+    private constructor() {
         const container = document.createElement('div');
 
         super("Ball On Plate", container, () => this.terminate());
 
-        this.address = address;
-        this.port = port;
-        this.api_end_point = api_end_point;
-
         this.build(container);
-        this.connect();
+    }
 
-        console.log("send task");
-        this.socket?.send(JSON.stringify({
-            'task_id': 'video_cam',
-            'settings': {
-                'resolution': '1280x720',
-                'fps': 30
-            }
-        }));
+    public static get(): BallOnPlate {
+        if (!this.instance) {
+            this.instance = new BallOnPlate();
+        }
+        return this.instance;
     }
 
     /**
@@ -41,48 +33,72 @@ class BallOnPlate extends Frame {
      * @returns {void}
      */
     private connect(): void {
-        this.socket = new WebSocket(`ws://${this.address}:${this.port}/${this.api_end_point}`);
-
-        // Connection opened
-        this.socket.addEventListener("open", () => {
-            console.log("Stream is open");
-        });
-
-        // Listen for messages
-        this.socket.addEventListener("message", (event) => {
-            if (this.image_stream != null) {
-                const blob = event.data;
-
-                const img = new Image();
-                img.onload = () => {
-                    this.image_stream?.drawFrame(img);
+        WebSocketHandler.subscribe(this.id, TASK_ID.BALL_ON_PLATE, (state: boolean, payload: object) => {
+            if (this.image_stream) {
+                if (state) {
+                    try {
+                        if (payload) {
+                            // response is expected to be a base64 string
+                            const img = new Image();
+                            img.onload = () => {
+                                this.image_stream?.drawFrame(img);
+                            };
+                            img.src = `data:image/jpeg;base64,${payload}`;
+                        }
+                    } catch (e) {
+                        console.error("Failed to parse message or draw frame:", e);
+                    }
                 }
-                img.src = URL.createObjectURL(blob);
+                else {
+                    this.image_stream?.stop();
+                }
             }
         });
 
-        this.socket.addEventListener("close", (event) => {
-            this.dispose();
-        });
+        WebSocketHandler.send(
+            TASK_ID.BALL_ON_PLATE,
+            State.CONNECT,
+            {
+                'env': 'BallOnPlate-v0',
+                'id': '0_9',
+                'model_name': 'best_model.zip',
+                'sb3_model': 'ppo',
+                'device': 'cpu',
+                'iterations': 10,
+                'simulation_mode': false,
+                'fps': 10
+            }
+        );
+    }
 
-        this.socket.addEventListener("error", (event) => {
-            console.log(`Socket Errer: ${event}`);
-            this.dispose();
-        });
+    private disconnect(): void {
+        WebSocketHandler.send(
+            TASK_ID.BALL_ON_PLATE, 
+            State.DISCONNECT, 
+            {}
+        );
     }
 
     private build(container: HTMLElement): void {
-        this.image_stream = new ImageStream(512, 632);
+        this.image_stream = new ImageStream(512, 632, this.start, this.stop);
         container.style.maxHeight = "632px";
-        container.appendChild(this.image_stream.canvas);
+        container.appendChild(this.image_stream.element);
+    }
+
+    private start = (): void => {
+        console.log("BallOnPlate: Start");
+        this.connect();
+    }
+
+    private stop = (): void => {
+        console.log("BallOnPlate: Stop");
+        this.disconnect();
     }
 
     private terminate = () => {
-        if (this.socket) {
-            console.log("Connection closed");
-            this.socket.close();
-            this.socket = undefined;
-        }
+        this.stop();
+        console.log("BallOnPlate: Terminate Node");
+        BallOnPlate.instance = undefined;
     }
 }
 

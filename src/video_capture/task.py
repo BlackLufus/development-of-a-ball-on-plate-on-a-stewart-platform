@@ -1,4 +1,5 @@
 import argparse
+from asyncio import Event
 import json
 import base64
 import logging
@@ -186,12 +187,12 @@ class VideoCaptureWindows:
 
         return logger, cam
 
-    def run(self):
+    def run(self, logger, event=None, stop_event: Event=None):
         logger, cam = self.__build(logger)
 
         last_frame_num = cam.frame_num
         try:
-            while cam.running:
+            while cam.running and not stop_event.is_set():
                 if last_frame_num != cam.frame_num:
                     last_frame_num = cam.frame_num
 
@@ -199,37 +200,16 @@ class VideoCaptureWindows:
                     if frame is not None:
                         logger.debug(f"FPS: {fps} (num: {frame_num})")
 
-                        # Anzeige des Bildes
-                        cv2.imshow("Threaded Camera", frame)
+                        if event and not stop_event.is_set():
+                            event(frame)
 
-                        # Mit 'q' beenden
-                        if cv2.waitKey(1) & 0xFF == ord('q'):
-                            break
+                        elif not event:
+                            # Anzeige des Bildes
+                            cv2.imshow("Threaded Camera", frame)
+
+                            # Mit 'q' beenden
+                            if cv2.waitKey(1) & 0xFF == ord('q'):
+                                break
 
         finally:
             cam.stop()
-
-    async def run_async(self, logger, send):
-        logger, cam = self.__build(logger)
-
-        last_frame_num = cam.frame_num
-        try:
-            while cam.running:
-                if last_frame_num != cam.frame_num:
-                    last_frame_num = cam.frame_num
-
-                    frame, fps, frame_num = cam.read()
-                    if frame is not None:
-                        logger.debug(f"FPS: {fps} (num: {frame_num})")
-
-                        success, encoded_image = cv2.imencode('.jpg', frame, [int(cv2.IMWRITE_JPEG_QUALITY), 80])
-                        if success:
-                            await send('video_cam', True, base64.b64encode(encoded_image.tobytes()))
-                                # encoded_image.tobytes())
-        except Exception as e:
-            logger.debug(e)
-            await send('video_cam', False, e)
-            pass
-        finally:
-            cam.stop()
-

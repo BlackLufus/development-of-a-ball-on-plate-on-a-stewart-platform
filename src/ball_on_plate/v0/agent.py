@@ -226,18 +226,12 @@ class BallOnPlate:
             pygame.display.update()
         # Save image
         else:
-            # Screenshot als Surface holen
-            screenshot_surface = pygame.display.get_surface()
-
-            # In Bytearray oder Bild umwandeln
-            image_str = pygame.image.tostring(screenshot_surface, 'RGB')
-            w, h = screenshot_surface.get_size()
-            frame = np.frombuffer(image_str, dtype=np.uint8).reshape((h, w, 3))
-
-            # JPEG-Komprimierung
-            success, encoded_image = cv2.imencode('.jpg', frame, [int(cv2.IMWRITE_JPEG_QUALITY), 50])
+            surface_array = pygame.surfarray.array3d(pygame.display.get_surface())  
+            image = np.transpose(surface_array, (1, 0, 2))  # (width, height, 3) -> (height, width, 3)
+            image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)  # Correct color from RGB to BGR for OpenCV
+            success, encoded_image = cv2.imencode('.jpg', image)
             if success:
-                self.raw_image_event(encoded_image.tobytes())
+                self.raw_image_event(encoded_image)
             # image.save(f'test_image/{datetime.now().strftime("%Y%m%d-%H%M%S%f")}.png')
             
                 

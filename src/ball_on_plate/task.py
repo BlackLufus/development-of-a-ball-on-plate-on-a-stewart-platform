@@ -1,5 +1,6 @@
 import argparse
 import asyncio
+import base64
 from queue import Queue
 import io
 import threading
@@ -129,7 +130,7 @@ class RunBallOnPlate:
         )
         parser.add_argument(
             '-m',
-            '--model',
+            '--sb3_model',
             help='',
             required=False,
             type=str,
@@ -172,75 +173,34 @@ class RunBallOnPlate:
         self.env = args.env
         self.id = args.id
         self.model_name = args.model_name
-        self.model = args.model
+        self.sb3_model = args.sb3_model
         self.device = args.device
         self.iterations = args.iterations
         self.simulation_mode = args.simulation_mode
         self.fps = args.fps
 
-    def manual(self, env, id, model_name, model, device, iterations, simulation_mode, fps):
+    def manual(self, env, id, model_name, sb3_model, device, iterations, simulation_mode, fps):
         self.env = env
         self.id = id
         self.model_name = model_name
-        self.model = model
+        self.sb3_model = sb3_model
         self.device = device
         self.iterations = iterations
         self.simulation_mode = simulation_mode
         self.fps = fps
 
-    def run(self, logger):
+    def run(self, logger, event=None, stop_event=None):
         from src.ball_on_plate.v0.training import run_sb3
         run_sb3(
             self.env,
             self.id,
             self.model_name,
-            self.model,
+            self.sb3_model,
             self.device,
             self.iterations,
             self.simulation_mode,
             self.fps,
-            logger
+            logger,
+            event,
+            stop_event
         )
-
-    async def run_async(self, logger, ws):
-        from src.ball_on_plate.v0.training import run_sb3
-
-        try:
-            image_queue = asyncio.Queue()
-            stop_event = asyncio.Event()
-            loop = asyncio.get_running_loop()
-
-            def raw_image_event(image_bytes):
-                # Sende das Bild sicher in die Async-Queue
-                asyncio.run_coroutine_threadsafe(image_queue.put(image_bytes), loop)
-            
-            # Funktion, die im Thread läuft
-            def run_training():
-                run_sb3(
-                    self.env,
-                    self.id,
-                    self.model_name,
-                    self.model,
-                    self.device,
-                    self.iterations,
-                    self.simulation_mode,
-                    self.fps,
-                    logger,
-                    raw_image_event
-                )
-                # Training ist vorbei – signalisiere das auch, falls nötig:
-                asyncio.run_coroutine_threadsafe(stop_event.set(), loop)
-
-            # Starte run_sb3 in separatem Thread
-            threading.Thread(target=run_training, daemon=True).start()
-
-            while not stop_event.is_set():
-                try:
-                    image = await asyncio.wait_for(image_queue.get(), timeout=1.0)
-                    if image:
-                        await ws.send(image)
-                except asyncio.TimeoutError:
-                    continue
-        except:
-            pass
-

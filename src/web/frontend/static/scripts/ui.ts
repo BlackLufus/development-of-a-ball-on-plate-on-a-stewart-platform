@@ -21,7 +21,7 @@ if (element1) {
 const video_cam = document.getElementById('video_cam');
 if (video_cam) {
     video_cam.addEventListener('click', () => {
-        const live_cam = new VideoCam();
+        const live_cam = VideoCam.get();
         live_cam.show();
     });
 }
@@ -29,7 +29,7 @@ if (video_cam) {
 const ball_on_plate = document.getElementById('ball_on_plate');
 if (ball_on_plate) {
     ball_on_plate.addEventListener('click', () => {
-        const live_cam = new BallOnPlate("localhost", 6500, "run_ball_on_plate");
+        const live_cam = BallOnPlate.get();
         live_cam.show();
     });
 }

@@ -1,0 +1,13 @@
+.stream_button {
+    position: absolute;
+    height: 40px;
+    width: 40px;
+    bottom: 10px;
+    left: 50%;
+    transform: translate(-50%);
+}
+
+.stream_button_element {
+    height: 40px;
+    width: 40px;
+}

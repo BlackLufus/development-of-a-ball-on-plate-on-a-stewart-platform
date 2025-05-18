@@ -139,7 +139,7 @@ class Frame {
     public show(): void {
         if (this.frame != undefined) {
             const playground = document.getElementById('playground');
-            if (playground) {
+            if (playground && !playground.contains(this.frame)) {
                 playground.appendChild(this.frame);
             } else {
                 console.warn("No element with ID 'playground' found.");

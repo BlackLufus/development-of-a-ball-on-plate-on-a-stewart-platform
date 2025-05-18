@@ -1,6 +1,7 @@
 import asyncio
 import base64
 import json
+from queue import Queue
 import threading
 import time
 from channels.generic.websocket import AsyncWebsocketConsumer
@@ -41,6 +42,9 @@ class StewartPlatformConsumer(AsyncWebsocketConsumer):
         self._video_cam_thread = None
         self._video_cam_stop_event = threading.Event()
 
+        self._run_ball_on_plate_thread = None
+        self._run_ball_on_plate_stop_event = threading.Event()
+
     async def connect(self):
         if self.is_connected:
             await self.disconnect()
@@ -61,18 +65,33 @@ class StewartPlatformConsumer(AsyncWebsocketConsumer):
         match task_id:
             case 'video_cam':
                 if state == 'connect':
-                    print("connect")
                     if self._video_cam_thread and self._video_cam_thread.is_alive():
                         await self.send_response(task_id, False, 'Already connected to video cam!')
                     else:
+                        device_name = payload.get('device_name')
                         resolution = payload.get('resolution')
                         fps = payload.get('fps')
-                        await self.video_cam_handler(resolution, fps)
+                        await self.video_cam_handler(device_name, resolution, fps)
                 elif state == 'disconnect':
                     print("disconnect") 
                     await self.stop_video_cam_handler()
             case 'ball_on_plate':
-                pass
+                if state == 'connect':
+                    if self._run_ball_on_plate_thread and self._run_ball_on_plate_thread.is_alive():
+                        await self.send_response(task_id, False, 'Already connected to video cam!')
+                    else:
+                        env = payload.get('env')
+                        id = payload.get('id')
+                        model_name = payload.get('model_name')
+                        sb3_model = payload.get('sb3_model')
+                        device = payload.get('device')
+                        iterations = payload.get('iterations')
+                        simulation_mode = payload.get('simulation_mode')
+                        fps = payload.get('fps')
+                        await self.run_ball_on_plate_handler(env, id, model_name, sb3_model, device, iterations, simulation_mode, fps)
+                elif state == 'disconnect':
+                    print("disconnect") 
+                    await self.stop_run_ball_on_plate_handler()
             case _:
                 await self.send_response(task_id, False, 'Task does not match with any existing tasks!')
 
@@ -81,64 +100,106 @@ class StewartPlatformConsumer(AsyncWebsocketConsumer):
         # Stop video cam thread if running
         await self.stop_video_cam_handler()
 
+    async def stop_run_ball_on_plate_handler(self):
+        if self._run_ball_on_plate_thread and self._run_ball_on_plate_thread.is_alive():
+            self._run_ball_on_plate_stop_event.set()
+            self._run_ball_on_plate_thread.join(timeout=2)
+
+    async def run_ball_on_plate_handler(self, env, id, model_name, sb3_model, device, iterations, simulation_mode, fps):
+        self._run_ball_on_plate_stop_event.clear()
+        loop = asyncio.get_running_loop()
+
+        def start_ball_on_plate(loop):
+            from src.ball_on_plate.task import RunBallOnPlate
+
+            def raw_image_event(buffer):
+                if not self._run_ball_on_plate_stop_event.is_set():
+                    b64_image = base64.b64encode(buffer).decode('utf-8')
+
+                    # Sende die base64-Daten an den Client (über asyncio)
+                    asyncio.run_coroutine_threadsafe(
+                        self.send_response('ball_on_plate', True, b64_image),
+                        loop
+                    )
+            try:
+                model = RunBallOnPlate()
+                model.manual(
+                    env,
+                    id,
+                    model_name,
+                    sb3_model,
+                    device,
+                    iterations,
+                    simulation_mode,
+                    fps
+                )
+                model.run(
+                    None,
+                    raw_image_event,
+                    self._run_ball_on_plate_stop_event
+                )
+            except Exception as e:
+                import traceback
+                traceback.print_exc()
+                print(e)
+                asyncio.run_coroutine_threadsafe(
+                    self.send_response('ball_on_plate', False, e),
+                    loop
+                )
+            finally:
+                asyncio.run_coroutine_threadsafe(
+                    self.send_response('ball_on_plate', False, 'Ball on plate ended'),
+                    loop
+                )
+
+        # Starte Thread
+        self._run_ball_on_plate_thread = threading.Thread(target=start_ball_on_plate, args=(loop,), daemon=True)
+        self._run_ball_on_plate_thread.start()
+
+
+    # Video Cam Section
     async def stop_video_cam_handler(self):
         if self._video_cam_thread and self._video_cam_thread.is_alive():
             self._video_cam_stop_event.set()
             self._video_cam_thread.join(timeout=2)
 
-    async def video_cam_handler(self, resolution, fps):
+    async def video_cam_handler(self, device_name, resolution, fps):
         self._video_cam_stop_event.clear()
         loop = asyncio.get_running_loop()
 
-        def start_cam(loop):
-            from src.video_capture.video_capture import CameraThreadWithAV
-            try:
-                cam = CameraThreadWithAV(
-                    device_name=f"video=Logitech BRIO",
-                    options={
-                        "video_size": resolution,
-                        "framerate": str(fps),
-                        "input_format": "mjpeg"
-                    },
-                    format="dshow",
-                    logger=None
-                )
-                last_frame_num = cam.frame_num
-                try:
-                    while cam.running and not self._video_cam_stop_event.is_set():
-                        frame, _, _ = cam.read()
-                        if last_frame_num != cam.frame_num:
-                            last_frame_num = cam.frame_num
+        def run(loop):
 
-                            # Encode frame to base64
-                            _, buffer = cv2.imencode('.jpg', frame)
-                            b64_image = base64.b64encode(buffer).decode('utf-8')
+            def raw_image_event(frame):
+                if not self._video_cam_stop_event.is_set():
+                    _, buffer = cv2.imencode('.jpg', frame)
+                    b64_image = base64.b64encode(buffer).decode('utf-8')
 
-                            # Sende die base64-Daten an den Client (über asyncio)
-                            asyncio.run_coroutine_threadsafe(
-                                self.send_response('video_cam', True, b64_image),
-                                loop
-                            )
-
-                        # kurze Pause, um CPU nicht zu überlasten
-                        time.sleep(0.01)  
-                
-                except Exception as e:
-                    print(e)
-                finally:
-                    cam.stop()
+                    # Sende die base64-Daten an den Client (über asyncio)
                     asyncio.run_coroutine_threadsafe(
-                        self.send_response('video_cam', False, 'Video stream ended'),
+                        self.send_response('video_cam', True, b64_image),
                         loop
                     )
+                
+            from src.video_capture.task import VideoCaptureWindows
+            try:
+                model = VideoCaptureWindows()
+                model.manual(device_name, resolution, fps)
+                model.run(
+                    None,
+                    raw_image_event,
+                    self._video_cam_stop_event
+                )
             except Exception as e:
+                import traceback
+                traceback.print_exc()
+                print(e)
                 asyncio.run_coroutine_threadsafe(
                     self.send_response('video_cam', False, e),
                     loop
                 )
 
         # Starte Thread
-        self._video_cam_thread = threading.Thread(target=start_cam, args=(loop,), daemon=True)
+        self._video_cam_thread = threading.Thread(target=run, args=(loop,), daemon=True)
         self._video_cam_thread.start()
 
 

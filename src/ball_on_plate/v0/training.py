@@ -1,3 +1,4 @@
+from asyncio import Event
 import os
 import time
 import gymnasium as gym
@@ -94,7 +95,7 @@ def train_sb3(env_id, id, sb3_model="PPO", use_existing_model=None, device='cpu'
             run_sb3(env_id, dir, model_name, model="PPO", episods=1, simulation_mode=True, render_fps=60)
 
 
-def run_sb3(env_id, id, model_name, sb3_model, device='cpu', iterations=10, simulation_mode=False, render_fps=32, logger: logging=None, raw_image_event=None):
+def run_sb3(env_id, id, model_name, sb3_model, device='cpu', iterations=10, simulation_mode=False, render_fps=32, logger: logging=None, raw_image_event=None, stop_event: Event=None):
     logger = logger or logging.getLogger(__name__)
 
     env = gym.make(env_id, simulation_mode=simulation_mode, render_fps=render_fps, raw_image_event=raw_image_event)
@@ -125,7 +126,7 @@ def run_sb3(env_id, id, model_name, sb3_model, device='cpu', iterations=10, simu
         obs = env.reset()[0]
         env.render()
         terminated = False
-        while True:
+        while True and not stop_event.is_set():
             count += 1
             action, _ = model.predict(observation=obs, deterministic=True) # Turn on deterministic, so predict always returns the same behavior
             obs, _, terminated, truncated, _ = env.step(action)
