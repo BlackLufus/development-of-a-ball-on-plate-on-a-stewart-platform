@@ -92,14 +92,15 @@ nav > ul > li > section > label {
 }
 
 nav > ul > li > div {
-    display: flex;
+    display: block;
     padding: 0 15px;
     justify-content: center;
     align-items: center;
 }
 
-nav > ul > li > div > label {
+nav > ul > li > div > span {
     align-content: center;
+    text-align: center;
     font-family: var(--primary-font-family);
     font-size: 22px;
 }

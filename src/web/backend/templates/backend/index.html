@@ -11,6 +11,9 @@
     <link rel="stylesheet" href="static/styles/content/live_cam.css">
     <link rel="stylesheet" href="static/styles/content/element/image_strean.css">
     <link rel="stylesheet" href="static/styles/content/element/stream_button.css">
+    <link rel="stylesheet" href="static/styles/content/control_panel.css">
+    <link rel="stylesheet" href="static/styles/content/element/menu_bar.css">
+    <link rel="stylesheet" href="static/styles/content/element/input.css">
     <title>Document</title>
 </head>
 <body>
@@ -40,10 +43,43 @@
                     </div>
                 </label>
             </li>
+            <li id="websocket_li">
+                <label class="switch">
+                    <input id="websocket" type="checkbox">
+                    <div class="slider round"></div>
+                    <div class="switch-box">
+                        <div class="switch-text switch-on-text">
+                            Verbunden
+                        </div>
+                        <div class="switch-text switch-off-text">
+                            Getrennt
+                        </div>
+                        </div>
+                    </div>
+                </label>
+            </li>
             <li>
-                <div id="element_1" class="button-text">
-                    <span>Element 1</span>
+                <section>
+                    <label>
+                        Stewart Platform
+                    </label>
+                </section>
+            </li>
+            <li>
+                <div id="control_panel"  class="button-text">
+                    <span>
+                        Control Panel
+                        <br>
+                        (Set/Circle Test/Nunchuck)
+                    </span>
                 </div>
+            </li>
+            <li>
+                <section>
+                    <label>
+                        Weitere Funktionen
+                    </label>
+                </section>
             </li>
             <li>
                 <div id="video_cam"  class="button-text">
@@ -52,15 +88,23 @@
             </li>
             <li>
                 <div id="ball_on_plate"  class="button-text">
-                    <span>Ball On Plate</span>
+                    <span>
+                        Ball On Plate
+                        <br>
+                        (Virtuell)
+                    </span>
                 </div>
             </li>
             <li>
-                <div id="element_4"  class="button-text">
-                    <span>Element 4</span>
+                <div id="ping_pong_ball"  class="button-text">
+                    <span>
+                        Ping Pong Ball
+                        <br>
+                        (Coming soon)
+                    </span>
                 </div>
             </li>
-            <li>
+            <!-- <li>
                 <div id="element_5"  class="button-text">
                     <span>Element 5</span>
                 </div>
@@ -104,7 +148,7 @@
                 <div id="element_12"  class="button-text">
                     <span>Element 12</span>
                 </div>
-            </li>
+            </li> -->
         </ul>
         <footer>
             <div>
@@ -122,7 +166,7 @@
         </header>
         <main id="main">
             <div id="playground" class="playground">
-                <div class="frame">
+                <!-- <div class="frame">
                     <div class="frame_header">
                         <span class="frame_title">Titel</span>
                         <button class="frame_close"></button>
@@ -137,7 +181,7 @@
                             </canvas>
                         </div>
                     </div>
-                </div>
+                </div> -->
             </div>
         </main>
         <footer>

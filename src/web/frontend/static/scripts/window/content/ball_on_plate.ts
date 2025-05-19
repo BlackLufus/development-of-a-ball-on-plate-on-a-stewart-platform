@@ -1,4 +1,4 @@
-import WebSocketHandler, { State, TASK_ID } from "../../websocket_handler.js";
+import WebSocketHandler, { State, TaskId } from "../../websocket_handler.js";
 import Frame from "../frame.js";
 import ImageStream from "./elements/image_stream.js";
 
@@ -33,7 +33,7 @@ class BallOnPlate extends Frame {
      * @returns {void}
      */
     private connect(): void {
-        WebSocketHandler.subscribe(this.id, TASK_ID.BALL_ON_PLATE, (state: boolean, payload: object) => {
+        WebSocketHandler.subscribe(this.id, TaskId.BALL_ON_PLATE, (state: boolean, payload: object) => {
             if (this.image_stream) {
                 if (state) {
                     try {
@@ -56,7 +56,7 @@ class BallOnPlate extends Frame {
         });
 
         WebSocketHandler.send(
-            TASK_ID.BALL_ON_PLATE,
+            TaskId.BALL_ON_PLATE,
             State.CONNECT,
             {
                 'env': 'BallOnPlate-v0',
@@ -73,10 +73,11 @@ class BallOnPlate extends Frame {
 
     private disconnect(): void {
         WebSocketHandler.send(
-            TASK_ID.BALL_ON_PLATE, 
+            TaskId.BALL_ON_PLATE, 
             State.DISCONNECT, 
             {}
         );
+        WebSocketHandler.unsubscribe(this.id);
     }
 
     private build(container: HTMLElement): void {

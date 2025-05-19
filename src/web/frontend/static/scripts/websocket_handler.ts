@@ -1,4 +1,7 @@
-export enum TASK_ID {
+export enum TaskId {
+    SET = 'set',
+    CIRCLE = 'circle',
+    NUNCHUCK = 'nunchuck',
     VIDEO_CAM = 'video_cam',
     BALL_ON_PLATE = 'ball_on_plate'
 }
@@ -11,17 +14,17 @@ export enum State {
 export class WebSocketHandlerListener {
 
     public id: number;
-    public task_id: TASK_ID;
+    public task_id: TaskId;
     public event: (success: boolean, payload: object) => void;
 
-    constructor(id: number, task_id: TASK_ID, event: (success: boolean, payload: object) => void) {
+    constructor(id: number, task_id: TaskId, event: (success: boolean, payload: object) => void) {
         this.id = id;
         this.task_id = task_id;
         this.event = event;
     }
 }
 
-export class WebSocketHandlerError extends Error {
+class WebSocketHandlerError extends Error {
 
     constructor(message: string) {
         super(message);
@@ -36,6 +39,7 @@ class WebSocketHandler {
 
     private url: string
     private websocket?: WebSocket;
+    private switchElement?: HTMLInputElement;
 
     private listener: Array<WebSocketHandlerListener> = [];
 
@@ -43,10 +47,17 @@ class WebSocketHandler {
         this.url = url;
     }
 
+    public register(switchElement: HTMLInputElement): void {
+        this.switchElement = switchElement;
+    }
+
     public connect(): void {
         this.websocket = new WebSocket(`ws://${this.url}`);
 
         this.websocket.addEventListener('open', event => {
+            if (this.switchElement) {
+                this.switchElement.checked = true;
+            }
             console.log("Connected");
         });
 
@@ -66,11 +77,14 @@ class WebSocketHandler {
         });
 
         this.websocket.addEventListener('close', event => {
+            if (this.switchElement) {
+                this.switchElement.checked = false;
+            }
             console.log("Disconnected");
         });
     }
 
-    public static send(task_id: TASK_ID, state: State, payload: object): boolean {
+    public static send(task_id: TaskId, state: State, payload: object): boolean {
         if (this.wsh && this.wsh.websocket && this.wsh.websocket.readyState != WebSocket.CLOSED) {
             this.wsh.websocket.send(JSON.stringify({
                 'task_id': task_id,
@@ -82,7 +96,7 @@ class WebSocketHandler {
         return false;
     }
 
-    public static subscribe(id: number, task_id: TASK_ID, event: (success: boolean, payload: object) => void): void {
+    public static subscribe(id: number, task_id: TaskId, event: (success: boolean, payload: object) => void): void {
         if (!this.wsh) {
             throw new WebSocketHandlerError('There is no WebSocketHandler instance!');
         }

@@ -11,6 +11,9 @@
     <link rel="stylesheet" href="styles/content/live_cam.css">
     <link rel="stylesheet" href="styles/content/element/image_strean.css">
     <link rel="stylesheet" href="styles/content/element/stream_button.css">
+    <link rel="stylesheet" href="styles/content/control_panel.css">
+    <link rel="stylesheet" href="styles/content/element/menu_bar.css">
+    <link rel="stylesheet" href="styles/content/element/input.css">
     <title>Document</title>
 </head>
 <body>
@@ -40,10 +43,43 @@
                     </div>
                 </label>
             </li>
+            <li id="websocket_li">
+                <label class="switch">
+                    <input id="websocket" type="checkbox">
+                    <div class="slider round"></div>
+                    <div class="switch-box">
+                        <div class="switch-text switch-on-text">
+                            Verbunden
+                        </div>
+                        <div class="switch-text switch-off-text">
+                            Getrennt
+                        </div>
+                        </div>
+                    </div>
+                </label>
+            </li>
             <li>
-                <div id="element_1" class="button-text">
-                    <span>Element 1</span>
+                <section>
+                    <label>
+                        Stewart Platform
+                    </label>
+                </section>
+            </li>
+            <li>
+                <div id="control_panel"  class="button-text">
+                    <span>
+                        Control Panel
+                        <br>
+                        (Set/Circle Test/Nunchuck)
+                    </span>
                 </div>
+            </li>
+            <li>
+                <section>
+                    <label>
+                        Weitere Funktionen
+                    </label>
+                </section>
             </li>
             <li>
                 <div id="video_cam"  class="button-text">
@@ -52,15 +88,23 @@
             </li>
             <li>
                 <div id="ball_on_plate"  class="button-text">
-                    <span>Ball On Plate</span>
+                    <span>
+                        Ball On Plate
+                        <br>
+                        (Virtuell)
+                    </span>
                 </div>
             </li>
             <li>
-                <div id="element_4"  class="button-text">
-                    <span>Element 4</span>
+                <div id="ping_pong_ball"  class="button-text">
+                    <span>
+                        Ping Pong Ball
+                        <br>
+                        (Coming soon)
+                    </span>
                 </div>
             </li>
-            <li>
+            <!-- <li>
                 <div id="element_5"  class="button-text">
                     <span>Element 5</span>
                 </div>
@@ -104,7 +148,7 @@
                 <div id="element_12"  class="button-text">
                     <span>Element 12</span>
                 </div>
-            </li>
+            </li> -->
         </ul>
         <footer>
             <div>
@@ -128,12 +172,94 @@
                         <button class="frame_close"></button>
                     </div>
                     <div class="frame_content">
-                        <div class="live_cam">
-                            <img src="assets/svg/play_button.svg" alt="Play Button" style="height: 40px; width: 40px; position: absolute; bottom: 10px; left: 50%; transform: translate(-50%); border-radius: 45px;">
-                            <!-- <img src="assets/svg/stop_button.svg" alt="Stop Button" style="height: 40px; width: 40px; position: absolute; bottom: 10px; left: 50%; transform: translate(-50%); border-radius: 45px;"> -->
-                            <canvas class="image_strean">
-                                
-                            </canvas>
+                        <div class="control_panel">
+                            <div class="menu_bar">
+                                <div class="menu_bar_item">
+                                    <input type="radio" name="menu_bar" checked>
+                                    <Span>
+                                        Set
+                                    </Span>
+                                </div>
+                                <div class="menu_bar_item">
+                                    <input type="radio" name="menu_bar">
+                                    <span>
+                                        Circle
+                                    </span>
+                                </div>
+                                <div class="menu_bar_item">
+                                    <input type="radio" name="menu_bar">
+                                    <Span>
+                                        Nunchuck
+                                    </Span>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="control_panel_setting_header">
+                                    <h1>Set</h1>
+                                    <span>
+                                        Description
+                                    </span>
+                                </div>
+                                <div class="control_panel_setting_options">
+                                    <h2>Options</h2>
+                                    <div class="input_element">
+                                        <div>
+                                            <span>X</span>
+                                        </div>
+                                        <div>
+                                            <input type="text">
+                                        </div>
+                                    </div>
+                                    <div class="input_element">
+                                        <div>
+                                            <span>Y</span>
+                                        </div>
+                                        <div>
+                                            <input type="text">
+                                        </div>
+                                    </div>
+                                    <div class="input_element">
+                                        <div>
+                                            <span>Z</span>
+                                        </div>
+                                        <div>
+                                            <input type="text">
+                                        </div>
+                                    </div>
+                                    <div class="input_element">
+                                        <div>
+                                            <span>Roll</span>
+                                        </div>
+                                        <div>
+                                            <input type="text">
+                                        </div>
+                                    </div>
+                                    <div class="input_element">
+                                        <div>
+                                            <span>pitch</span>
+                                        </div>
+                                        <div>
+                                            <input type="text">
+                                        </div>
+                                    </div>
+                                    <div class="input_element">
+                                        <div>
+                                            <span>yaw</span>
+                                        </div>
+                                        <div>
+                                            <input type="text">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="control_panel_setting_actions">
+                                    <h2>Actions</h2>
+                                    <div>
+                                        <button>
+                                            Übernehmen
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

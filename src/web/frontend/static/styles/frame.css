@@ -1,8 +1,9 @@
 .frame {
     position: absolute;
     overflow: hidden;
-    border-radius: 5px;
-    z-index: 1000;
+    border: 1px solid rgb(180, 180, 180);
+    border-radius: 10px;
+    min-height: 56px;
 }
 
 .frame_header {
@@ -15,6 +16,8 @@
     height: 28px;
     user-select: none;
     backdrop-filter: blur(4px);
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
 }
 
 .frame_title {
@@ -42,7 +45,7 @@
 .frame_close::before, .frame_close::after {
     position: absolute;
     top: 14px;
-    right: 15px;
+    right: 12px;
     content: "";
     padding: 0 7px;
     height: 2px;
@@ -61,4 +64,6 @@
 
 .frame_content {
     background-color: var(--third-background-color);
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
 }

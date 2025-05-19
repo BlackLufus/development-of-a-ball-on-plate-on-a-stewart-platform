@@ -3,6 +3,7 @@ import Point from "../point.js";
 
 class Frame {
 
+    private static zCounter: number = 1000;
     private static id = 0;
 
     private frame: HTMLDivElement;
@@ -19,22 +20,23 @@ class Frame {
      * @param {method} terminateEvent 
      */
     constructor(titleText: string, contentElement?: HTMLElement, terminateEvent?: () => void) {
-        const frame = document.createElement('div');
-        frame.className = 'frame';
+        this.frame = document.createElement('div');
+        this.frame.className = 'frame';
+        this.frame.style.zIndex = (Frame.zCounter++).toString();
 
-        const header = document.createElement('div');
-        header.className = "frame_header";
-        frame.appendChild(header);
+        this.header = document.createElement('div');
+        this.header.className = "frame_header";
+        this.frame.appendChild(this.header);
 
         const title = document.createElement('span');
         title.className = "frame_title";
         title.textContent = titleText;
-        header.appendChild(title);
+        this.header.appendChild(title);
 
         const close_button = document.createElement('button');
         close_button.className = "frame_close";
         close_button.addEventListener("click", () => this.dispose());
-        header.appendChild(close_button);
+        this.header.appendChild(close_button);
 
         const contentWrapper = document.createElement('div');
         contentWrapper.className = "frame_content";
@@ -43,10 +45,8 @@ class Frame {
         } else if (contentElement) {
             contentWrapper.textContent = contentElement; // fallback, falls kein Element
         }
-        frame.appendChild(contentWrapper);
+        this.frame.appendChild(contentWrapper);
 
-        this.frame = frame;
-        this.header = header;
         this.terminateEvent = terminateEvent;
         this.addEventListeners();
     }
@@ -57,9 +57,18 @@ class Frame {
      */
     private addEventListeners(): void {
         EventListener.addEventListener(
+            this.frame,
+            'mousedown',
+            this.focus,
+            false,
+            `frame-${this.id}`
+        )
+        EventListener.addEventListener(
             this.header,
             'mousedown',
             (rootEvent: any) => {
+
+                this.focus(rootEvent);
 
                 // 🟡 Offset merken
                 this.dragOffsetX = rootEvent.clientX - this.frame.offsetLeft;
@@ -144,6 +153,16 @@ class Frame {
             } else {
                 console.warn("No element with ID 'playground' found.");
             }
+        }
+    }
+
+    public focus(event: MouseEvent): void {
+        const target = event.target as HTMLElement;
+        const frame = target.closest('.frame') as HTMLElement | null;
+
+        if (frame && frame.style.zIndex != `${Frame.zCounter-1}`) {
+            console.log(`zIndex: ${frame.style.zIndex}`)
+            frame.style.zIndex = (Frame.zCounter++).toString();
         }
     }
 

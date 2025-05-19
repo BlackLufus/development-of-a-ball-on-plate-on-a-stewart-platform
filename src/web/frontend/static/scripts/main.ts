@@ -1,3 +1,3 @@
-import UI from './ui.js';
+import Manager from './manager.js';
 
-UI.init();
+Manager.get();

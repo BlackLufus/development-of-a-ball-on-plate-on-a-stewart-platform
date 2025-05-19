@@ -1,4 +1,4 @@
-import WebSocketHandler, { State, TASK_ID } from "../../websocket_handler.js";
+import WebSocketHandler, { State, TaskId } from "../../websocket_handler.js";
 import Frame from "../frame.js";
 import ImageStream from "./elements/image_stream.js";
 
@@ -34,7 +34,7 @@ class VideoCam extends Frame {
      */
     private connect(): void {
         
-        WebSocketHandler.subscribe(this.id, TASK_ID.VIDEO_CAM, (state: boolean, payload: object) => {
+        WebSocketHandler.subscribe(this.id, TaskId.VIDEO_CAM, (state: boolean, payload: object) => {
             if (this.image_stream) {
                 if (state) {
                     try {
@@ -57,7 +57,7 @@ class VideoCam extends Frame {
         });
 
         WebSocketHandler.send(
-            TASK_ID.VIDEO_CAM,
+            TaskId.VIDEO_CAM,
             State.CONNECT,
             {
                 'device_name': 'Logitech BRIO',
@@ -68,7 +68,7 @@ class VideoCam extends Frame {
     }
 
     private disconnect(): void {
-        WebSocketHandler.send(TASK_ID.VIDEO_CAM, State.DISCONNECT, {});
+        WebSocketHandler.send(TaskId.VIDEO_CAM, State.DISCONNECT, {});
     }
 
     /**

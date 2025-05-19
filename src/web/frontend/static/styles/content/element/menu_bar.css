@@ -1,0 +1,31 @@
+.menu_bar {
+    display: flex;
+    
+    width: 100%;
+}
+
+.menu_bar_item {
+    width: 100%;
+    border-bottom: 1px solid black;
+    border-top: 1px solid black;
+}
+
+.menu_bar_item:not(:last-child) {
+    border-right: 1px solid black;
+}
+
+.menu_bar_item:hover {
+    background-color: red;
+}
+
+.menu_bar_item > span {
+    font-size: 22px;
+}
+
+.menu_bar_item> input {
+    display: none;
+}
+
+.menu_bar_item:has(> input:checked) {
+    background-color: purple;
+}
