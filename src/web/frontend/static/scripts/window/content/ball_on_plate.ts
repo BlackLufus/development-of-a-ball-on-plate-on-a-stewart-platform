@@ -2,16 +2,35 @@ import WebSocketHandler, { State, TaskId } from "../../websocket_handler.js";
 import Frame from "../frame.js";
 import ImageStream from "./elements/image_stream.js";
 
+/**
+ * BallOnPlateError is a custom error class for handling errors specific to the Ball On Plate simulation.
+ * It extends the built-in Error class and sets the name property to "BallOnPlateError".
+ */
+class BallOnPlateError extends Error {
+    constructor(message: string) {
+        super(message);
+        this.name = "BallOnPlateError";
+        Object.setPrototypeOf(this, BallOnPlateError.prototype);
+    }
+}
+
+/**
+ * Represents the Ball On Plate frame, providing a singleton interface for managing
+ * the visualization and communication with the Ball On Plate simulation backend.
+ * 
+ * This class handles the connection to the backend via WebSocket, manages the image
+ * stream for displaying simulation frames, and provides lifecycle management for the frame.
+ */
 class BallOnPlate extends Frame {
 
     private static instance?: BallOnPlate;
     image_stream?: ImageStream;
     
     /**
-     * Creates a BallOnPlate frame
-     * @param {string} address 
-     * @param {number} port 
-     * @param {string} api_end_point 
+     * Creates a BallOnPlate frame.
+     * @private
+     * @remarks
+     * Use the static {@link BallOnPlate.get} method to obtain the singleton instance.
      */
     private constructor() {
         const container = document.createElement('div');
@@ -21,6 +40,10 @@ class BallOnPlate extends Frame {
         this.build(container);
     }
 
+    /**
+     * Retrieves the singleton instance of the BallOnPlate frame.
+     * @returns {BallOnPlate} The singleton instance.
+     */
     public static get(): BallOnPlate {
         if (!this.instance) {
             this.instance = new BallOnPlate();
@@ -46,7 +69,7 @@ class BallOnPlate extends Frame {
                             img.src = `data:image/jpeg;base64,${payload}`;
                         }
                     } catch (e) {
-                        console.error("Failed to parse message or draw frame:", e);
+                        throw new BallOnPlateError("Failed to parse message or draw frame: " + e);
                     }
                 }
                 else {
@@ -54,7 +77,13 @@ class BallOnPlate extends Frame {
                 }
             }
         });
+    }
 
+    /**
+     * Sends a connection payload to the backend.
+     * @private
+     */
+    private send(): void {
         WebSocketHandler.send(
             TaskId.BALL_ON_PLATE,
             State.CONNECT,
@@ -71,6 +100,10 @@ class BallOnPlate extends Frame {
         );
     }
 
+    /**
+     * Disconnects from the Ball On Plate simulation backend and unsubscribes from updates.
+     * @private
+     */
     private disconnect(): void {
         WebSocketHandler.send(
             TaskId.BALL_ON_PLATE, 
@@ -80,22 +113,40 @@ class BallOnPlate extends Frame {
         WebSocketHandler.unsubscribe(this.id);
     }
 
+    /**
+     * Builds the Ball On Plate frame UI by initializing the image stream and appending it to the container.
+     * @param container - The HTML container element for the frame.
+     * @private
+     */
     private build(container: HTMLElement): void {
         this.image_stream = new ImageStream(512, 632, this.start, this.stop);
         container.style.maxHeight = "632px";
         container.appendChild(this.image_stream.element);
     }
 
+    /**
+     * Starts the Ball On Plate simulation by establishing the backend connection.
+     * @private
+     */
     private start = (): void => {
         console.log("BallOnPlate: Start");
         this.connect();
+        this.send();
     }
 
+    /**
+     * Stops the Ball On Plate simulation by disconnecting from the backend.
+     * @private
+     */
     private stop = (): void => {
         console.log("BallOnPlate: Stop");
         this.disconnect();
     }
 
+    /**
+     * Terminates the Ball On Plate frame, performing cleanup and resetting the singleton instance.
+     * @private
+     */
     private terminate = () => {
         this.stop();
         console.log("BallOnPlate: Terminate Node");

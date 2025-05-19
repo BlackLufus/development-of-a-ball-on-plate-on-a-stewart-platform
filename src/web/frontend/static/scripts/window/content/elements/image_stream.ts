@@ -1,5 +1,13 @@
 import StreamButton from "./stream_button.js";
 
+class ImageStreamError extends Error {
+    constructor(message: string) {
+        super(message);
+        this.name = "ImageStreamError";
+        Object.setPrototypeOf(this, ContextMenuError.prototype);
+    }
+}
+
 class ImageStream extends StreamButton {
 
     public readonly element: HTMLElement;

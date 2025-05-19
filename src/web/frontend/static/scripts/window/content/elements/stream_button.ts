@@ -1,3 +1,11 @@
+class StreamButtonError extends Error {
+    constructor(message: string) {
+        super(message);
+        this.name = "StreamButtonError";
+        Object.setPrototypeOf(this, StreamButtonError.prototype);
+    }
+}
+
 class StreamButton {
 
     protected readonly stream_buttons: HTMLElement;

@@ -1,6 +1,14 @@
 import EventListener from "../EventListener.js";
 import Point from "../point.js";
 
+class FrameError extends Error {
+    constructor(message: string) {
+        super(message);
+        this.name = "FrameError";
+        Object.setPrototypeOf(this, FrameError.prototype);
+    }
+}
+
 class Frame {
 
     private static zCounter: number = 1000;
@@ -124,7 +132,7 @@ class Frame {
 
         const playground = document.getElementById('playground');
         if (!playground) {
-            return point;
+            throw new FrameError("No element with ID 'playground' found.");
         }
         if (point.x < 0) {
             point.x = 0;
@@ -148,10 +156,14 @@ class Frame {
     public show(): void {
         if (this.frame != undefined) {
             const playground = document.getElementById('playground');
-            if (playground && !playground.contains(this.frame)) {
+            if (!playground) {
+                throw new FrameError("No element with ID 'playground' found.");
+            }
+            else if (!playground.contains(this.frame)) {
+                throw new FrameError("Frame is not in playground.");
+            }
+            else {
                 playground.appendChild(this.frame);
-            } else {
-                console.warn("No element with ID 'playground' found.");
             }
         }
     }
@@ -171,7 +183,7 @@ class Frame {
      * @returns {void}
      */
     public dispose(): void {
-        if (this.frame != undefined) {
+        if (this.frame) {
             if (this.terminateEvent) {
                 this.terminateEvent();
             }

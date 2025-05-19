@@ -1,3 +1,58 @@
 .control_panel {
     width: 400px;
 }
+
+.control_panel_setting {
+    padding: 6px 8px;
+}
+
+.control_panel_setting_header {
+    padding-bottom: 12px;
+}
+
+.control_panel_setting_header > h1 {
+    padding-bottom: 6px;
+}
+
+.control_panel_setting_header > span {
+    font-size: 22px;
+}
+
+
+.control_panel_setting_options {
+    padding-bottom: 8px;
+}
+
+.control_panel_setting_options > h2 {
+    padding-bottom: 6px;
+}
+
+.control_panel_setting_options > div {
+    padding: 1px 0;
+}
+
+
+.control_panel_setting_actions {
+    padding-bottom: 6px;
+}
+
+.control_panel_setting_actions > h2 {
+    padding-bottom: 6px;
+}
+
+.control_panel_setting_actions > div {
+    display: flex;
+    justify-content: center;
+}
+
+.control_panel_setting_actions > div > button {
+    margin: 0 4px;
+    padding: 4px 12px;
+    width: 180px;
+    border-radius: 5px;
+    border: 1px solid #999;
+}
+
+.control_panel_setting_actions > div > button > span {
+    font-size: 22px;
+}

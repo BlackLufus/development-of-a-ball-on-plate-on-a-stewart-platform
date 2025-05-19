@@ -6,12 +6,11 @@
 
 .menu_bar_item {
     width: 100%;
-    border-bottom: 1px solid black;
-    border-top: 1px solid black;
+    border-bottom: 1px solid #aaa;
 }
 
 .menu_bar_item:not(:last-child) {
-    border-right: 1px solid black;
+    border-right: 1px solid #aaa;
 }
 
 .menu_bar_item:hover {
@@ -19,7 +18,7 @@
 }
 
 .menu_bar_item > span {
-    font-size: 22px;
+    font-size: 26px;
 }
 
 .menu_bar_item> input {
