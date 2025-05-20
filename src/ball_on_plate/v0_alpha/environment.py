@@ -4,14 +4,14 @@ from gymnasium.envs.registration import register
 from gymnasium.utils.env_checker import check_env
 
 
-from stewart_platform.reinforcement_learning.ball_on_plate import v0_ball_on_plate as bop
+from src.ball_on_plate.v0_alpha import agent as bop
 import numpy as np
 
 gym.registry.clear()
 
 register(
     id="BallOnPlate-v0",
-    entry_point="v0_ball_on_plate_env:BallOnPlateEnv",
+    entry_point="src.ball_on_plate.v0.environment:BallOnPlateEnv",
 )
 
 class BallOnPlateEnv(gym.Env):
@@ -21,13 +21,13 @@ class BallOnPlateEnv(gym.Env):
     The robot can move in four directions: up, down, left, right.
     The robot receives a reward of +1 for picking up the target object and -1 for hitting the walls.
     """
-    metadata = {"render_modes": ["human"], "render_fps": 60, "simulation_mode": False}
+    metadata = {"render_modes": ["human"]}
 
-    def __init__(self, render_mode=None):
+    def __init__(self, platform, smh, cam, render_mode=None, render_fps=60):
         super().__init__()
         self.render_mode = render_mode
 
-        self.ball = bop.BallOnPlate(fps=self.metadata["render_fps"], simulation_mode=self.metadata["simulation_mode"])
+        self.ball = bop.BallOnPlate(platform=platform, smh=smh, cam=cam, fps=render_fps)
         self.action_space = spaces.Box(
             low=np.array([
                 -self.ball.max_angle,
@@ -43,6 +43,14 @@ class BallOnPlateEnv(gym.Env):
         # spaces.Discrete(len(bop.BallOnPlateAction))
 
         self.observation_space = spaces.Box(
+            # Each array is min and max values
+            # [
+            #     sx, sy,
+            #     vx, vy,
+            #     roll (rad), pitch (rad),
+            #     target_x, target_y,
+            #     isOnTarget
+            # ]
             low=np.array([
                 -1.0, -1.0,
                 -1.0, -1.0,
@@ -99,9 +107,7 @@ class BallOnPlateEnv(gym.Env):
         self.steps += 1
 
         # Perform action and get some informations back
-        # old_dist = np.linalg.norm(np.array(self.ball.target_pos) - np.array([self.ball.sx, self.ball.sy]))
         finish, isOnTarget, boarder_crossed = self.ball.perform_action(action)
-        # new_dist = np.linalg.norm(np.array(self.ball.target_pos) - np.array([self.ball.sx, self.ball.sy]))
 
         # Basic rewards
         reward = -1
@@ -133,7 +139,7 @@ class BallOnPlateEnv(gym.Env):
         self.ball.render()
     
 if __name__ == "__main__":
-    env = gym.make("BallOnPlate-v0", render_mode="human")
+    env = gym.make("BallOnPlate-v0", render_mode="human", render_fps=5, simulation_mode=True)
     
     # Use this to check our custom environment
     print("Check environment begin")

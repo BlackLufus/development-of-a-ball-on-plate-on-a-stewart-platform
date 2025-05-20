@@ -126,7 +126,7 @@ def run_sb3(env_id, id, model_name, sb3_model, device='cpu', iterations=10, simu
         obs = env.reset()[0]
         env.render()
         terminated = False
-        while True and not stop_event.is_set():
+        while True or stop_event and not stop_event.is_set():
             count += 1
             action, _ = model.predict(observation=obs, deterministic=True) # Turn on deterministic, so predict always returns the same behavior
             obs, _, terminated, truncated, _ = env.step(action)

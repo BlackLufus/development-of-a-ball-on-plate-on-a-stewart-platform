@@ -43,6 +43,14 @@ class BallOnPlateEnv(gym.Env):
         # spaces.Discrete(len(bop.BallOnPlateAction))
 
         self.observation_space = spaces.Box(
+            # Each array is min and max values
+            # [
+            #     sx, sy,
+            #     vx, vy,
+            #     roll (rad), pitch (rad),
+            #     target_x, target_y,
+            #     isOnTarget
+            # ]
             low=np.array([
                 -1.0, -1.0,
                 -1.0, -1.0,
