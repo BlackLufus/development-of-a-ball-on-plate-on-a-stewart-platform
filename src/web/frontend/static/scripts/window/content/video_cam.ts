@@ -108,6 +108,7 @@ class VideoCam extends Frame {
      */
     private disconnect(): void {
         WebSocketHandler.send(TaskId.VIDEO_CAM, State.DISCONNECT, {});
+        WebSocketHandler.unsubscribe(this.id);
     }
 
     /**
