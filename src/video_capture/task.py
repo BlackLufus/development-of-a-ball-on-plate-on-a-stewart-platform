@@ -83,7 +83,7 @@ class VideoCaptureLinux():
                     last_frame_num = cam.frame_num
 
                     frame, fps, frame_num = cam.read()
-                    if event and not stop_event.is_set():
+                    if not event or stop_event.is_set():
                         break
                     elif frame is not None:
                         logger.debug(f"FPS: {fps} (num: {frame_num})")
@@ -178,7 +178,7 @@ class VideoCaptureWindows:
                     last_frame_num = cam.frame_num
 
                     frame, fps, frame_num = cam.read()
-                    if event and not stop_event.is_set():
+                    if not event or stop_event.is_set():
                         break
                     elif frame is not None:
                         logger.debug(f"FPS: {fps} (num: {frame_num})")
