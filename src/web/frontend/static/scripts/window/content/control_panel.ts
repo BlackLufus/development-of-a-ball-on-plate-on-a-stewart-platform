@@ -28,6 +28,7 @@ class ControlPanel extends Frame {
 
     private static instance?: ControlPanel;
     private selected_task: TaskId = TaskId.SET;
+    private connected: boolean = false;
     private values: Record<string, any> = {
         x: {
             type: InputType.NUMBER,
@@ -45,10 +46,10 @@ class ControlPanel extends Frame {
         },
         z: {
             type: InputType.NUMBER,
-            value: 0,
+            value: 62,
             step: 0.1,
-            min: -5,
-            max: 5
+            min: 58,
+            max: 70
         },
         roll: {
             type: InputType.NUMBER,
@@ -80,10 +81,10 @@ class ControlPanel extends Frame {
         },
         steps: {
             type: InputType.NUMBER,
-            value: 0.1,
-            step: 0.005,
+            value: 1,
+            step: 1,
             min: 0.01,
-            max: 5
+            max: 300
         },
         period: {
             type: InputType.NUMBER,
@@ -147,6 +148,7 @@ class ControlPanel extends Frame {
      * @private
      */
     private connect(): void {
+        this.connected = true;
         WebSocketHandler.subscribe(this.id, this.selected_task, (state: boolean, payload: object) => {
             if (true) {
                 if (state) {
@@ -160,14 +162,7 @@ class ControlPanel extends Frame {
                 }
             }
         });
-    }
 
-    /**
-     * Sends the current task and its parameters to the backend.
-     * 
-     * @private
-     */
-    private send(): void {
         WebSocketHandler.send(
             this.selected_task,
             State.CONNECT,
@@ -216,6 +211,7 @@ class ControlPanel extends Frame {
      * @private
      */
     private disconnect(): void {
+        this.connected = false;
         WebSocketHandler.send(
             this.selected_task, 
             State.DISCONNECT, 
@@ -257,7 +253,6 @@ class ControlPanel extends Frame {
         switch(this.selected_task) {
             case TaskId.SET:
                 this.buildContent(
-                    'Set Task',
                     'Set the position and orientation of the steward platform',
                     'Agrumente',
                     [
@@ -270,13 +265,12 @@ class ControlPanel extends Frame {
                     ],
                     'Aktionen',
                     [
-                        new ActionButton('Übernehmen', () => this.send())
+                        new ActionButton('Übertragen', () => this.connect())
                     ]
                 );
                 break;
             case TaskId.CIRCLE:
                 this.buildContent(
-                    'Circle Task',
                     'Task description',
                     'Agrumente',
                     [
@@ -287,13 +281,13 @@ class ControlPanel extends Frame {
                     ],
                     'Aktionen',
                     [
-                        new ActionButton('Übernehmen', () => this.send())
+                        new ActionButton('Übertragen', () => this.connect()),
+                        new ActionButton('Unterbrechen', () => this.disconnect())
                     ]
                 );
                 break;
             case TaskId.NUNCHUCK:
                 this.buildContent(
-                    'Nunchuck Task',
                     'Task description',
                     'Agrumente',
                     [
@@ -303,7 +297,8 @@ class ControlPanel extends Frame {
                     ],
                     'Aktionen',
                     [
-                        new ActionButton('Übernehmen', () => this.send())
+                        new ActionButton('Übertragen', () => this.connect()),
+                        new ActionButton('Unterbrechen', () => this.disconnect())
                     ]
                 );
                 break;
@@ -321,7 +316,7 @@ class ControlPanel extends Frame {
      * @param {Array<ActionButton>} actions_list - The list of action buttons.
      * @private
      */
-    private buildContent(task_name: string, task_description: string, argument_header_name: string, agrument_list: Array<Input>, action_header_name: string, actions_list: Array<ActionButton>): void {
+    private buildContent(task_description: string, argument_header_name: string, agrument_list: Array<Input>, action_header_name: string, actions_list: Array<ActionButton>): void {
         this.content_elememt.innerHTML = "";
         
         const top_div = document.createElement('div');
@@ -369,10 +364,11 @@ class ControlPanel extends Frame {
      * @private
      */
     private task_changed = (task_id: TaskId) => {
-        this.disconnect();
+        if (this.connected) {
+            this.disconnect();
+        }
         this.selected_task = task_id;
         this.setContent();
-        this.connect();
     }
 
     /**

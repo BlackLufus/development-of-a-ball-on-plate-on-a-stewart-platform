@@ -21,13 +21,13 @@ class Dropdown {
 
     public readonly element: HTMLElement;
 
-    constructor(values: Array<DropdownItem>, selectEvent: (value: DropdownItem, index: number) => void) {
+    constructor(values: Array<DropdownItem>, selectEvent: (value: DropdownItem, index: number) => void, index: number=0) {
         this.element = document.createElement('div');
 
-        this.build(values, selectEvent);
+        this.build(values, selectEvent, index);
     }
 
-    private build(values: Array<DropdownItem>, selectEvent: (value: DropdownItem, index: number) => void): void {
+    private build(values: Array<DropdownItem>, selectEvent: (value: DropdownItem, index: number) => void, index: number): void {
         this.element.className = 'select_dropdown_container';
 
         const select = document.createElement('select');
@@ -47,6 +47,7 @@ class Dropdown {
             option.text = value.name;
             select.appendChild(option);
         });
+        select.selectedIndex = index;
     }
 }
 

@@ -54,6 +54,13 @@ class StewartPlatformConsumer(AsyncWebsocketConsumer):
         self._run_ball_on_plate_thread = None
         self._run_ball_on_plate_stop_event = threading.Event()
 
+        with open('./src/config.json', 'r') as f:
+            config_data = json.load(f)
+            self.base_radius = config_data['settings']['base_radius']
+            self.base_angle = config_data['settings']['base_angle']
+            self.platform_radius = config_data['settings']['platform_radius']
+            self.platform_angle = config_data['settings']['platform_angle']
+
     async def connect(self):
         if self.is_connected:
             await self.disconnect()
@@ -92,10 +99,11 @@ class StewartPlatformConsumer(AsyncWebsocketConsumer):
                     if self._circle_thread and self._circle_thread.is_alive():
                         await self.send_response(task_id, False, 'Already connected to circle task!')
                     else:
-                        device_name = payload.get('device_name')
-                        resolution = payload.get('resolution')
-                        fps = payload.get('fps')
-                        await self.run_circle_handler(device_name, resolution, fps)
+                        radius = payload.get('radius')
+                        steps = payload.get('steps')
+                        period = payload.get('period')
+                        smooth = payload.get('smooth')
+                        await self.run_circle_handler(radius, steps, period, smooth)
                 elif state == 'disconnect':
                     print("disconnect from circle task") 
                     await self.stop_circle_handler()
@@ -140,14 +148,18 @@ class StewartPlatformConsumer(AsyncWebsocketConsumer):
                         await self.run_ball_on_plate_handler(env, id, model_name, sb3_model, device, iterations, simulation_mode, fps)
                 elif state == 'disconnect':
                     print("disconnect") 
-                    await self.stop_run_ball_on_plate_handler()
+                    await self.stop_ball_on_plate_handler()
             case _:
                 await self.send_response(task_id, False, 'Task does not match with any existing tasks!')
 
     async def disconnect(self, code):
         print("Client disconnected...")
         # Stop video cam thread if running
+        await self.stop_set_handler()
+        await self.stop_circle_handler()
+        await self.stop_nunchuck_handler()
         await self.stop_video_cam_handler()
+        await self.stop_ball_on_plate_handler()
 
     async def stop_set_handler(self):
         if self._set_thread and self._set_thread.is_alive():
@@ -160,7 +172,7 @@ class StewartPlatformConsumer(AsyncWebsocketConsumer):
             from src.stewart_platform.task import Set
 
             try:
-                model = Set()
+                model = Set(self.base_radius, self.base_angle, self.platform_radius, self.platform_angle)
                 model.manual(
                     x,
                     y,
@@ -197,16 +209,16 @@ class StewartPlatformConsumer(AsyncWebsocketConsumer):
             self._circle_stop_event.set()
             self._circle_thread.join(timeout=2)
 
-    async def run_circle_handler(self, device_name, resolution, fps):
-        self._video_cam_stop_event.clear()
+    async def run_circle_handler(self, radius, steps, period, smooth):
+        self._circle_stop_event.clear()
         loop = asyncio.get_running_loop()
 
         def run(loop):
                 
             from src.stewart_platform.task import Circle
             try:
-                model = Circle()
-                model.manual(device_name, resolution, fps)
+                model = Circle(self.base_radius, self.base_angle, self.platform_radius, self.platform_angle)
+                model.manual(radius, steps, period, smooth)
                 model.run(
                     None,
                     self._circle_stop_event
@@ -239,7 +251,7 @@ class StewartPlatformConsumer(AsyncWebsocketConsumer):
                 
             from src.nunchuk.task import Nunchuk
             try:
-                model = Nunchuk()
+                model = Nunchuk(self.base_radius, self.base_angle, self.platform_radius, self.platform_angle)
                 model.manual(radius, period, use_accelerometer)
                 model.run(
                     None,
@@ -260,7 +272,7 @@ class StewartPlatformConsumer(AsyncWebsocketConsumer):
 
 
     # Ball on Plate Section
-    async def stop_run_ball_on_plate_handler(self):
+    async def stop_ball_on_plate_handler(self):
         if self._run_ball_on_plate_thread and self._run_ball_on_plate_thread.is_alive():
             self._run_ball_on_plate_stop_event.set()
             self._run_ball_on_plate_thread.join(timeout=2)

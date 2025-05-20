@@ -24,7 +24,7 @@ class Input {
     }
 
     private build(id: any, name: string, values: Record<string, any>): void {
-        this.element.classList = 'input_element';
+        this.element.classList.add('input_element');
 
         const argument_div = document.createElement('div');
         const argument = document.createElement('span');
@@ -33,14 +33,14 @@ class Input {
         this.element.appendChild(argument_div);
 
         if (values[id].type == InputType.DROPDOWN) {
-            console.log(values[id].list[values[id].value]);
 
             const dropdown = new Dropdown(
                 values[id].list,
                 (item: DropdownItem, index: number) => {
                     values[id].value = item.id;
                     values[id].index = index;
-                }
+                },
+                values[id].index
             );
             this.element.appendChild(dropdown.element);
         }

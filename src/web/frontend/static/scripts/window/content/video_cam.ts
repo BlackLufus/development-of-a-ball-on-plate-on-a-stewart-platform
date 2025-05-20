@@ -97,7 +97,7 @@ class VideoCam extends Frame {
             //     'platform': 'linux',
             //     'device_name': '/dev/video1',
             //     'resolution': '1280x720',
-            //     'fps': 30
+            //     'fps': 10
             // }
         );
     }

@@ -61,10 +61,10 @@ class VideoCaptureLinux():
 
         # Initialize the video capture
         cam = CameraThreadWithAV(
-            device_name=self.args.device_name,
+            device_name=self.device_name,
             options={
-                "video_size": self.args.resolution,
-                "framerate": str(self.args.framerate),
+                "video_size": self.resolution,
+                "framerate": str(self.framerate),
                 "input_format": "mjpeg"
             },
             format="v4l2",

@@ -1,4 +1,5 @@
 import argparse
+from asyncio import Event
 import logging
 import time
 
@@ -59,7 +60,7 @@ class Nunchuk:
         self.period = period
         self.use_accelerometer = use_accelerometer
 
-    def run(self, logger):        
+    def run(self, logger, stop_event:Event=None):        
         from src.stewart_platform.stewart_platform import StewartPlatform
         from src.stewart_platform.servo_motor_handler import ServoMotorHandler
         from src.nunchuk.nunchuk import Nunchuk
@@ -80,6 +81,8 @@ class Nunchuk:
         logger = logger or logging.getLogger("StewartPlatform.Circle")
 
         while True:
+            if stop_event and stop_event.is_set():
+                return
             # Get the Nunchuk values
             nc.measure()
             nc.dump()

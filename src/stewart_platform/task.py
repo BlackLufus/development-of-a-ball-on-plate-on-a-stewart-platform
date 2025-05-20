@@ -63,20 +63,20 @@ class Set:
         )
 
         self.args, _ = parser.parse_known_args()
-        self.x = self.args.x,
-        self.y = self.args.y,
-        self.z = self.args.z,
-        self.roll = self.args.roll,
-        self.pitch = self.args.pitch,
-        self.yaw = self.args.yaw,
+        self.x = self.args.x
+        self.y = self.args.y
+        self.z = self.args.z
+        self.roll = self.args.roll
+        self.pitch = self.args.pitch
+        self.yaw = self.args.yaw
     
     def manual(self, x, y, z, roll, pitch, yaw):
-        self.x = x,
-        self.y = y,
-        self.z = z,
-        self.roll = roll,
-        self.pitch = pitch,
-        self.yaw = yaw,
+        self.x = x
+        self.y = y
+        self.z = z
+        self.roll = roll
+        self.pitch = pitch
+        self.yaw = yaw
 
     def run(self, logger):
         from src.stewart_platform.stewart_platform import StewartPlatform
@@ -92,6 +92,9 @@ class Set:
         logger = logger or logging.getLogger("StewartPlatform.Set")
 
         # Set the values for the Stewart platform
+        print(self.x)
+        print(self.y)
+        print(self.z)
         smh.set(
             platform,
             self.x,
@@ -196,8 +199,10 @@ class Circle:
             angles = np.linspace(0, 2 * math.pi, int(steps))
 
             # Set the radius of the circle
-            while True and not stop_event.is_set():
+            while True:
                 for theta in angles:
+                    if stop_event and stop_event.is_set():
+                        return
                     x_offset = radius * math.cos(theta)
                     # x_offset = 0
                     # x_offset = np.random.uniform(-10, 10)
@@ -211,11 +216,11 @@ class Circle:
         else:
 
             # Start the circular motion test
-            while True and not stop_event.is_set():
+            while True:
                 # setAngle(0, 0, 62, 15, 0, 0)
                 # print("Step 1")
                 for i in np.arange(-radius, 0, steps):
-                    if stop_event.is_set():
+                    if stop_event and stop_event.is_set():
                         return
                     smh.set(platform, 0, 0, 62, radius, i, 0)
                     time.sleep(period)
@@ -223,7 +228,7 @@ class Circle:
                 # setAngle(0, 0, 62, 15, 15, 0)
                 # print("Step 2")
                 for i in np.arange(0, radius, steps):
-                    if stop_event.is_set():
+                    if stop_event and stop_event.is_set():
                         return
                     smh.set(platform, 0, 0, 62, radius, i, 0)
                     time.sleep(period)
@@ -231,7 +236,7 @@ class Circle:
                 # setAngle(0, 0, 62, 0, 15, 0)
                 # print("Step 3")
                 for i in np.arange(radius, 0, -steps):
-                    if stop_event.is_set():
+                    if stop_event and stop_event.is_set():
                         return
                     smh.set(platform, 0, 0, 62, i, radius, 0)
                     time.sleep(period)
@@ -239,7 +244,7 @@ class Circle:
                 # setAngle(0, 0, 62, -15, 15, 0)
                 # print("Step 4")
                 for i in np.arange(0, -radius, -steps):
-                    if stop_event.is_set():
+                    if stop_event and stop_event.is_set():
                         return
                     smh.set(platform, 0, 0, 62, i, radius, 0)
                     time.sleep(period)
@@ -247,7 +252,7 @@ class Circle:
                 # setAngle(0, 0, 62, -15, 0, 0)
                 # print("Step 5")
                 for i in np.arange(radius, 0, -steps):
-                    if stop_event.is_set():
+                    if stop_event and stop_event.is_set():
                         return
                     smh.set(platform, 0, 0, 62, -radius, i, 0)
                     time.sleep(period)
@@ -255,7 +260,7 @@ class Circle:
                 # setAngle(0, 0, 62, -15, -15, 0)
                 # print("Step 6")
                 for i in np.arange(0, -radius, -steps):
-                    if stop_event.is_set():
+                    if stop_event and stop_event.is_set():
                         return
                     smh.set(platform, 0, 0, 62, -radius, i, 0)
                     time.sleep(period)
@@ -263,7 +268,7 @@ class Circle:
                 # setAngle(0, 0, 62, 0, -15, 0)
                 # print("Step 7")
                 for i in np.arange(-radius, 0, steps):
-                    if stop_event.is_set():
+                    if stop_event and stop_event.is_set():
                         return
                     smh.set(platform, 0, 0, 62, i, -radius, 0)
                     time.sleep(period)
@@ -271,7 +276,7 @@ class Circle:
                 # setAngle(0, 0, 62, 15, -15, 0)
                 # logger.debug("Step 8")
                 for i in np.arange(0, radius, steps):
-                    if stop_event.is_set():
+                    if stop_event and stop_event.is_set():
                         return
                     smh.set(platform, 0, 0, 62, i, -radius, 0)
                     time.sleep(period)
