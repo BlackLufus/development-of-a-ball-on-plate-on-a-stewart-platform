@@ -39,6 +39,15 @@ class StewartPlatformConsumer(AsyncWebsocketConsumer):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        
+        self._set_thread = None
+
+        self._circle_thread = None
+        self._circle_stop_event = threading.Event()
+
+        self._nunchuck_thread = None
+        self._nunchuck_stop_event = threading.Event()
+
         self._video_cam_thread = None
         self._video_cam_stop_event = threading.Event()
 
@@ -63,22 +72,62 @@ class StewartPlatformConsumer(AsyncWebsocketConsumer):
         print(task_id)
 
         match task_id:
+            case 'set':
+                if state == 'connect':
+                    if self._set_thread and self._set_thread.is_alive():
+                        await self.send_response(task_id, False, 'Already connected to set task!')
+                    else:
+                        x = payload.get('x')
+                        y = payload.get('y')
+                        z = payload.get('z')
+                        roll = payload.get('roll')
+                        pitch = payload.get('pitch')
+                        yaw = payload.get('yaw')
+                        await self.run_set_handler(x, y, z, roll, pitch, yaw)
+                elif state == 'disconnect':
+                    print("disconnect fronm set task") 
+                    await self.stop_set_handler()
+            case 'circle':
+                if state == 'connect':
+                    if self._circle_thread and self._circle_thread.is_alive():
+                        await self.send_response(task_id, False, 'Already connected to circle task!')
+                    else:
+                        device_name = payload.get('device_name')
+                        resolution = payload.get('resolution')
+                        fps = payload.get('fps')
+                        await self.run_circle_handler(device_name, resolution, fps)
+                elif state == 'disconnect':
+                    print("disconnect from circle task") 
+                    await self.stop_circle_handler()
+            case 'nunchuck':
+                if state == 'connect':
+                    if self._nunchuck_thread and self._nunchuck_thread.is_alive():
+                        await self.send_response(task_id, False, 'Already connected to nunchuck task!')
+                    else:
+                        radius = payload.get('radius')
+                        period = payload.get('period')
+                        use_accelerometer = payload.get('use_accelerometer')
+                        await self.run_nunchuck_handler(radius, period, use_accelerometer)
+                elif state == 'disconnect':
+                    print("disconnect from nunchuck task") 
+                    await self.stop_nunchuck_handler()
             case 'video_cam':
                 if state == 'connect':
                     if self._video_cam_thread and self._video_cam_thread.is_alive():
                         await self.send_response(task_id, False, 'Already connected to video cam!')
                     else:
+                        platform = payload.get('platform')
                         device_name = payload.get('device_name')
                         resolution = payload.get('resolution')
                         fps = payload.get('fps')
-                        await self.video_cam_handler(device_name, resolution, fps)
+                        await self.run_video_cam_handler(platform, device_name, resolution, fps)
                 elif state == 'disconnect':
                     print("disconnect") 
                     await self.stop_video_cam_handler()
             case 'ball_on_plate':
                 if state == 'connect':
                     if self._run_ball_on_plate_thread and self._run_ball_on_plate_thread.is_alive():
-                        await self.send_response(task_id, False, 'Already connected to video cam!')
+                        await self.send_response(task_id, False, 'Already connected to ball on plate!')
                     else:
                         env = payload.get('env')
                         id = payload.get('id')
@@ -100,6 +149,117 @@ class StewartPlatformConsumer(AsyncWebsocketConsumer):
         # Stop video cam thread if running
         await self.stop_video_cam_handler()
 
+    async def stop_set_handler(self):
+        if self._set_thread and self._set_thread.is_alive():
+            self._set_thread.join(timeout=2)
+
+    async def run_set_handler(self, x, y, z, roll, pitch, yaw):
+        loop = asyncio.get_running_loop()
+
+        def start_ball_on_plate(loop):
+            from src.stewart_platform.task import Set
+
+            try:
+                model = Set()
+                model.manual(
+                    x,
+                    y,
+                    z,
+                    roll,
+                    pitch,
+                    yaw
+                )
+                model.run(
+                    None
+                )
+            except Exception as e:
+                import traceback
+                traceback.print_exc()
+                print(e)
+                asyncio.run_coroutine_threadsafe(
+                    self.send_response('set', False, e),
+                    loop
+                )
+            finally:
+                asyncio.run_coroutine_threadsafe(
+                    self.send_response('set', False, 'Set task ended'),
+                    loop
+                )
+
+        # Starte Thread
+        self._set_thread = threading.Thread(target=start_ball_on_plate, args=(loop,), daemon=True)
+        self._set_thread.start()
+
+    
+    # Circle Section
+    async def stop_circle_handler(self):
+        if self._circle_thread and self._circle_thread.is_alive():
+            self._circle_stop_event.set()
+            self._circle_thread.join(timeout=2)
+
+    async def run_circle_handler(self, device_name, resolution, fps):
+        self._video_cam_stop_event.clear()
+        loop = asyncio.get_running_loop()
+
+        def run(loop):
+                
+            from src.stewart_platform.task import Circle
+            try:
+                model = Circle()
+                model.manual(device_name, resolution, fps)
+                model.run(
+                    None,
+                    self._circle_stop_event
+                )
+            except Exception as e:
+                import traceback
+                traceback.print_exc()
+                print(e)
+                asyncio.run_coroutine_threadsafe(
+                    self.send_response('circle', False, e),
+                    loop
+                )
+
+        # Starte Thread
+        self._circle_thread = threading.Thread(target=run, args=(loop,), daemon=True)
+        self._circle_thread.start()
+
+
+    # Nunchuck Section
+    async def stop_nunchuck_handler(self):
+        if self._nunchuck_thread and self._nunchuck_thread.is_alive():
+            self._nunchuck_stop_event.set()
+            self._nunchuck_thread.join(timeout=2)
+
+    async def run_nunchuck_handler(self, radius, period, use_accelerometer):
+        self._nunchuck_stop_event.clear()
+        loop = asyncio.get_running_loop()
+
+        def run(loop):
+                
+            from src.nunchuk.task import Nunchuk
+            try:
+                model = Nunchuk()
+                model.manual(radius, period, use_accelerometer)
+                model.run(
+                    None,
+                    self._nunchuck_stop_event
+                )
+            except Exception as e:
+                import traceback
+                traceback.print_exc()
+                print(e)
+                asyncio.run_coroutine_threadsafe(
+                    self.send_response('circle', False, e),
+                    loop
+                )
+
+        # Starte Thread
+        self._nunchuck_thread = threading.Thread(target=run, args=(loop,), daemon=True)
+        self._nunchuck_thread.start()
+
+
+    # Ball on Plate Section
     async def stop_run_ball_on_plate_handler(self):
         if self._run_ball_on_plate_thread and self._run_ball_on_plate_thread.is_alive():
             self._run_ball_on_plate_stop_event.set()
@@ -163,7 +323,7 @@ class StewartPlatformConsumer(AsyncWebsocketConsumer):
             self._video_cam_stop_event.set()
             self._video_cam_thread.join(timeout=2)
 
-    async def video_cam_handler(self, device_name, resolution, fps):
+    async def run_video_cam_handler(self, platform, device_name, resolution, fps):
         self._video_cam_stop_event.clear()
         loop = asyncio.get_running_loop()
 
@@ -179,10 +339,15 @@ class StewartPlatformConsumer(AsyncWebsocketConsumer):
                         self.send_response('video_cam', True, b64_image),
                         loop
                     )
-                
-            from src.video_capture.task import VideoCaptureWindows
+            if platform == 'linux':
+                from src.video_capture.task import VideoCaptureLinux
+            else:
+                from src.video_capture.task import VideoCaptureWindows
             try:
-                model = VideoCaptureWindows()
+                if platform == 'linux':
+                    model = VideoCaptureLinux()
+                else:
+                    model = VideoCaptureWindows()
                 model.manual(device_name, resolution, fps)
                 model.run(
                     None,

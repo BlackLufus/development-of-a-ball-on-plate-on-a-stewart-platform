@@ -73,21 +73,24 @@ class VideoCaptureLinux():
 
         return logger, cam
 
-    def run(self, logger, send_data = None):
+    def run(self, logger, event=None, stop_event: Event=None):
         logger, cam = self.__build(logger)
 
         last_frame_num = cam.frame_num
         try:
-            while cam.running:
+            while cam.running and not stop_event.is_set():
                 if last_frame_num != cam.frame_num:
                     last_frame_num = cam.frame_num
 
                     frame, fps, frame_num = cam.read()
-                    if frame is not None:
+                    if event and not stop_event.is_set():
+                        break
+                    elif frame is not None:
                         logger.debug(f"FPS: {fps} (num: {frame_num})")
 
-                        if send_data:
-                            send_data(frame)
+                        if event:
+                            event(frame)
+
                         else:
                             # Anzeige des Bildes
                             cv2.imshow("Threaded Camera", frame)
@@ -96,28 +99,6 @@ class VideoCaptureLinux():
                             if cv2.waitKey(1) & 0xFF == ord('q'):
                                 break
 
-        finally:
-            cam.stop()
-    
-    async def run_async(self, logger, ws):
-        logger, cam = self.__build(logger)
-
-        last_frame_num = cam.frame_num
-        try:
-            while cam.running:
-                if last_frame_num != cam.frame_num:
-                    last_frame_num = cam.frame_num
-
-                    frame, fps, frame_num = cam.read()
-                    if frame is not None:
-                        logger.debug(f"FPS: {fps} (num: {frame_num})")
-
-                        success, encoded_image = cv2.imencode('.jpg', frame, [int(cv2.IMWRITE_JPEG_QUALITY), 80])
-                        if success:
-                            await ws.send(encoded_image.tobytes())
-        except Exception as e:
-            logger.debug(e)
-            pass
         finally:
             cam.stop()
 
@@ -197,13 +178,15 @@ class VideoCaptureWindows:
                     last_frame_num = cam.frame_num
 
                     frame, fps, frame_num = cam.read()
-                    if frame is not None:
+                    if event and not stop_event.is_set():
+                        break
+                    elif frame is not None:
                         logger.debug(f"FPS: {fps} (num: {frame_num})")
 
-                        if event and not stop_event.is_set():
+                        if event:
                             event(frame)
 
-                        elif not event:
+                        else:
                             # Anzeige des Bildes
                             cv2.imshow("Threaded Camera", frame)
 

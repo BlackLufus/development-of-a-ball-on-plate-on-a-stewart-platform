@@ -3,7 +3,7 @@ import logging
 import time
 
 
-class NunchukParser:
+class Nunchuk:
 
     def __init__(self, base_radius: int, base_angle: list, platform_radius: int, platform_angle: list):
         self.base_radius = base_radius
@@ -47,6 +47,17 @@ class NunchukParser:
         )
 
         self.args, _ = parser.parse_known_args()
+        self.radius = self.args.radius
+        self.period = self.args.period
+        self.use_accelerometer = self.args.use_accelerometer
+    
+    def manual(self, radius, period, use_accelerometer):
+        """
+        Set the parameters for the Nunchuk controller.
+        """
+        self.radius = radius
+        self.period = period
+        self.use_accelerometer = use_accelerometer
 
     def run(self, logger):        
         from src.stewart_platform.stewart_platform import StewartPlatform
@@ -63,9 +74,9 @@ class NunchukParser:
         nc = Nunchuk()
 
         # Get the arguments
-        radius = self.args.radius
-        period = self.args.period
-        use_accelerometer = self.args.use_accelerometer
+        radius = self.radius
+        period = self.period
+        use_accelerometer = self.use_accelerometer
         logger = logger or logging.getLogger("StewartPlatform.Circle")
 
         while True:

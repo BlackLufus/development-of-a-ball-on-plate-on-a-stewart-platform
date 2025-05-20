@@ -1,11 +1,12 @@
 import argparse
+from asyncio import Event
 import logging
 import math
 import time
 
 import numpy as np
 
-class SetParser:
+class Set:
     """
     Set the Stewart platform.
     """
@@ -62,6 +63,20 @@ class SetParser:
         )
 
         self.args, _ = parser.parse_known_args()
+        self.x = self.args.x,
+        self.y = self.args.y,
+        self.z = self.args.z,
+        self.roll = self.args.roll,
+        self.pitch = self.args.pitch,
+        self.yaw = self.args.yaw,
+    
+    def manual(self, x, y, z, roll, pitch, yaw):
+        self.x = x,
+        self.y = y,
+        self.z = z,
+        self.roll = roll,
+        self.pitch = pitch,
+        self.yaw = yaw,
 
     def run(self, logger):
         from src.stewart_platform.stewart_platform import StewartPlatform
@@ -79,15 +94,15 @@ class SetParser:
         # Set the values for the Stewart platform
         smh.set(
             platform,
-            self.args.x,
-            self.args.y,
-            self.args.z,
-            self.args.roll,
-            self.args.pitch,
-            self.args.yaw
+            self.x,
+            self.y,
+            self.z,
+            self.roll,
+            self.pitch,
+            self.yaw
         )
 
-class CircleParser:
+class Circle:
     """
     Circle test for the Stewart platform.
     """
@@ -140,8 +155,18 @@ class CircleParser:
         )
 
         self.args, _ = parser.parse_known_args()
+        self.radius = self.args.radius
+        self.steps = self.args.steps
+        self.period = self.args.period
+        self.smooth = self.args.smooth
+    
+    def manual(self, radius, steps, period, smooth):
+        self.radius = radius
+        self.steps = steps
+        self.period = period
+        self.smooth = smooth
 
-    def run(self, logger):        
+    def run(self, logger, stop_event: Event=None):        
         from src.stewart_platform.stewart_platform import StewartPlatform
         from src.stewart_platform.servo_motor_handler import ServoMotorHandler
 
@@ -152,10 +177,10 @@ class CircleParser:
         smh = ServoMotorHandler(logger)
 
         # Get the arguments
-        radius = self.args.radius
-        steps = self.args.steps
-        period = self.args.period
-        smooth = self.args.smooth
+        radius = self.radius
+        steps = self.steps
+        period = self.period
+        smooth = self.smooth
         logger = logger or logging.getLogger("StewartPlatform.Circle")
 
         # Set the initial position of the Stewart platform
@@ -171,7 +196,7 @@ class CircleParser:
             angles = np.linspace(0, 2 * math.pi, int(steps))
 
             # Set the radius of the circle
-            while True:
+            while True and not stop_event.is_set():
                 for theta in angles:
                     x_offset = radius * math.cos(theta)
                     # x_offset = 0
@@ -186,52 +211,68 @@ class CircleParser:
         else:
 
             # Start the circular motion test
-            while True:
+            while True and not stop_event.is_set():
                 # setAngle(0, 0, 62, 15, 0, 0)
                 # print("Step 1")
                 for i in np.arange(-radius, 0, steps):
+                    if stop_event.is_set():
+                        return
                     smh.set(platform, 0, 0, 62, radius, i, 0)
                     time.sleep(period)
 
                 # setAngle(0, 0, 62, 15, 15, 0)
                 # print("Step 2")
                 for i in np.arange(0, radius, steps):
+                    if stop_event.is_set():
+                        return
                     smh.set(platform, 0, 0, 62, radius, i, 0)
                     time.sleep(period)
 
                 # setAngle(0, 0, 62, 0, 15, 0)
                 # print("Step 3")
                 for i in np.arange(radius, 0, -steps):
+                    if stop_event.is_set():
+                        return
                     smh.set(platform, 0, 0, 62, i, radius, 0)
                     time.sleep(period)
 
                 # setAngle(0, 0, 62, -15, 15, 0)
                 # print("Step 4")
                 for i in np.arange(0, -radius, -steps):
+                    if stop_event.is_set():
+                        return
                     smh.set(platform, 0, 0, 62, i, radius, 0)
                     time.sleep(period)
 
                 # setAngle(0, 0, 62, -15, 0, 0)
                 # print("Step 5")
                 for i in np.arange(radius, 0, -steps):
+                    if stop_event.is_set():
+                        return
                     smh.set(platform, 0, 0, 62, -radius, i, 0)
                     time.sleep(period)
 
                 # setAngle(0, 0, 62, -15, -15, 0)
                 # print("Step 6")
                 for i in np.arange(0, -radius, -steps):
+                    if stop_event.is_set():
+                        return
                     smh.set(platform, 0, 0, 62, -radius, i, 0)
                     time.sleep(period)
 
                 # setAngle(0, 0, 62, 0, -15, 0)
                 # print("Step 7")
                 for i in np.arange(-radius, 0, steps):
+                    if stop_event.is_set():
+                        return
                     smh.set(platform, 0, 0, 62, i, -radius, 0)
                     time.sleep(period)
 
                 # setAngle(0, 0, 62, 15, -15, 0)
                 # logger.debug("Step 8")
                 for i in np.arange(0, radius, steps):
+                    if stop_event.is_set():
+                        return
                     smh.set(platform, 0, 0, 62, i, -radius, 0)
                     time.sleep(period)
         

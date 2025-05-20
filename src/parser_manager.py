@@ -230,20 +230,20 @@ class ParserManager:
             None
         """
         if self.operation == 'set':
-                from src.stewart_platform.parser import SetParser
-                model = SetParser(self.base_radius, self.base_angle, self.platform_radius, self.platform_angle)
+                from src.stewart_platform.task import Set
+                model = Set(self.base_radius, self.base_angle, self.platform_radius, self.platform_angle)
                 model.parser()
                 self.setup_logger()
                 model.run(self.logger)
         elif self.operation == 'circle':
-                from src.stewart_platform.parser import CircleParser
-                model = CircleParser(self.base_radius, self.base_angle, self.platform_radius, self.platform_angle)
+                from src.stewart_platform.task import Circle
+                model = Circle(self.base_radius, self.base_angle, self.platform_radius, self.platform_angle)
                 model.parser()
                 self.setup_logger()
                 model.run(self.logger)
         elif self.operation == 'nunchuck':
-                from src.nunchuk.parser import NunchukParser
-                model = NunchukParser(self.base_radius, self.base_angle, self.platform_radius, self.platform_angle)
+                from src.nunchuk.task import Nunchuk
+                model = Nunchuk(self.base_radius, self.base_angle, self.platform_radius, self.platform_angle)
                 model.parser()
                 self.setup_logger()
                 model.run(self.logger)

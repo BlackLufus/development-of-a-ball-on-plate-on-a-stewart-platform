@@ -26,8 +26,6 @@ class VideoCam extends Frame {
     private static instance?: VideoCam;
     private image_stream?: ImageStream;
 
-
-    
     /**
      * Represents the Video Cam frame, providing a singleton interface for managing
      * the visualization and communication with the Video Cam simulation backend.
@@ -87,11 +85,20 @@ class VideoCam extends Frame {
         WebSocketHandler.send(
             TaskId.VIDEO_CAM,
             State.CONNECT,
+            // Example for Windows
             {
+                'platform': 'windows',
                 'device_name': 'Logitech BRIO',
                 'resolution': '1280x720',
                 'fps': 30
             }
+            // Example for Linux
+            // {
+            //     'platform': 'linux',
+            //     'device_name': '/dev/video1',
+            //     'resolution': '1280x720',
+            //     'fps': 30
+            // }
         );
     }
 

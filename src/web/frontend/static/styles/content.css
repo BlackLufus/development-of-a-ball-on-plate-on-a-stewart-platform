@@ -3,6 +3,7 @@
     padding: 0;
     box-sizing: border-box;
     font-family: var(--primary-font-family);
+    transition: background-color 0.35s ease;
 }
 
 html, body {

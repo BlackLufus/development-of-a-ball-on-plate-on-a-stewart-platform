@@ -137,14 +137,14 @@ class Frame {
         if (point.x < 0) {
             point.x = 0;
         }
-        else if (point.x > playground.offsetWidth - this.frame.offsetWidth) {
-            point.x = playground.offsetWidth - this.frame.offsetWidth;
+        else if (point.x > playground.offsetWidth - this.header.offsetWidth) {
+            point.x = playground.offsetWidth - this.header.offsetWidth;
         }
         if (point.y < 0) {
             point.y = 0;
         }
-        else if (point.y > playground.offsetHeight - this.frame.offsetHeight) {
-            point.y = playground.offsetHeight - this.frame.offsetHeight;
+        else if (point.y > playground.offsetHeight - this.header.offsetHeight) {
+            point.y = playground.offsetHeight - this.header.offsetHeight;
         }
         return point;
     }
@@ -159,8 +159,8 @@ class Frame {
             if (!playground) {
                 throw new FrameError("No element with ID 'playground' found.");
             }
-            else if (!playground.contains(this.frame)) {
-                throw new FrameError("Frame is not in playground.");
+            else if (playground.contains(this.frame)) {
+                throw new FrameError("Frame already in playground");
             }
             else {
                 playground.appendChild(this.frame);

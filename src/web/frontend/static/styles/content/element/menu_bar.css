@@ -1,23 +1,27 @@
 .menu_bar {
     display: flex;
-    
     width: 100%;
+    cursor: pointer;
 }
 
 .menu_bar_item {
     width: 100%;
-    border-bottom: 1px solid #aaa;
+    padding: 4px 6px;
+    border-bottom: 2px solid var(--menu-border-color);
+    border-top: 2px solid var(--menu-border-color);
 }
 
 .menu_bar_item:not(:last-child) {
-    border-right: 1px solid #aaa;
+    border-right: 2px solid var(--menu-border-color);
 }
 
 .menu_bar_item:hover {
-    background-color: red;
+    background-color: var(--secondary-background-color);
 }
 
 .menu_bar_item > span {
+    color: var(--preferred-color);
+    font-weight: bold;
     font-size: 26px;
 }
 
@@ -26,5 +30,6 @@
 }
 
 .menu_bar_item:has(> input:checked) {
-    background-color: purple;
+    background-color: var(--third-background-color);
+    color: #aaa;
 }

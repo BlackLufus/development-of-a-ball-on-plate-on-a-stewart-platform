@@ -1,58 +1,82 @@
+/* Control Panel */
 .control_panel {
-    width: 400px;
+    width: 480px;
+    background-color: var(--primary-dialog-background-color);
 }
 
-.control_panel_setting {
-    padding: 6px 8px;
+
+/* Container */
+.control_panel_Container {
+    padding: 2px 12px 10px 12px;
 }
 
-.control_panel_setting_header {
-    padding-bottom: 12px;
+
+/* Header */
+.control_panel_description {
+    padding: 8px 0;
+    border-bottom: 2px solid var(--menu-border-color);
 }
 
-.control_panel_setting_header > h1 {
-    padding-bottom: 6px;
-}
-
-.control_panel_setting_header > span {
+.control_panel_description > p {
+    color: var(--secondary-color);
     font-size: 22px;
 }
 
 
-.control_panel_setting_options {
-    padding-bottom: 8px;
+/* Content */
+.control_panel_content {
+    padding: 12px 0;
+    border-bottom: 2px solid var(--menu-border-color);
 }
 
-.control_panel_setting_options > h2 {
+.control_panel_content > h2 {
     padding-bottom: 6px;
+    color: var(--preferred-color);
 }
 
-.control_panel_setting_options > div {
+.control_panel_content > div {
     padding: 1px 0;
 }
 
 
-.control_panel_setting_actions {
-    padding-bottom: 6px;
+/* Footer */
+.control_panel_actions {
+    display: block;
+    padding: 12px 0;
 }
 
-.control_panel_setting_actions > h2 {
+.control_panel_actions > h2 {
     padding-bottom: 6px;
+    color: var(--preferred-color);
 }
 
-.control_panel_setting_actions > div {
+.control_panel_actions > div {
     display: flex;
     justify-content: center;
 }
 
-.control_panel_setting_actions > div > button {
+.control_panel_actions > div > button {
     margin: 0 4px;
     padding: 4px 12px;
     width: 180px;
+    padding: 4px 20px;
     border-radius: 5px;
     border: 1px solid #999;
+    cursor: pointer;
+    background-color: var(--primary-dialog-background-color);
 }
 
-.control_panel_setting_actions > div > button > span {
-    font-size: 22px;
+.control_panel_actions > div > button:hover:active {
+    background: var(--secondary-dialog-background-color);
+}
+
+.control_panel_actions > div > button > span {
+    font-size: 1.4rem;
+    color: var(--secondary-color);
+    transition: color 0.35s ease;
+    text-align: center;
+}
+
+.control_panel_actions > div > button > button:hover > span {
+    color: var(--preferred-color);
 }

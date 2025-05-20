@@ -32,31 +32,22 @@ class Input {
         argument_div.appendChild(argument);
         this.element.appendChild(argument_div);
 
-        const input_div = document.createElement('div');
-        const input = document.createElement('input');
-        input_div.appendChild(input);
         if (values[id].type == InputType.DROPDOWN) {
             console.log(values[id].list[values[id].value]);
-            input.type = 'text';
-            input.value = values[id].list[values[id].index].name;
-            input.readOnly = true;
+
             const dropdown = new Dropdown(
                 values[id].list,
                 (item: DropdownItem, index: number) => {
                     values[id].value = item.id;
-                    input.value = item.name;
                     values[id].index = index;
                 }
             );
-            input.addEventListener(
-                'click',
-                () => {
-                    dropdown.toggle();
-                }
-            );
-            input_div.appendChild(dropdown.element);
+            this.element.appendChild(dropdown.element);
         }
         else {
+            const input_div = document.createElement('div');
+            const input = document.createElement('input');
+            input_div.appendChild(input);
             input.type = values[id].type;
             input.value = values[id].value;
             input.min = values[id].min;
@@ -68,8 +59,8 @@ class Input {
                     values[id]['value'] = values[id].type == InputType.NUMBER ? Number(input.value) : input.value;
                 }
             )
+            this.element.appendChild(input_div);
         }
-        this.element.appendChild(input_div);
     }
 }
 
