@@ -74,22 +74,22 @@ class ControlPanel extends Frame {
         },
         radius: {
             type: InputType.NUMBER,
-            value: 5.8,
-            step: 0.1,
-            min: -5,
-            max: 5
+            value: 4,
+            step: 0.25,
+            min: -4,
+            max: 4
         },
         steps: {
             type: InputType.NUMBER,
-            value: 1,
+            value: 75,
             step: 1,
-            min: 0.01,
+            min: 0,
             max: 300
         },
         period: {
             type: InputType.NUMBER,
-            value: 0,
-            step: 0.1,
+            value: 0.005,
+            step: 0.005,
             min: 0,
             max: 5
         },
@@ -104,8 +104,8 @@ class ControlPanel extends Frame {
         },
         use_accelerometer: {
             type: InputType.DROPDOWN,
-            value: true,
-            index: 0,
+            value: false,
+            index: 1,
             list: [
                 new DropdownItem(true, "True"),
                 new DropdownItem(false, "False")

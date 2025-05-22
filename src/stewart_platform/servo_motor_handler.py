@@ -11,12 +11,12 @@ class ServoMotorHandler:
     # Standard deviation for each angle so that the r-axis is horizontal
     # servo: angle deviation
     deviation = {
-        0: 8,  # Rechts
-        1: 5,  # Links
-        2: 6,  # Rechts
-        3: 8,  # Links
-        4: 10, # Rechts
-        5: 2   # Links
+        0: -4,  # Rechts
+        1: 0,  # Links
+        2: -2,  # Rechts
+        3: 3,  # Links
+        4: -4, # Rechts
+        5: -6   # Links
     }
 
     def set(self, platform: StewartPlatform, x: float, y: float, z: float, alpha: float, beta: float, gamma: float):

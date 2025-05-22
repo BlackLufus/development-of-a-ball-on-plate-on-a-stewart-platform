@@ -86,19 +86,19 @@ class VideoCam extends Frame {
             TaskId.VIDEO_CAM,
             State.CONNECT,
             // Example for Windows
-            {
-                'platform': 'windows',
-                'device_name': 'Logitech BRIO',
-                'resolution': '1280x720',
-                'fps': 30
-            }
-            // Example for Linux
             // {
-            //     'platform': 'linux',
-            //     'device_name': '/dev/video1',
+            //     'platform': 'windows',
+            //     'device_name': 'Logitech BRIO',
             //     'resolution': '1280x720',
-            //     'fps': 10
+            //     'fps': 30
             // }
+            // Example for Linux
+            {
+                'platform': 'linux',
+                'device_name': '/dev/video0',
+                'resolution': '1280x720',
+                'fps': 10
+            }
         );
     }
 
@@ -117,8 +117,8 @@ class VideoCam extends Frame {
      * @returns {void}
      */
     private build(container: HTMLDivElement): void {
-        this.image_stream = new ImageStream(600, 400, this.start, this.stop);
-        container.style.maxHeight = "400px";
+        this.image_stream = new ImageStream(1024, 576, this.start, this.stop);
+        container.style.maxHeight = "576px";
         container.appendChild(this.image_stream.element);
     }
 
