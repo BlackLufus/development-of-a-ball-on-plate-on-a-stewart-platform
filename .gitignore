@@ -184,8 +184,9 @@ cython_debug/
 /node_modules
 
 # src/detector
-*.jpg
-*.png
 src/detector/content/
 src/detector/images/
 src/detector/labels/
+
+# Prevent old project
+src/viet/
