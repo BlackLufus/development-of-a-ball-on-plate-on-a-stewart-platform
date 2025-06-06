@@ -14,6 +14,8 @@ class BallTracker:
         success, img_rgb = self.cap.read()
         if not success:
             return None
+
+        img_rgb = cv2.rotate(img_rgb, cv2.ROTATE_180)
         
         # Crop image to the preferd size
         crop_top, crop_left = 0, 86
@@ -26,7 +28,7 @@ class BallTracker:
             cv2.imshow('img_gray', img_gray)
 
         # Get binarty image
-        _, tresh = cv2.threshold(img_gray, 130, 255, cv2.THRESH_BINARY)
+        _, tresh = cv2.threshold(img_gray, 210, 255, cv2.THRESH_BINARY)
         if self.debug:
             cv2.imshow('tresh', tresh)
 
@@ -81,7 +83,7 @@ class BallTracker:
 
 # Beispielverwendung
 if __name__ == "__main__":
-    tracker = BallTracker(camera_index=0, debug=True)
+    tracker = BallTracker(debug=True)
 
     while True:
         ball_position = tracker.get_ball_position()

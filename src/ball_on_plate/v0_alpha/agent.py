@@ -126,10 +126,10 @@ class BallOnPlate:
 
         # Set random target position
         self.target_pos = (
-            0,
-            0
-            # self.np_random.uniform(-self.plate_radius + self.boarder_distance, self.plate_radius - self.boarder_distance),
-            # self.np_random.uniform(-self.plate_radius + self.boarder_distance, self.plate_radius - self.boarder_distance)
+            # 0,
+            # 0
+            self.np_random.uniform(-self.plate_radius + self.boarder_distance, self.plate_radius - self.boarder_distance),
+            self.np_random.uniform(-self.plate_radius + self.boarder_distance, self.plate_radius - self.boarder_distance)
         )
 
         position = None
