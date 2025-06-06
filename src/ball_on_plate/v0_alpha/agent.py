@@ -7,30 +7,45 @@ import numpy as np
 import pygame
 from os import path
 
-from src.detector.object_detection import ObjectDetection
+from src.detection.opencv.ball_tracker import BallTracker
 from src.stewart_platform.servo_motor_handler import ServoMotorHandler
 from src.stewart_platform.stewart_platform import StewartPlatform
-from src.video_capture.video_capture import CameraThreadWithAV
     
 class BallOnPlate:
 
-    def __init__(self, platform:StewartPlatform, smh:ServoMotorHandler, cam:CameraThreadWithAV, fps=1):
-        self.object_detection = ObjectDetection()
+    def __init__(self, fps=1):
+        self.ball_tracker = BallTracker(debug=False)
 
         # Initialize the platform
-        self.platform = platform
+        self.platform = StewartPlatform(
+            86,
+            [
+                343,
+                19,
+                101,
+                139,
+                221,
+                259
+            ],
+            86,
+            [
+                347,
+                13,
+                107,
+                133,
+                227,
+                253
+            ]
+        )
 
         # Initialize the servo motor handler
-        self.smh = smh
-
-        # Initialize the camera
-        self.cam = cam
+        self.smh = ServoMotorHandler()
 
         # Set screen size
         self.screen_size = 512
 
         # Physikalische Parameter
-        self.real_width = 0.15 # 30 cm in Metern (m)
+        self.real_width = 0.20 # 30 cm in Metern (m)
         self.plate_radius = self.real_width / 2 # In meter (m)
         self.boarder_distance = 0.01 # in meter (m)
         self.tolerance = 0.015 # Tolerance next to target in meter (m)
@@ -50,8 +65,8 @@ class BallOnPlate:
         self._init_pygame()
     
     def _init_pygame(self):
-        if self.raw_image_event:
-            os.environ["SDL_VIDEODRIVER"] = "dummy"
+        # if self.raw_image_event:
+        #     os.environ["SDL_VIDEODRIVER"] = "dummy"
         pygame.init() # initialize pygame
         pygame.display.init() # Initialize the display module
 
@@ -111,16 +126,19 @@ class BallOnPlate:
 
         # Set random target position
         self.target_pos = (
-            self.np_random.uniform(-self.plate_radius + self.boarder_distance, self.plate_radius - self.boarder_distance),
-            self.np_random.uniform(-self.plate_radius + self.boarder_distance, self.plate_radius - self.boarder_distance)
+            0,
+            0
+            # self.np_random.uniform(-self.plate_radius + self.boarder_distance, self.plate_radius - self.boarder_distance),
+            # self.np_random.uniform(-self.plate_radius + self.boarder_distance, self.plate_radius - self.boarder_distance)
         )
 
-        # Read first frame
-        frame, fps, frame_num = self.cam.read()
-        self.last_frame_num = frame_num
+        position = None
+        while not position:
+            position = self.ball_tracker.get_ball_position()
+            time.sleep(0.01)
 
         # Get initial ball position
-        self.sx_old, self.sy_old = self.get_ball_position(frame)
+        self.sx_old, self.sy_old = position
 
         # Set current time
         self.last_time = time.time()
@@ -131,7 +149,6 @@ class BallOnPlate:
         - frame: The
         """
         # Get ball position
-        x, y = self.object_detection.get_ball_position(frame)
 
         # Convert to real world coordinates
         x = (x - self.screen_size/2) / self.pixels_per_meter
@@ -143,51 +160,48 @@ class BallOnPlate:
         self.last_action = action
 
         # Set roll and pitch for rotation
-        self.roll = action[0]
-        self.pitch = action[1]
+        self.roll = min(4, action[0])
+        self.pitch = min(4, action[1])
         self.smh.set(self.platform, 0, 0, 62, self.roll, self.pitch, 0)
 
-        while self.cam.running:
-            if self.last_frame_num != self.cam.frame_num:
-                self.last_frame_num = self.cam.frame_num
 
-                # Get current time
-                self.current_time = time.time()
-                self.delta_t = self.current_time - self.last_time
-                self.last_time = self.current_time
+        position = None
+        while not position:
+            position = self.ball_tracker.get_ball_position()
+            time.sleep(0.01)
 
-                # Get frame
-                frame, fps, frame_num = self.cam.read()
-                if not frame:
-                    break
-                
-                # Get new ball position
-                self.sx, self.sy = self.get_ball_position(frame)
+        # Get current time
+        self.current_time = time.time()
+        self.delta_t = self.current_time - self.last_time
+        self.last_time = self.current_time
+        
+        # Get new ball position
+        self.sx, self.sy = position
 
-                # Get Velocity
-                self.vx = (self.sx - self.sx_old) / self.delta_t
-                self.vy = (self.sy - self.sy_old) / self.delta_t
-                self.sx_old = self.sx
-                self.sy_old = self.sy
+        self.sx = int((self.sx / 644) * 512)
+        self.sy = int((self.sy / 600) * 512)
 
-                # Check if ball crossed the border
-                boarder_crossed = True if self.sx < -self.real_width/2 or self.sx > self.real_width/2 or self.sy < -self.real_width/2 or self.sy > self.real_width/2 else False
+        self.sx = (self.sx - self.screen_size/2) / self.pixels_per_meter
+        self.sy = (self.sy - self.screen_size/2) / self.pixels_per_meter
 
-                # Check if ball is on target
-                if (abs(self.sx - self.target_pos[0]) < self.tolerance and 
-                        abs(self.sy - self.target_pos[1]) < self.tolerance):
-                    self.isOnTarget = True
-                    self.isOnTargetTime += self.delta_t
-                else:
-                    self.isOnTarget = False
-                    self.isOnTargetTime = 0
-                return self.isOnTargetTime >= 3.0, self.isOnTarget, boarder_crossed
-            
-            else:
-                # If the frame is not updated, wait for a short time
-                # to avoid busy waiting
-                time.sleep(0.01)
-        return 0, False, False
+        # Get Velocity
+        self.vx = (self.sx - self.sx_old) / self.delta_t
+        self.vy = (self.sy - self.sy_old) / self.delta_t
+        self.sx_old = self.sx
+        self.sy_old = self.sy
+
+        # Check if ball crossed the border
+        boarder_crossed = True if self.sx < -self.real_width/2 or self.sx > self.real_width/2 or self.sy < -self.real_width/2 or self.sy > self.real_width/2 else False
+
+        # Check if ball is on target
+        if (abs(self.sx - self.target_pos[0]) < self.tolerance and 
+                abs(self.sy - self.target_pos[1]) < self.tolerance):
+            self.isOnTarget = True
+            self.isOnTargetTime += self.delta_t
+        else:
+            self.isOnTarget = False
+            self.isOnTargetTime = 0
+        return self.isOnTargetTime >= 3.0, self.isOnTarget, boarder_crossed
 
     def _meters_to_pixels(self, x, y, img_size):
         """Umrechnung physikalische Koordinaten (Meter) zu Pixelkoordinaten"""
@@ -277,7 +291,7 @@ class BallOnPlate:
 
 if __name__ == "__main__":
 
-    ballOnPlate = BallOnPlate(fps=20, simulation_mode=False)
+    ballOnPlate = BallOnPlate(fps=20)
     ballOnPlate.render()
     while(True):
 

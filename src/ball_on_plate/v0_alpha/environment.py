@@ -10,8 +10,8 @@ import numpy as np
 gym.registry.clear()
 
 register(
-    id="BallOnPlate-v0",
-    entry_point="src.ball_on_plate.v0.environment:BallOnPlateEnv",
+    id="BallOnPlate-v0_alpha",
+    entry_point="src.ball_on_plate.v0_alpha.environment:BallOnPlateEnv",
 )
 
 class BallOnPlateEnv(gym.Env):
@@ -23,11 +23,11 @@ class BallOnPlateEnv(gym.Env):
     """
     metadata = {"render_modes": ["human"]}
 
-    def __init__(self, platform, smh, cam, render_mode=None, render_fps=60):
+    def __init__(self, render_mode=None, render_fps=60):
         super().__init__()
         self.render_mode = render_mode
 
-        self.ball = bop.BallOnPlate(platform=platform, smh=smh, cam=cam, fps=render_fps)
+        self.ball = bop.BallOnPlate(fps=render_fps)
         self.action_space = spaces.Box(
             low=np.array([
                 -self.ball.max_angle,
@@ -139,12 +139,12 @@ class BallOnPlateEnv(gym.Env):
         self.ball.render()
     
 if __name__ == "__main__":
-    env = gym.make("BallOnPlate-v0", render_mode="human", render_fps=5, simulation_mode=True)
+    env = gym.make("BallOnPlate-v0_alpha", render_mode="human", render_fps=20)
     
     # Use this to check our custom environment
-    print("Check environment begin")
-    check_env(env.unwrapped)
-    print("Check environment end")
+    # print("Check environment begin")
+    # check_env(env.unwrapped)
+    # print("Check environment end")
 
     for _ in range(10):
         
