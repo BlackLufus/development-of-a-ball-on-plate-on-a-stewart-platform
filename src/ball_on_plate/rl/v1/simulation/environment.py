@@ -1,17 +1,18 @@
+import math
 import gymnasium as gym
 from gymnasium import spaces
 from gymnasium.envs.registration import register
 from gymnasium.utils.env_checker import check_env
 
 
-from src.ball_on_plate.v0_alpha import agent as bop
+from src.ball_on_plate.rl.v1.simulation import agent as bop
 import numpy as np
 
 gym.registry.clear()
 
 register(
-    id="BallOnPlate-v0_alpha",
-    entry_point="src.ball_on_plate.v0_alpha.environment:BallOnPlateEnv",
+    id="BallOnPlate-v1",
+    entry_point="src.ball_on_plate.rl.v1.simulation.environment:BallOnPlateEnv",
 )
 
 class BallOnPlateEnv(gym.Env):
@@ -23,11 +24,11 @@ class BallOnPlateEnv(gym.Env):
     """
     metadata = {"render_modes": ["human"]}
 
-    def __init__(self, render_mode=None, render_fps=60):
+    def __init__(self, render_mode=None, render_fps=60, simulation_mode=True, raw_image_event=None):
         super().__init__()
         self.render_mode = render_mode
 
-        self.ball = bop.BallOnPlate(fps=render_fps)
+        self.ball = bop.BallOnPlate(fps=render_fps, simulation_mode=simulation_mode, raw_image_event=raw_image_event)
         self.action_space = spaces.Box(
             low=np.array([
                 -self.ball.max_angle,
@@ -81,7 +82,7 @@ class BallOnPlateEnv(gym.Env):
             np.deg2rad(self.ball.pitch),
             self.ball.target_pos[0] / self.ball.plate_radius,
             self.ball.target_pos[1] / self.ball.plate_radius,
-            1.0 if self.ball.isOnTarget else 0.0
+            self.ball.distance_to_target
         ], dtype=np.float32)
         return obs
     
@@ -89,6 +90,8 @@ class BallOnPlateEnv(gym.Env):
         super().reset(seed=seed)
 
         self.steps = 0
+
+        self.points_got = 0
 
         self.ball.reset(seed)
         
@@ -107,12 +110,20 @@ class BallOnPlateEnv(gym.Env):
         self.steps += 1
 
         # Perform action and get some informations back
-        finish, isOnTarget, boarder_crossed = self.ball.perform_action(action)
+        # old_dist = np.linalg.norm(np.array(self.ball.target_pos) - np.array([self.ball.sx, self.ball.sy]))
+        finish, distance_to_target_reward, boarder_crossed = self.ball.perform_action(action)
+        # new_dist = np.linalg.norm(np.array(self.ball.target_pos) - np.array([self.ball.sx, self.ball.sy]))
 
         # Basic rewards
         reward = -1
-        if isOnTarget:
-            reward += 2
+
+        if distance_to_target_reward == -1 and self.points_got > 0:
+            reward -= self.points_got
+            self.points_got = 0
+        elif distance_to_target_reward >= 0:
+            # reward = math.pow(distance_to_target_reward + 1, 2)
+            reward = 1
+            self.points_got += reward
 
         # Check ending condition
         terminated = False
@@ -139,12 +150,12 @@ class BallOnPlateEnv(gym.Env):
         self.ball.render()
     
 if __name__ == "__main__":
-    env = gym.make("BallOnPlate-v0_alpha", render_mode="human", render_fps=20)
+    env = gym.make("BallOnPlate-v1", render_mode="human", render_fps=5, simulation_mode=True)
     
     # Use this to check our custom environment
-    # print("Check environment begin")
-    # check_env(env.unwrapped)
-    # print("Check environment end")
+    print("Check environment begin")
+    check_env(env.unwrapped)
+    print("Check environment end")
 
     for _ in range(10):
         

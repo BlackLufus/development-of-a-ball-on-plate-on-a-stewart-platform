@@ -1,18 +1,11 @@
-from datetime import datetime
-from enum import Enum
 import math
 import os
-import random
 import sys
 import time
 import cv2
 import numpy as np
 import pygame
 from os import path
-
-# In Bytearray oder Bild umwandeln
-import io
-from PIL import Image
     
 class BallOnPlate:
 
@@ -20,7 +13,7 @@ class BallOnPlate:
         self.screen_size = 512
 
         # Physikalische Parameter
-        self.real_width = 0.15 # 30 cm in Metern (m)
+        self.real_width = 0.20 # 30 cm in Metern (m)
         self.plate_radius = self.real_width / 2 # In meter (m)
         self.boarder_distance = 0.01 # in meter (m)
         self.tolerance = 0.015 # Tolerance next to target in meter (m)
@@ -111,7 +104,7 @@ class BallOnPlate:
 
         # check if it is simulation mode
         if self.simulation_mode:
-            self.delta_t = self.np_random.uniform(0.001, 0.100)
+            self.delta_t = self.np_random.uniform(0.05, 0.20)
         else:
             self.current_time = time.time()
             self.delta_t = self.current_time - self.last_time

@@ -4,14 +4,14 @@ from gymnasium.envs.registration import register
 from gymnasium.utils.env_checker import check_env
 
 
-from src.ball_on_plate.v0_alpha import agent as bop
+from src.ball_on_plate.rl.v2.physical import agent as bop
 import numpy as np
 
 gym.registry.clear()
 
 register(
-    id="BallOnPlate-v0_alpha",
-    entry_point="src.ball_on_plate.v0_alpha.environment:BallOnPlateEnv",
+    id="BallOnPlate-v2",
+    entry_point="src.ball_on_plate.rl.v2.physical.environment:BallOnPlateEnv",
 )
 
 class BallOnPlateEnv(gym.Env):

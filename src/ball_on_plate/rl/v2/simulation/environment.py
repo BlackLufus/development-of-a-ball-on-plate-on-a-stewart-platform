@@ -5,14 +5,14 @@ from gymnasium.envs.registration import register
 from gymnasium.utils.env_checker import check_env
 
 
-from src.ball_on_plate.v1.simulation import agent as bop
+from src.ball_on_plate.rl.v2.simulation import agent as bop
 import numpy as np
 
 gym.registry.clear()
 
 register(
-    id="BallOnPlate-v1",
-    entry_point="src.ball_on_plate.v1.simulation.environment:BallOnPlateEnv",
+    id="BallOnPlate-v2",
+    entry_point="src.ball_on_plate.rl.v2.simulation.environment:BallOnPlateEnv",
 )
 
 class BallOnPlateEnv(gym.Env):
@@ -121,17 +121,18 @@ class BallOnPlateEnv(gym.Env):
             reward -= self.points_got
             self.points_got = 0
         elif distance_to_target_reward >= 0:
-            reward = math.pow(distance_to_target_reward + 1, 2)
+            # reward = math.pow(distance_to_target_reward + 1, 2)
+            reward = 1
             self.points_got += reward
 
         # Check ending condition
         terminated = False
         truncated = False
         if finish:
-            reward += (self.max_steps - self.steps) / 10
+            reward += 100
             terminated = True
         elif self.steps > self.max_steps or boarder_crossed:
-            reward -= self.max_steps / 10
+            reward -= 100
             truncated = True
 
         # Get observation
@@ -149,7 +150,7 @@ class BallOnPlateEnv(gym.Env):
         self.ball.render()
     
 if __name__ == "__main__":
-    env = gym.make("BallOnPlate-v1", render_mode="human", render_fps=5, simulation_mode=True)
+    env = gym.make("BallOnPlate-v2", render_mode="human", render_fps=5, simulation_mode=True)
     
     # Use this to check our custom environment
     print("Check environment begin")
