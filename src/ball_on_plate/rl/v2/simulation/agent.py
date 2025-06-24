@@ -121,14 +121,25 @@ class BallOnPlate:
         desired_roll  = self.last_action[0]
         desired_pitch = self.last_action[1]
 
-        alpha = min(self.delta_t / self.servo_delay, 1.0)
+        # Calculate delta angles
+        delta_roll = desired_roll - self.roll
+        delta_pitch = desired_pitch - self.pitch
 
-        self.roll  += alpha * (desired_roll  - self.roll)
-        self.pitch += alpha * (desired_pitch - self.pitch)
+        # Max agular speed
+        self.max_agular_speed = 20.0
 
+        # Degree times delta time
+        max_delta_angle = self.max_agular_speed * self.delta_t
+
+        # Result are roll and pitch
+        self.roll = np.clip(delta_roll, -max_delta_angle, max_delta_angle)
+        self.pitch = np.clip(delta_pitch, -max_delta_angle, max_delta_angle)
+
+        # Get random noise
         noise_roll  = np.random.normal(0.0, self.servo_noise_std)
         noise_pitch = np.random.normal(0.0, self.servo_noise_std)
 
+        # Add noice
         self.roll  = self.roll  + noise_roll
         self.pitch = self.pitch + noise_pitch
 
