@@ -7,9 +7,9 @@ import logging
 from stable_baselines3 import A2C, DQN, PPO
 from stable_baselines3.common.callbacks import EvalCallback
 
-from src.ball_on_plate.v0_alpha import environment
+from src.ball_on_plate.v1.physical import environment
 
-def train_sb3(env_id, id, sb3_model="PPO", use_existing_model=None, device='cpu', sequential_execution=False, iterations = 40, steps_per_iteration=5_000, logger=None):
+def train_sb3(env_id, id, sb3_model="ppo", use_existing_model=None, device='cpu', sequential_execution=False, iterations = 40, steps_per_iteration=5_000, logger=None):
     os.makedirs(f"./models/bop/{id}", exist_ok=True)
 
     env = gym.make(env_id)
@@ -62,9 +62,10 @@ def train_sb3(env_id, id, sb3_model="PPO", use_existing_model=None, device='cpu'
     # PPO mit angepassten Hyperparametern
     elif sb3_model == "ppo":
         if use_existing_model is not None:
-            model = PPO(
+            model = PPO.load(
                 use_existing_model,
-                env,
+                env=env,
+                tensorboard_log=f"./tensorboard/bop/{id}",
                 device=device
             )
         else:
@@ -95,7 +96,8 @@ def train_sb3(env_id, id, sb3_model="PPO", use_existing_model=None, device='cpu'
             run_sb3(env_id, dir, model_name, model="PPO", episods=1, simulation_mode=True, render_fps=60)
 
 
-def run_sb3(env_id, id, model_name, sb3_model, device='cpu', iterations=10, render_fps=32):
+def run_sb3(env_id, id, model_name, sb3_model, device='cpu', iterations=10, simulation_mode=False, render_fps=32, logger: logging=None, raw_image_event=None, stop_event: Event=None):
+    logger = logger or logging.getLogger(__name__)
 
     env = gym.make(env_id, render_fps=render_fps)
 
@@ -118,7 +120,7 @@ def run_sb3(env_id, id, model_name, sb3_model, device='cpu', iterations=10, rend
             device=device
         )
 
-    print(iterations)
+    logger.debug(iterations)
     for _ in range(iterations):
         count = 0
         # Run a test
@@ -134,16 +136,16 @@ def run_sb3(env_id, id, model_name, sb3_model, device='cpu', iterations=10, rend
 
             if terminated or truncated:
                 if terminated:
-                    print(f"Success (count: {count})")
+                    logger.debug(f"Success (count: {count})")
                 else:
-                    print(f"Failed (count: {count})")
+                    logger.debug(f"Failed (count: {count})")
                 break
 
 
 if __name__ == "__main__":
-    env_id = 'BallOnPlate-v0_alpha'
-    dir = "0_9"
-    model_name = "best_model"
-    # train_sb3(env_id, dir, model="PPO", device='cpu', iterations=100, steps_per_iteration=10_000)
-    # train_sb3(env_id, model_dir, tensorboard_dir, useopencl_existing_model=f"{model_dir}/{model_name}")
-    run_sb3(env_id, dir, model_name, sb3_model="ppo")
+    env_id = 'BallOnPlate-v1'
+    dir = "2_1" # Use version number as dir name
+    model_name = "best_model.zip"
+    # train_sb3(env_id, dir, sb3_model="ppo", device='cpu', iterations=100, steps_per_iteration=10_000)
+    train_sb3(env_id, dir, use_existing_model=f"./models/bop/{dir}/{model_name}", device='cuda')
+    # run_sb3(env_id, dir, model_name, sb3_model="ppo")

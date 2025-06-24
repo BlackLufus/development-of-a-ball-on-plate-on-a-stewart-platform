@@ -47,14 +47,14 @@ class BallOnPlate:
         # Physikalische Parameter
         self.real_width = 0.20 # 30 cm in Metern (m)
         self.plate_radius = self.real_width / 2 # In meter (m)
-        self.boarder_distance = 0.01 # in meter (m)
+        self.boarder_distance = 0.035 # in meter (m)
         self.tolerance = 0.015 # Tolerance next to target in meter (m)
         self.pixels_per_meter = 512 / self.real_width  # Convert platform to computer-readable coordinate system ()
         
         # Gravity
         self.g = 9.81
         self.max_velocity = 0.15
-        self.max_angle = 7.5
+        self.max_angle = 4
 
         # Set random state
         self.np_random = np.random.RandomState()
@@ -115,7 +115,8 @@ class BallOnPlate:
         self.smh.set(self.platform, 0, 0, 62, 0, 0, 0)
 
         # initialize variables
-        self.isOnTarget = False
+        self.distance_to_target_reward = 0.0
+        self.distance_to_target = 0.0
         self.isOnTargetTime = 0.0
         self.roll = 0.0 # X-Axis
         self.pitch = 0.0 # Y-Axis
@@ -193,15 +194,18 @@ class BallOnPlate:
         # Check if ball crossed the border
         boarder_crossed = True if self.sx < -self.real_width/2 or self.sx > self.real_width/2 or self.sy < -self.real_width/2 or self.sy > self.real_width/2 else False
 
-        # Check if ball is on target
+        # Is ball on target
         if (abs(self.sx - self.target_pos[0]) < self.tolerance and 
                 abs(self.sy - self.target_pos[1]) < self.tolerance):
-            self.isOnTarget = True
+            self.distance_to_target_reward = 1 - (math.sqrt(math.pow(self.sx - self.target_pos[0], 2) + math.pow(self.sy - self.target_pos[1], 2)) / self.tolerance)
             self.isOnTargetTime += self.delta_t
         else:
-            self.isOnTarget = False
+            self.distance_to_target_reward = -1
             self.isOnTargetTime = 0
-        return self.isOnTargetTime >= 3.0, self.isOnTarget, boarder_crossed
+
+        self.distance_to_target = math.sqrt(math.pow(self.sx - self.target_pos[0], 2) + math.pow(self.sy - self.target_pos[1], 2)) / self.plate_radius
+            
+        return self.isOnTargetTime >= 3.0, self.distance_to_target_reward, boarder_crossed
 
     def _meters_to_pixels(self, x, y, img_size):
         """Umrechnung physikalische Koordinaten (Meter) zu Pixelkoordinaten"""
