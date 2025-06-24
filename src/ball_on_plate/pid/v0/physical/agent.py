@@ -10,7 +10,7 @@ from src.stewart_platform.stewart_platform import StewartPlatform
     
 class BallOnPlate:
 
-    def __init__(self, fps=1, friction=0.95, Kp=4.0, Ki=2.0, Kd=1.0):
+    def __init__(self, fps=1, Kp=4.0, Ki=2.0, Kd=1.0):
         self.ball_tracker = BallTracker(debug=False)
 
         # Initialize the platform
@@ -51,7 +51,6 @@ class BallOnPlate:
         self.g = 9.81
         self.max_velocity = 0.15
         self.max_angle = np.radians(4.0)
-        self.friction = friction
 
         # PID-Controller
         self.Kp = Kp
@@ -197,6 +196,8 @@ class BallOnPlate:
         self.pitch_theta = np.clip(uy, -self.max_angle, self.max_angle)
         self.pitch = np.degrees(self.pitch_theta)
 
+        self.smh.set(self.platform, 0, 0, 62, self.roll, self.pitch, 0)
+
         # Check border crossed
         boarder_crossed = True if self.sx < -self.real_width/2 or self.sx > self.real_width/2 or self.sy < -self.real_width/2 or self.sy > self.real_width/2 else False
 
@@ -294,7 +295,7 @@ class BallOnPlate:
 
 if __name__ == "__main__":
 
-    agent = BallOnPlate(fps=10, simulation_mode=False, friction=0.8, Kp=1.0, Ki=0.0, Kd=0.20)
+    agent = BallOnPlate(fps=30, Kp=1.5, Ki=0.0, Kd=0.5)
 
     for _ in range(10):
         agent.reset()

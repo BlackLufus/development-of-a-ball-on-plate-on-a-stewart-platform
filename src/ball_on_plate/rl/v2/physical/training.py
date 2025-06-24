@@ -3,7 +3,7 @@ import gymnasium as gym
 from stable_baselines3 import A2C, DQN, PPO
 from stable_baselines3.common.callbacks import EvalCallback
 
-from src.ball_on_plate.rl.v2.physical.environment import environment
+from src.ball_on_plate.rl.v2.physical import environment
 
 def train_sb3(env_id, id, sb3_model="PPO", use_existing_model=None, device='cpu', sequential_execution=False, iterations = 40, steps_per_iteration=5_000, logger=None):
     os.makedirs(f"./models/bop/{id}", exist_ok=True)
@@ -138,7 +138,7 @@ def run_sb3(env_id, id, model_name, sb3_model, device='cpu', iterations=10, rend
 
 if __name__ == "__main__":
     env_id = 'BallOnPlate-v2'
-    dir = "0_9"
+    dir = "2_1"
     model_name = "best_model"
     # train_sb3(env_id, dir, model="PPO", device='cpu', iterations=100, steps_per_iteration=10_000)
     # train_sb3(env_id, model_dir, tensorboard_dir, useopencl_existing_model=f"{model_dir}/{model_name}")

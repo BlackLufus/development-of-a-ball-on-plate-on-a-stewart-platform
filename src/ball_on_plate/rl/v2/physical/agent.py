@@ -1,3 +1,4 @@
+import math
 import sys
 import time
 import numpy as np
@@ -51,7 +52,7 @@ class BallOnPlate:
         # Gravity
         self.g = 9.81
         self.max_velocity = 0.15
-        self.max_angle = 7.5
+        self.max_angle = 4.0
 
         # Set random state
         self.np_random = np.random.RandomState()
@@ -112,7 +113,8 @@ class BallOnPlate:
         self.smh.set(self.platform, 0, 0, 62, 0, 0, 0)
 
         # initialize variables
-        self.isOnTarget = False
+        self.distance_to_target_reward = 0.0
+        self.distance_to_target = 0.0
         self.isOnTargetTime = 0.0
         self.roll = 0.0 # X-Axis
         self.pitch = 0.0 # Y-Axis
@@ -187,18 +189,26 @@ class BallOnPlate:
         self.sx_old = self.sx
         self.sy_old = self.sy
 
-        # Check if ball crossed the border
-        boarder_crossed = True if self.sx < -self.real_width/2 or self.sx > self.real_width/2 or self.sy < -self.real_width/2 or self.sy > self.real_width/2 else False
+        # Border crossed
+        boarder_crossed = False
+        if self.sx < -self.real_width/2 or self.sx > self.real_width/2 or self.sy < -self.real_width/2 or self.sy > self.real_width/2:
+            boarder_crossed = True
 
-        # Check if ball is on target
+        # Is ball on target
         if (abs(self.sx - self.target_pos[0]) < self.tolerance and 
                 abs(self.sy - self.target_pos[1]) < self.tolerance):
-            self.isOnTarget = True
+            self.distance_to_target_reward = 1 - (math.sqrt(math.pow(self.sx - self.target_pos[0], 2) + math.pow(self.sy - self.target_pos[1], 2)) / self.tolerance)
             self.isOnTargetTime += self.delta_t
         else:
-            self.isOnTarget = False
+            self.distance_to_target_reward = -1
             self.isOnTargetTime = 0
-        return self.isOnTargetTime >= 3.0, self.isOnTarget, boarder_crossed
+
+        self.distance_to_target = math.sqrt(math.pow(self.sx - self.target_pos[0], 2) + math.pow(self.sy - self.target_pos[1], 2)) / self.plate_radius
+
+        # Store last action
+        self.last_action = action
+            
+        return self.isOnTargetTime >= 3.0, self.distance_to_target_reward, boarder_crossed
 
     def _meters_to_pixels(self, x, y, img_size):
         """Umrechnung physikalische Koordinaten (Meter) zu Pixelkoordinaten"""
