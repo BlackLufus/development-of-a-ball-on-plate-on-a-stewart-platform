@@ -25,7 +25,7 @@ class BallOnPlate:
         self.max_angle = 4
 
         # Additional varibales
-        self.servo_delay = 0.015 # [s] (15ms)
+        self.max_agular_speed = 20.0 # [degree] (degree per second)
         self.servo_noise_std = 0.1
 
         # Set random state
@@ -125,9 +125,6 @@ class BallOnPlate:
         delta_roll = desired_roll - self.roll
         delta_pitch = desired_pitch - self.pitch
 
-        # Max agular speed
-        self.max_agular_speed = 20.0
-
         # Degree times delta time
         max_delta_angle = self.max_agular_speed * self.delta_t
 
@@ -157,7 +154,7 @@ class BallOnPlate:
         # Calculcate velocity for y
         self.vy = self.vy + self.ay * self.delta_t
 
-        # friction (This need to be fixed)
+        # friction, it is used to simulate common friction on different ground.
         self.friction_mu = np.random.uniform(0.96, 0.995)
         self.vx *= self.friction_mu
         self.vy *= self.friction_mu
