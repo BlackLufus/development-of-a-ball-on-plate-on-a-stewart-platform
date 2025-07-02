@@ -316,16 +316,37 @@ if __name__ == "__main__":
 
     agent = BallOnPlate(fps=30, Kp=1.0, Ki=0.1, Kd=0.5)
 
-    for _ in range(10):
-        agent.reset()
-        agent.render()
+    do_circle = True
+
+    if do_circle:
+        max_steps = 150
+        angles = np.linspace(0, 2 * np.pi, int(max_steps))
+        radius = 0.05 # m
+        steps = 0
         while(True):
+            agent.target_pos = (
+                radius * np.cos(angles[steps]),
+                radius * np.sin(angles[steps])
+            )
+            steps += 1
+            if steps >= max_steps:
+                steps = 0
+
             finish, isOnTarget, boarder_crossed = agent.perform_action()
             print(f"Is on target: {isOnTarget}")
             agent.render()
-            if finish:
-                print("Episode is Successful!")
-                break
-            elif boarder_crossed:
-                print("Episode Failed!")
-                break
+
+    else:
+        for _ in range(10):
+            agent.reset()
+            agent.render()
+            while(True):
+                finish, isOnTarget, boarder_crossed = agent.perform_action()
+                print(f"Is on target: {isOnTarget}")
+                agent.render()
+                if finish:
+                    print("Episode is Successful!")
+                    break
+                elif boarder_crossed:
+                    print("Episode Failed!")
+                    break
