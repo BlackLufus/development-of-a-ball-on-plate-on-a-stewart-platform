@@ -15,7 +15,7 @@ class BallOnPlate:
         # Physikalische Parameter
         self.real_width = 0.20 # 30 cm in Metern (m)
         self.plate_radius = self.real_width / 2 # In meter (m)
-        self.boarder_distance = 0.01 # in meter (m)
+        self.boarder_distance = 0.025 # in meter (m)
         self.tolerance = 0.015 # Tolerance next to target in meter (m)
         self.pixels_per_meter = 512 / self.real_width  # Convert platform to computer-readable coordinate system ()
         
