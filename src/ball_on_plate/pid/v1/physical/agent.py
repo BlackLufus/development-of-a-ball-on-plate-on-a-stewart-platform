@@ -131,6 +131,8 @@ class BallOnPlate:
         self.ay = 0.0 # m/s^2
         self.vx = 0.0 # s/t
         self.vy = 0.0 # s/t
+        self.ux = 0.0 # prev s/t
+        self.uy = 0.0 # prev s/t
         self.sx = self.np_random.uniform(-self.plate_radius, self.plate_radius) # Position in Meter
         self.sy = self.np_random.uniform(-self.plate_radius, self.plate_radius) # Position in Meter
         self.target_pos = (
@@ -170,10 +172,16 @@ class BallOnPlate:
         self.sy = (self.sy - self.screen_size/2) / self.pixels_per_meter
 
         # Get Velocity
+        self.ux= self.vx
+        self.uy = self.vy
         self.vx = (self.sx - self.sx_old) / self.delta_t
         self.vy = (self.sy - self.sy_old) / self.delta_t
         self.sx_old = self.sx
         self.sy_old = self.sy
+
+        # Get Accelorator
+        self.ax = (self.vx - self.ux) / self.delta_t
+        self.ay = (self.vy - self.uy) / self.delta_t
 
         # Get Target Position
         tsx, tsy = self.target_pos
@@ -268,12 +276,12 @@ class BallOnPlate:
         self.window_surface.blit(y_axis_img, y_axis_pos)
 
         # Draw Accelerate
-        accelerate_img = self.action_font.render(f'Accelerate -> x:{round(self.ax * 100, 2)}cm/s y:{round(self.ay * 100, 2)}cm/s', True, (0,0,0), (255,255,255))
+        accelerate_img = self.action_font.render(f'Accelerate -> x:{round(self.ax * 100, 2)}cm/s² y:{round(self.ay * 100, 2)}cm/s²', True, (0,0,0), (255,255,255))
         accelerate_pos = (0, self.window_size[1] - self.action_info_height * 3)
         self.window_surface.blit(accelerate_img, accelerate_pos)
 
         # Draw Velocity
-        velocity_img = self.action_font.render(f'Velocity -> x:{round(self.vx * 100, 2)}cm/s² y:{round(self.vy * 100, 2)}cm/s²', True, (0,0,0), (255,255,255))
+        velocity_img = self.action_font.render(f'Velocity -> x:{round(self.vx * 100, 2)}cm/s y:{round(self.vy * 100, 2)}cm/s', True, (0,0,0), (255,255,255))
         velocity_pos = (0, self.window_size[1] - self.action_info_height * 2)
         self.window_surface.blit(velocity_img, velocity_pos)
 
@@ -306,7 +314,7 @@ class BallOnPlate:
 
 if __name__ == "__main__":
 
-    agent = BallOnPlate(fps=30, Kp=1.5, Ki=0.0, Kd=0.5)
+    agent = BallOnPlate(fps=30, Kp=1.0, Ki=0.1, Kd=0.5)
 
     for _ in range(10):
         agent.reset()

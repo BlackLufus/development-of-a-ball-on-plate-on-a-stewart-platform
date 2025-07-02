@@ -232,12 +232,12 @@ class BallOnPlate:
         self.window_surface.blit(y_axis_img, y_axis_pos)
 
         # Draw Accelerate
-        accelerate_img = self.action_font.render(f'Accelerate -> x:{round(self.ax * 100, 2)}cm/s y:{round(self.ay * 100, 2)}cm/s', True, (0,0,0), (255,255,255))
+        accelerate_img = self.action_font.render(f'Accelerate -> x:{round(self.ax * 100, 2)}cm/s² y:{round(self.ay * 100, 2)}cm/s²', True, (0,0,0), (255,255,255))
         accelerate_pos = (0, self.window_size[1] - self.action_info_height * 3)
         self.window_surface.blit(accelerate_img, accelerate_pos)
 
         # Draw Velocity
-        velocity_img = self.action_font.render(f'Velocity -> x:{round(self.vx * 100, 2)}cm/s² y:{round(self.vy * 100, 2)}cm/s²', True, (0,0,0), (255,255,255))
+        velocity_img = self.action_font.render(f'Velocity -> x:{round(self.vx * 100, 2)}cm/s y:{round(self.vy * 100, 2)}cm/s', True, (0,0,0), (255,255,255))
         velocity_pos = (0, self.window_size[1] - self.action_info_height * 2)
         self.window_surface.blit(velocity_img, velocity_pos)
 
