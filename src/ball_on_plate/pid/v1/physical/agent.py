@@ -314,14 +314,14 @@ class BallOnPlate:
 
 if __name__ == "__main__":
 
-    agent = BallOnPlate(fps=30, Kp=1.0, Ki=0.1, Kd=0.5)
+    agent = BallOnPlate(fps=30, Kp=2.2, Ki=0.3, Kd=0.85)
 
     do_circle = True
 
     if do_circle:
-        max_steps = 150
+        max_steps = 80
         angles = np.linspace(0, 2 * np.pi, int(max_steps))
-        radius = 0.05 # m
+        radius = 0.04 # m
         steps = 0
         while(True):
             agent.target_pos = (

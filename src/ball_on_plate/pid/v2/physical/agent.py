@@ -1,17 +1,47 @@
-import os
 import sys
-import cv2
+import time
 import numpy as np
 import pygame
 from os import path
+
+from src.detection.opencv.ball_tracker import BallTracker
+from src.stewart_platform.servo_motor_handler import ServoMotorHandler
+from src.stewart_platform.stewart_platform import StewartPlatform
     
 class BallOnPlate:
 
-    def __init__(self, fps=1, simulation_mode=True, friction=0.95, Kp=4.0, Ki=2.0, Kd=1.0, raw_image_event=None):
+    def __init__(self, fps=1, Kp=4.0, Ki=2.0, Kd=1.0):
+        self.ball_tracker = BallTracker(debug=False)
+
+        # Initialize the platform
+        self.platform = StewartPlatform(
+            86,
+            [
+                343,
+                19,
+                101,
+                139,
+                221,
+                259
+            ],
+            86,
+            [
+                347,
+                13,
+                107,
+                133,
+                227,
+                253
+            ]
+        )
+
+        # Initialize the servo motor handler
+        self.smh = ServoMotorHandler()
+        
         self.screen_size = 512
 
         # Physikalische Parameter
-        self.real_width = 0.15 # 30 cm in Metern (m)
+        self.real_width = 0.25 # 30 cm in Metern (m)
         self.plate_radius = self.real_width / 2 # In meter (m)
         self.boarder_distance = 0.01 # in meter (m)
         self.tolerance = 0.015 # Tolerance next to target in meter (m)
@@ -21,7 +51,6 @@ class BallOnPlate:
         self.g = 9.81
         self.max_velocity = 0.15
         self.max_angle = np.radians(4.0)
-        self.friction = friction
 
         # Additional varibales
         self.max_agular_speed = 20.0 # [degree] (degree per second)
@@ -44,14 +73,10 @@ class BallOnPlate:
         self.reset()
 
         self.fps = fps
-        self.simulation_mode = simulation_mode
-        self.raw_image_event = raw_image_event
         self.last_action = None
         self._init_pygame()
     
     def _init_pygame(self):
-        if self.raw_image_event:
-            os.environ["SDL_VIDEODRIVER"] = "dummy"
         pygame.init() # initialize pygame
         pygame.display.init() # Initialize the display module
 
@@ -106,6 +131,8 @@ class BallOnPlate:
         self.ay = 0.0 # m/s^2
         self.vx = 0.0 # s/t
         self.vy = 0.0 # s/t
+        self.ux = 0.0 # prev s/t
+        self.uy = 0.0 # prev s/t
         self.sx = self.np_random.uniform(-self.plate_radius, self.plate_radius) # Position in Meter
         self.sy = self.np_random.uniform(-self.plate_radius, self.plate_radius) # Position in Meter
         self.target_pos = (
@@ -113,30 +140,49 @@ class BallOnPlate:
             self.np_random.uniform(-self.plate_radius + self.boarder_distance, self.plate_radius - self.boarder_distance)
         )
 
+        position = None
+        while not position:
+            position = self.ball_tracker.get_ball_position()
+            time.sleep(0.01)
+
+        # Get initial ball position
+        self.sx_old, self.sy_old = position
+
+        # Set current time
+        self.last_time = time.time()
+
     def perform_action(self) -> bool:
-        print(f"roll: {self.roll}  -  pitch: {self.pitch}")
+        position = None
+        while not position:
+            position = self.ball_tracker.get_ball_position()
+            time.sleep(0.01)
 
-        # Calculate accelerate for x
-        self.ax = (3/5) * self.g * self.roll_theta
+        # Get current time
+        self.current_time = time.time()
+        self.delta_t = self.current_time - self.last_time
+        self.last_time = self.current_time
+        
+        # Get new ball position
+        self.sx, self.sy = position
 
-        # Calculate accelerate for y
-        self.ay = (3/5) * self.g * self.pitch_theta
+        self.sx = int((self.sx / 644) * 512)
+        self.sy = int((self.sy / 600) * 512)
 
-        # Calculcate velocity for x
-        self.vx = self.vx + self.ax * self.delta_t
+        self.sx = (self.sx - self.screen_size/2) / self.pixels_per_meter
+        self.sy = (self.sy - self.screen_size/2) / self.pixels_per_meter
 
-        # Calculcate velocity for y
-        self.vy = self.vy + self.ay * self.delta_t
+        # Get Velocity
+        self.ux= self.vx
+        self.uy = self.vy
+        self.vx = (self.sx - self.sx_old) / self.delta_t
+        self.vy = (self.sy - self.sy_old) / self.delta_t
+        self.sx_old = self.sx
 
-        # friction
-        self.vx *=self.friction
-        self.vy *=self.friction
+        self.sy_old = self.sy
 
-        # Calculcate position for x
-        self.sx = self.sx + self.vx * self.delta_t + (1/2) * self.ax * (self.delta_t * self.delta_t)
-
-        # Calculcate position for y
-        self.sy = self.sy + self.vy * self.delta_t + (1/2) * self.ay * (self.delta_t * self.delta_t)
+        # Get Accelorator
+        self.ax = (self.vx - self.ux) / self.delta_t
+        self.ay = (self.vy - self.uy) / self.delta_t
 
         # Get Target Position
         tsx, tsy = self.target_pos
@@ -150,7 +196,6 @@ class BallOnPlate:
         derivative_x = (ex - self.prev_error_x) / self.delta_t
         self.prev_error_x = ex
         ux = self.Kp * ex + self.Ki * self.integral_x + self.Kd * derivative_x
-        # print(ux)
 
         # Set roll
         desire_roll = np.clip(ux, -self.max_angle, self.max_angle)
@@ -171,10 +216,10 @@ class BallOnPlate:
         self.pitch_theta += np.clip(delta_pitch, -max_delta_angle, max_delta_angle)
         self.pitch = np.degrees(self.pitch_theta)
 
-        # Border crossed
-        boarder_crossed = False
-        if self.sx < -self.real_width/2 or self.sx > self.real_width/2 or self.sy < -self.real_width/2 or self.sy > self.real_width/2:
-            boarder_crossed = True
+        self.smh.set(self.platform, 0, 0, 62, self.roll, self.pitch, 0)
+
+        # Check border crossed
+        boarder_crossed = True if self.sx < -self.real_width/2 or self.sx > self.real_width/2 or self.sy < -self.real_width/2 or self.sy > self.real_width/2 else False
 
         # Is ball on target
         if (abs(self.sx - self.target_pos[0]) < self.tolerance and 
@@ -247,17 +292,7 @@ class BallOnPlate:
         self.window_surface.blit(position_img, position_pos)
 
         # Draw Target Position
-        if not self.raw_image_event:
-            pygame.display.update()
-        # Save image
-        else:
-            surface_array = pygame.surfarray.array3d(pygame.display.get_surface())  
-            image = np.transpose(surface_array, (1, 0, 2))  # (width, height, 3) -> (height, width, 3)
-            image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)  # Correct color from RGB to BGR for OpenCV
-            success, encoded_image = cv2.imencode('.jpg', image)
-            if success:
-                self.raw_image_event(encoded_image)
-            # image.save(f'test_image/{datetime.now().strftime("%Y%m%d-%H%M%S%f")}.png')
+        pygame.display.update()
             
                 
         # Limit frames per second
@@ -280,14 +315,14 @@ class BallOnPlate:
 
 if __name__ == "__main__":
 
-    agent = BallOnPlate(fps=10, simulation_mode=False, friction=0.8, Kp=1.0, Ki=0.0, Kd=0.20)
+    agent = BallOnPlate(fps=30, Kp=1.0, Ki=0.12, Kd=0.85)
 
-    do_cirlce = True
+    do_circle = True
 
-    if do_cirlce:
-        max_steps = 80
+    if do_circle:
+        max_steps = 40
         angles = np.linspace(0, 2 * np.pi, int(max_steps))
-        radius = 0.05 # m
+        radius = 0.065 # m
         steps = 0
         while(True):
             agent.target_pos = (
@@ -301,6 +336,7 @@ if __name__ == "__main__":
             finish, isOnTarget, boarder_crossed = agent.perform_action()
             print(f"Is on target: {isOnTarget}")
             agent.render()
+
     else:
         for _ in range(10):
             agent.reset()

@@ -11,7 +11,7 @@ class BallOnPlate:
         self.screen_size = 512
 
         # Physikalische Parameter
-        self.real_width = 0.15 # 30 cm in Metern (m)
+        self.real_width = 0.25 # 30 cm in Metern (m)
         self.plate_radius = self.real_width / 2 # In meter (m)
         self.boarder_distance = 0.01 # in meter (m)
         self.tolerance = 0.015 # Tolerance next to target in meter (m)
@@ -24,7 +24,7 @@ class BallOnPlate:
         self.friction = friction
 
         # Additional varibales
-        self.max_agular_speed = 20.0 # [degree] (degree per second)
+        self.max_agular_speed = 180.0 # [degree] (degree per second)
         self.servo_noise_std = 0.1
 
         # PID-Controller
@@ -117,10 +117,10 @@ class BallOnPlate:
         print(f"roll: {self.roll}  -  pitch: {self.pitch}")
 
         # Calculate accelerate for x
-        self.ax = (3/5) * self.g * self.roll_theta
+        self.ax = (5/7) * self.g * self.roll_theta
 
         # Calculate accelerate for y
-        self.ay = (3/5) * self.g * self.pitch_theta
+        self.ay = (5/7) * self.g * self.pitch_theta
 
         # Calculcate velocity for x
         self.vx = self.vx + self.ax * self.delta_t
@@ -280,7 +280,7 @@ class BallOnPlate:
 
 if __name__ == "__main__":
 
-    agent = BallOnPlate(fps=10, simulation_mode=False, friction=0.8, Kp=1.0, Ki=0.0, Kd=0.20)
+    agent = BallOnPlate(fps=10, simulation_mode=False, friction=0.8, Kp=1.0, Ki=0.0, Kd=0.50)
 
     do_cirlce = True
 

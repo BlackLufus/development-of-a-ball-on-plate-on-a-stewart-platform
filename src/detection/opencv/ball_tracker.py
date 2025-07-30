@@ -28,7 +28,7 @@ class BallTracker:
             cv2.imshow('img_gray', img_gray)
 
         # Get binarty image
-        _, tresh = cv2.threshold(img_gray, 210, 255, cv2.THRESH_BINARY)
+        _, tresh = cv2.threshold(img_gray, 200, 255, cv2.THRESH_BINARY)
         if self.debug:
             cv2.imshow('tresh', tresh)
 

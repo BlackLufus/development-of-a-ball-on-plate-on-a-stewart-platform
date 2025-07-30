@@ -5,14 +5,14 @@ from gymnasium.envs.registration import register
 from gymnasium.utils.env_checker import check_env
 
 
-from src.ball_on_plate.rl.v2.physical import agent as bop
+from src.ball_on_plate.rl.v3.physical import agent as bop
 import numpy as np
 
 gym.registry.clear()
 
 register(
-    id="BallOnPlate-v2",
-    entry_point="src.ball_on_plate.rl.v2.physical.environment:BallOnPlateEnv",
+    id="BallOnPlate-v3",
+    entry_point="src.ball_on_plate.rl.v3.physical.environment:BallOnPlateEnv",
 )
 
 class BallOnPlateEnv(gym.Env):
@@ -150,7 +150,7 @@ class BallOnPlateEnv(gym.Env):
         self.ball.render()
     
 if __name__ == "__main__":
-    env = gym.make("BallOnPlate-v2", render_mode="human", render_fps=5, simulation_mode=True)
+    env = gym.make("BallOnPlate-v3", render_mode="human", render_fps=5, simulation_mode=True)
     
     # Use this to check our custom environment
     print("Check environment begin")
