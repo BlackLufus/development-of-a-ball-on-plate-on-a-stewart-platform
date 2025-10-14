@@ -110,6 +110,16 @@ ball-on-plate/
 │   │   ├── slider.py
 │   │   ├── stewart_plattform.py
 │   │   └── task.py
+│   ├── vacuum_robot/
+│   │   ├── analyse/
+│   │   ├── images/
+│   │   ├── v0/
+│   │   ├── ...
+│   │   ├── v3/
+│   │   │   ├── agent.py
+│   │   │   ├── environment.py
+│   │   │   └── training.py
+│   │   └── q_table.py
 │   ├── video_capture/
 │   │   ├── video_capture.py
 │   │   └── task.py
