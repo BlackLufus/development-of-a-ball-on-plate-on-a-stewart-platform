@@ -190,3 +190,6 @@ src/detector/labels/
 
 # Prevent old project
 src/viet/
+
+/example
+/docu
