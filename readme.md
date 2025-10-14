@@ -1,21 +1,21 @@
-# Development of a Ball-on-Plate Prototype on a Stewart Platform
+# Development of a ball-on-plate prototype on a Stewart platform with comparison between PID and reinforcement learning
 
-## 📌 Projektbeschreibung
+## 📌 Project description
 
-Dieses Projekt beschäftigt sich mit der **Entwicklung eines Ball-on-Plate-Prototyps** auf einer **Stewart-Plattform**.  
-Das Ziel ist es, den Ball präzise auf einer beweglichen Platte zu stabilisieren und zu steuern — sowohl mit einem **klassischen PID-Regler** als auch mit einem **Reinforcement-Learning-Agenten (RL)**.  
-Durch den Vergleich dieser beiden Ansätze sollen die Stärken und Schwächen von modellbasierten und lernbasierten Regelungen untersucht werden.
+This project deals with the **development of a ball-on-plate prototype** on a **Stewart platform**.  
+The goal is to stabilize and control the ball precisely on a moving plate—both with a **classical PID controller** and with a **reinforcement learning agent (RL)**.  
+By comparing these two approaches, the strengths and weaknesses of model-based and learning-based control systems will be investigated.
 
-## 🛠️ Rahmenbedingungen
+## 🛠️ General conditions
 
-Die Umsetzung diese Projekts baut vollständig auf bereits vorhandenen Komponenten auf:
+The implementation of this project is based entirely on existing components:
 
-- Stewart-Plattform mit 6 Aktuatoren
-- Sechs EMAX-ES09MD-Servomotoren
-- Logitech Brio zur Ballpositionsbestimmung
-- Nvidia Jetson TX2 Development Kit zum ansprechen von Servomotoren über die I2C Schnittstelle
+- Stewart platform with 6 actuators
+- Six EMAX-ES09MD servo motors
+- Logitech Brio for ball position determination
+- Nvidia Jetson TX2 Development Kit for controlling servo motors via the I2C interface
 
-### 💻 Systemanforderungen
+### 💻 System requirements
 
 - **Betriebssystem** Ubuntu 18.04
 - **Python** 3.12.10  
@@ -23,36 +23,36 @@ Die Umsetzung diese Projekts baut vollständig auf bereits vorhandenen Komponent
 - **NPM Version** 10.8.2
 - **tsc Version** 5.8.3
 
-### 📦 Erforderliche Python-Pakete
+### 📦 Required Python packages
 
-Die benötigten Abhängigkeiten können über `requirements.txt` installiert werden:
+The required dependencies can be installed via `requirements.txt`:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-## 🪄 TypeScript zu JavaScript kompilieren
+## 🪄 Compiling TypeScript to JavaScript
 
-Das Web-Frontend des Projekts basiert auf **TypeScript** und muss vor der Ausführung in **JavaScript** transpiliert werden.
+The web front end of the project is based on **TypeScript** and must be converted to **JavaScript** before execution.
 
-### 1. Abhängigkeiten installieren
-Wechsle in das `web/frontend`-Verzeichnis und installiere die benötigten npm-Pakete:
+### 1. Install dependencies
+Navigate to the `web/frontend` directory and install the required npm packages:
 
 ```bash
 cd src/web/frontend
 npm install
 ```
 
-### 2. TypeScript kompilieren
+### 2. Compiling TypeScript
 
-Die Kompilierung erfolgt mit dem im Projekt enthaltenen ```tsconfig.json```.
-Führe dazu im Hauptverzeichnis oder im ```frontend```-Ordner folgenden Befehl aus:
+Compilation is performed using the tsconfig.json file included in the project.
+To do this, execute the following command in the main directory or in the frontend folder:
 
 ```bash
 npx tsc
 ```
 
-## 📂 Projektstruktur
+## 📂 Project structure
 
 ```bash
 ball-on-plate/
@@ -125,79 +125,79 @@ ball-on-plate/
 └── README.md
 ```
 
-## 🧩 Weitere Module
+## 🧩 Additional modules
 
-```nunchuck/``` – Nunchuck-Steuerung zur manuellen Plattformkontrolle
+```nunchuck/``` – Nunchuck control for manual platform control
 
-```video_capture/``` – Direkter Kamera-Zugriff
+```video_capture/``` – Direct camera access
 
-```stewart_plattform/``` – Low-Level-Servosteuerung, Kinematik, PCA9685-Ansteuerung
+```stewart_platform/``` – Low-level servo control, kinematics, PCA9685 control
 
-```parser_manager.py``` – Konfigurationsverwaltung über **config.json**
+```parser_manager.py``` – Configuration management via **config.json**
 
-## 🚀 Anwendung
+## 🚀 Application
 
-Einige Funktionen können direkt über die main ausgeführt werden:
+Some functions can be executed directly via main:
 
 ```bash
 python -m src.main --help
 ```
 
-### Stewart Plattform direkt steuern
+### Control the Stewart platform directly
 
 ```bash
 python -m src.main --run set
 ```
 
-oder 
+or
 
 ```bash
 python -m src.main --run circle
 ```
 
-### Nunchuck Steuerung
+### Nunchuck control
 
 ```bash
 python -m src.main --run nunchuck
 ```
 
-### Video Abrage
+### Video capture
 
 ```bash
 python -m src.main --run video_capture_linux
 ```
 
-### Simulation (RL oder PID) ausführen
+### Run simulation (RL or PID)
 
 ```bash
 python -m src.main --run ball_on_plate
 ```
 
-### Simulation (RL oder PID) ausführen/trainieren
+### Execute/train simulation (RL or PID)
 
 ```bash
 python -m src.ball_on_plate.rl.v3.simulation.train
 ```
 
-oder
+or
 
 ```bash
 python -m src.ball_on_plate.pid.v2.simulation.agent
 ```
 
-### Physisch (RL oder PID) ausführen/trainieren
+### Perform/train physically (RL or PID)
 
 ```bash
 python -m src.ball_on_plate.rl.v3.physical.train
 ```
 
-oder
+or
 
 ```bash
 python -m src.ball_on_plate.pid.v2.physical.agent
 ```
 
-### Weboberfläche
+### Web interface
 
 ```bash
 python -m src.web.manage runserver 127.0.0.1:8000
@@ -205,5 +205,5 @@ python -m src.web.manage runserver 127.0.0.1:8000
 
 ## 🧾 Lizenz
 
-Dieses Projekt steht unter der ```MIT``` License.
-Details siehe LICENSE.
+This project is licensed under the `MIT` License.\\
+For details, see LICENSE.
