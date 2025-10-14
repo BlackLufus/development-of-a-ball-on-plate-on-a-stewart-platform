@@ -6,11 +6,11 @@ import ImageStream from "./elements/image_stream.js";
  * BallOnPlateError is a custom error class for handling errors specific to the Ball On Plate simulation.
  * It extends the built-in Error class and sets the name property to "BallOnPlateError".
  */
-class BallOnPlateError extends Error {
+class BallOnPlateSimulationError extends Error {
     constructor(message: string) {
         super(message);
         this.name = "BallOnPlateError";
-        Object.setPrototypeOf(this, BallOnPlateError.prototype);
+        Object.setPrototypeOf(this, BallOnPlateSimulationError.prototype);
     }
 }
 
@@ -21,9 +21,9 @@ class BallOnPlateError extends Error {
  * This class handles the connection to the backend via WebSocket, manages the image
  * stream for displaying simulation frames, and provides lifecycle management for the frame.
  */
-class BallOnPlate extends Frame {
+class BallOnPlateSimulation extends Frame {
 
-    private static instance?: BallOnPlate;
+    private static instance?: BallOnPlateSimulation;
     image_stream?: ImageStream;
     
     /**
@@ -35,7 +35,7 @@ class BallOnPlate extends Frame {
     private constructor() {
         const container = document.createElement('div');
 
-        super("Ball On Plate", container, () => this.terminate());
+        super("Ball On Plate Simulation", container, () => this.terminate());
 
         this.build(container);
     }
@@ -44,9 +44,9 @@ class BallOnPlate extends Frame {
      * Retrieves the singleton instance of the BallOnPlate frame.
      * @returns {BallOnPlate} The singleton instance.
      */
-    public static get(): BallOnPlate {
+    public static get(): BallOnPlateSimulation {
         if (!this.instance) {
-            this.instance = new BallOnPlate();
+            this.instance = new BallOnPlateSimulation();
         }
         return this.instance;
     }
@@ -69,7 +69,7 @@ class BallOnPlate extends Frame {
                             img.src = `data:image/jpeg;base64,${payload}`;
                         }
                     } catch (e) {
-                        throw new BallOnPlateError("Failed to parse message or draw frame: " + e);
+                        throw new BallOnPlateSimulationError("Failed to parse message or draw frame: " + e);
                     }
                 }
                 else {
@@ -150,8 +150,8 @@ class BallOnPlate extends Frame {
     private terminate = () => {
         this.stop();
         console.log("BallOnPlate: Terminate Node");
-        BallOnPlate.instance = undefined;
+        BallOnPlateSimulation.instance = undefined;
     }
 }
 
-export default BallOnPlate;
+export default BallOnPlateSimulation;
