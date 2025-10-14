@@ -83,7 +83,7 @@ class TrainBallOnPlate:
         self.args, _ = parser.parse_known_args()
 
     def run(self, logger):
-        from src.ball_on_plate.v0.training import train_sb3
+        from src.ball_on_plate.rl.v0.simulation.training import train_sb3
         train_sb3(
             self.args.env, 
             self.args.dir, 
@@ -190,7 +190,7 @@ class RunBallOnPlate:
         self.fps = fps
 
     def run(self, logger, event=None, stop_event=None):
-        from src.ball_on_plate.v0.training import run_sb3
+        from src.ball_on_plate.rl.v0.simulation.training import run_sb3
         run_sb3(
             self.env,
             self.id,

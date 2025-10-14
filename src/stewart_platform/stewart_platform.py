@@ -149,13 +149,14 @@ class StewartPlatform:
                 raise ValueError(f"Beinlänge {L} liegt außerhalb des zulässigen Bereichs. Erlaubt: {abs(r - l)} <= L <= {r + l}")            
             
             # Calculate cos_theta to check if value is between -1 and 1
-            # cos_theta = (math.pow(r, 2) + math.pow(L, 2) - math.pow(l, 2)) / (2 * r * L)
-            cos_theta = (L - math.sqrt(math.pow(l, 2) - math.pow(r, 2))) / r
+            cos_theta = (math.pow(r, 2) + math.pow(L, 2) - math.pow(l, 2)) / (2 * r * L)
+            # cos_theta = (L - math.sqrt(math.pow(l, 2) - math.pow(r, 2))) / r
             if cos_theta < -1 or cos_theta > 1:
                 raise ValueError(f"Ungültiger Winkel für L={L}, r={r}, l={l}: cos_theta={cos_theta}")
             
             # Get the final degree and add it to list
-            theta = math.degrees(math.asin(cos_theta))
+            theta = math.degrees(math.acos(cos_theta))
+            # theta = math.degrees(math.asin(cos_theta))
             angles.append(theta)
         
         # return a list of all angels

@@ -15,18 +15,18 @@ class BallOnPlate:
         # Physikalische Parameter
         self.real_width = 0.25 # 25 cm in Metern (m)
         self.plate_radius = self.real_width / 2 # In meter (m)
-        self.boarder_distance = 0.025 # in meter (m)
-        self.tolerance = 0.015 # Tolerance next to target in meter (m)
+        self.boarder_distance = 0.04 # in meter (m)
+        self.tolerance = 0.02 # Tolerance next to target in meter (m)
         self.pixels_per_meter = 512 / self.real_width  # Convert platform to computer-readable coordinate system ()
         
         # Gravity
         self.g = 9.81
         self.max_velocity = 0.15
-        self.max_angle = 4
+        self.max_angle = 3
 
         # Additional varibales
-        self.max_agular_speed = 20.0 # [degree] (degree per second)
-        self.servo_noise_std = 0.1
+        self.max_agular_speed = 8.0 # [degree] (degree per second)
+        self.servo_noise_std = 0.25
 
         # Set random state
         self.np_random = np.random.RandomState()
@@ -106,11 +106,11 @@ class BallOnPlate:
     def perform_action(self, action) -> bool:
 
         # Randomize gravitational force
-        self.g = np.random.uniform(9.7, 9.9)
+        self.g = np.random.uniform(9.8, 9.82)
 
         # check if it is simulation mode
         if self.simulation_mode:
-            self.delta_t = self.np_random.uniform(0.05, 0.20)
+            self.delta_t = self.np_random.uniform(0.05, 0.175)
         else:
             self.current_time = time.time()
             self.delta_t = self.current_time - self.last_time
@@ -133,8 +133,8 @@ class BallOnPlate:
         self.pitch = np.clip(delta_pitch, -max_delta_angle, max_delta_angle)
 
         # Get random noise
-        noise_roll  = np.random.normal(0.0, self.servo_noise_std)
-        noise_pitch = np.random.normal(0.0, self.servo_noise_std)
+        noise_roll  = np.random.normal(-self.servo_noise_std, self.servo_noise_std)
+        noise_pitch = np.random.normal(-self.servo_noise_std, self.servo_noise_std)
 
         # Add noice
         self.roll  = self.roll  + noise_roll
@@ -281,6 +281,7 @@ if __name__ == "__main__":
 
     ballOnPlate = BallOnPlate(fps=20, simulation_mode=False)
     ballOnPlate.render()
+    ballOnPlate.reset()
     while(True):
 
         random_action = (

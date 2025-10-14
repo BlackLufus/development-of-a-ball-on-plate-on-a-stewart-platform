@@ -143,7 +143,7 @@ def run_sb3(env_id, id, model_name, sb3_model, device='cpu', iterations=10, simu
 
 if __name__ == "__main__":
     env_id = 'BallOnPlate-v3'
-    dir = "3_0" # Use version number as dir name
+    dir = "3_10" # Use version number as dir name
     model_name = "best_model.zip"
     # train_sb3(env_id, dir, sb3_model="ppo", device='cpu', iterations=100, steps_per_iteration=10_000)
     # train_sb3(env_id, model_dir, tensorboard_dir, useopencl_existing_model=f"{model_dir}/{model_name}")

@@ -1,183 +1,204 @@
-# Grundlagen: Schritt für Schritt Anleitung zur berechnung der Stewart-Plattform:
+# Development of a Ball-on-Plate Prototype on a Stewart Platform
 
-## 1. **Geometrie der Plattform definieren**
+## 📌 Projektbeschreibung
 
-**Basis (festes Element):**
+Dieses Projekt beschäftigt sich mit der **Entwicklung eines Ball-on-Plate-Prototyps** auf einer **Stewart-Plattform**.  
+Das Ziel ist es, den Ball präzise auf einer beweglichen Platte zu stabilisieren und zu steuern — sowohl mit einem **klassischen PID-Regler** als auch mit einem **Reinforcement-Learning-Agenten (RL)**.  
+Durch den Vergleich dieser beiden Ansätze sollen die Stärken und Schwächen von modellbasierten und lernbasierten Regelungen untersucht werden.
 
-6 Befestigungspunkte $ B_i $ ($ i = 1, \dots, 6 $) auf einem Kreis mit Radius $ R_b $.
-Typische Anordnung: Punkte um $ 60^\circ $ versetzt.
-Koordinaten im Basissystem:
+## 🛠️ Rahmenbedingungen
 
-$
-B_i = \begin{bmatrix} R_b \cos(\theta_{b_i}) \\ R_b \sin(\theta_{b_i}) \\ 0 \end{bmatrix}
-$
+Die Umsetzung diese Projekts baut vollständig auf bereits vorhandenen Komponenten auf.
 
-**Plattform (bewegliches Element):**
+- Stewart-Plattform mit 6 Aktuatoren
+- Sechs EMAX-ES09MD-Servomotoren
+- Logitech Brio zur Ballpositionsbestimmung
+- Nvidia Jetson TX2 Development Kit zum ansprechen von Servomotoren über die I2C Schnittstelle
 
-6 Befestigungspunkte $ P_i $ auf einem Kreis mit Radius $ R_p $.
-Koordinaten im Plattformsystem:
+### 💻 Systemanforderungen
 
-$
-P_i = \begin{bmatrix} R_p \cos(\theta_{p_i}) \\ R_p \sin(\theta_{p_i}) \\ 0 \end{bmatrix}
-$
+- **Betriebssystem** Ubuntu 18.04
+- **Python** 3.12.10  
+- **Node.js** v20.17.0
+- **NPM Version** 10.8.2
+- **tsc Version** 5.8.3
 
-## 2. **Position und Orientierung der Plattform festlegen**
+### 📦 Erforderliche Python-Pakete
 
-**Translation (Verschiebung):**
+Die benötigten Abhängigkeiten können über `requirements.txt` installiert werden:
 
-Verschiebungsvektor $ \mathbf{t} = \begin{bmatrix} x \\ y \\ z \end{bmatrix} $.
+```bash
+pip install -r requirements.txt
+```
 
-**Rotation:**
+## 🪄 TypeScript zu JavaScript kompilieren
 
-Rotationsmatrix $ \mathbf{R} $ aus Euler-Winkeln (z. B. Roll-Pitch-Yaw):
+Das Web-Frontend des Projekts basiert auf **TypeScript** und muss vor der Ausführung in **JavaScript** transpiliert werden.
 
-$R_B = R_z(ψ) * R_y(θ) * R_x(ϕ) $
+### 1. Abhängigkeiten installieren
+Wechsle in das `web/frontend`-Verzeichnis und installiere die benötigten npm-Pakete:
 
-**Rotation um die Z-Achse (Yaw, ψ)**
+```bash
+cd src/web/frontend
+npm install
+```
 
-$
-R_z(ψ) = \begin{bmatrix}
-\cosψ & -sinψ & 0 \\
-sinψ & cosψ & 0 \\
-0 & 0 & 1
-\end{bmatrix}
-$
+### 2. TypeScript kompilieren
 
-**Rotation um die Y-Achse (Pitch, θ)**
+Die Kompilierung erfolgt mit dem im Projekt enthaltenen ```tsconfig.json```.
+Führe dazu im Hauptverzeichnis oder im ```frontend```-Ordner folgenden Befehl aus:
 
-$
-R_y(θ) = 
-\begin{bmatrix}
-cos(θ) & 0 & sin(θ) \\
-0 & 1 & 0 \\
--sin(θ) & 0 & cos(θ)
-\end{bmatrix}
-$
+```bash
+npx tsc
+```
 
-**Rotation um die X-Achse (Roll, ϕ)**
+## 📂 Projektstruktur
 
-$
-R_y(θ) = 
-\begin{bmatrix}
-1 & 0 & 0 \\
-0 & cos(ϕ) & -sin(ϕ) \\
-0 & sin(ϕ) & cos(ϕ)
-\end{bmatrix}
-$
+ball-on-plate/
+├── src/
+│   ├── ball_on_plate/
+│   │   ├── pid/
+│   │   │   ├── v2/
+│   │   │   │   ├── physical/
+│   │   │   │   │   ├── images/
+│   │   │   │   │   └── agent.py
+│   │   │   │   ├── simulation/
+│   │   │   │   │   ├── images/
+│   │   │   │   │   └── agent.py
+│   │   ├── rl/
+│   │   │   ├── v3/
+│   │   │   │   ├── physical/
+│   │   │   │   │   ├── images/
+│   │   │   │   │   ├── agent.py
+│   │   │   │   │   ├── environment.py
+│   │   │   │   │   └── training.py
+│   │   │   │   ├── simulation/
+│   │   │   │   │   ├── images/
+│   │   │   │   │   ├── agent.py
+│   │   │   │   │   ├── environment.py
+│   │   │   │   │   └── training.py
+│   │   ├── task.py
+│   ├── detection/
+│   │   ├── opencv/
+│   │   │   └── ball_tracker.py
+│   │   ├── yolo/
+│   │   │   ├── ac_detection.py
+│   │   │   ├── cv_detection.py
+│   │   │   └── recognition.py
+│   ├── nunchuck/
+│   │   ├── nunchuck.py
+│   │   └── task.py
+│   ├── stewart_plattform/
+│   │   ├── PCA9685/
+│   │   │   ├── PCA9685.py
+│   │   ├── servo_motor_handler.py
+│   │   ├── slider.py
+│   │   ├── stewart_plattform.py
+│   │   └── task.py
+│   ├── video_capture/
+│   │   ├── video_capture.py
+│   │   └── task.py
+│   ├── web/
+│   │   ├── backend/
+│   │   │   ├── consumer.py
+│   │   │   └── ...
+│   │   ├── frontend/
+│   │   │   ├── assets/
+│   │   │   ├── scripts/
+│   │   │   ├── styles/
+│   │   │   └── index.html
+│   │   ├── server/
+│   │   │   ├── asgi.py
+│   │   │   ├── settings.py
+│   │   │   ├── urls.py
+│   │   │   └── wsgi.py
+│   │   └── manager.py
+│   ├── config.json
+│   ├── main.py
+│   └── parser_manager.py
+├── requirements.txt
+├── tsconfig.json
+└── README.md
 
-**Beispiel:**
+## 🧩 Weitere Module
 
-$
-R_B =
-\begin{bmatrix}
-cos(ψ) & -sin(ψ) & 0 \\
-sin(ψ) & cos(ψ) & 0 \\
-0 & 0 & 1
-\end{bmatrix}
-\
-*
-\begin{bmatrix}
-cos(θ) & 0 & sin(θ) \\
-0 & 1 & 0 \\
--sin(θ) & 0 & cos(θ)
-\end{bmatrix}
-*
-\begin{bmatrix}
-1 & 0 & 0 \\
-0 & cos(ϕ) & -sin(ϕ) \\
-0 & sin(ϕ) & cos(ϕ)
-\end{bmatrix}
-$
+```nunchuck/``` – Nunchuck-Steuerung zur manuellen Plattformkontrolle
 
-$
-R_B =
-\begin{bmatrix}
-cos(ψ)cos(θ) & -sin(ψ) & cos(ψ)sin(θ) \\
-sin(ψ)cos(θ) & cos(ψ) & sin(ψ)sin(θ) \\
--sin(θ) & 0 & cos(θ)
-\end{bmatrix}
-*
-\begin{bmatrix}
-1 & 0 & 0 \\
-0 & cos(ϕ) & -sin(ϕ) \\
-0 & sin(ϕ) & cos(ϕ)
-\end{bmatrix}
-$
+```video_capture/``` – Direkter Kamera-Zugriff
 
-$
-R_B =
-\begin{bmatrix}
-cos(ψ)cos(θ) & -sin(ψ)cos(ϕ)+cos(ψ)sin(θ)sin(ϕ) & sin(ψ)sin(ϕ)+cos(ψ)sin(θ)cos(ϕ) \\
-sin(ψ)cos(θ) & cos(ψ)cos(ϕ) + sin(ψ)sin(θ)sin(ϕ) & -cos(ϕ)sin(ϕ)+sin(ψ)sin(θ)cos(ϕ) \\
--sin(θ) & cos(θ)sin(ϕ) & cos(θ)cos(ϕ)
-\end{bmatrix}
-$
+```stewart_plattform/``` – Low-Level-Servosteuerung, Kinematik, PCA9685-Ansteuerung
 
-Werte zwischen $-90\degree$ und $90\degree$
-$
-ψ = 30\degree
-$
-$
-θ = 20\degree
-$
-$
-ϕ = 10\degree
-$
+```parser_manager.py``` – Konfigurationsverwaltung über **config.json**
 
-## 3. **Plattformpunkte ins Basissystem transformieren**
+## 🚀 Anwendung
 
-Jeder Plattformpunkt $ P_i $ wird transformiert:
+Einige Funktionen können direkt über die main ausgeführt werden:
 
-$
-P_{b_i} = \mathbf{R} \cdot P_i + \mathbf{t}
-$
+```bash
+python -m src.main --help
+```
 
-**Beispiel:**
+### Stewart Plattform direkt steuern
 
-Für $ P_1 = \begin{bmatrix} 0.8 \\ 0 \\ 0 \end{bmatrix} $:
+```bash
+python -m src.main --run set
+```
 
-$
-P_{b_1} = \mathbf{R} \cdot \begin{bmatrix} 0.8 \\ 0 \\ 0 \end{bmatrix} + \begin{bmatrix} 0.1 \\ 0.2 \\ 0.5 \end{bmatrix}
-$
+oder 
 
-## 4. **Beinvektoren berechnen**
+```bash
+python -m src.main --run circle
+```
 
-Vektor für Bein $ i $:
+### Nunchuck Steuerung
 
-$
-\mathbf{v}_i = P_{b_i} - B_i
-$
+```bash
+python -m src.main --run nunchuck
+```
 
-**Beispiel:**
+### Video Abrage
 
-$
-\mathbf{v}_1 = \begin{bmatrix} 0.75 \\ 0.64 \\ 0.34 \end{bmatrix} - \begin{bmatrix} 1.0 \\ 0 \\ 0 \end{bmatrix} = \begin{bmatrix} -0.25 \\ 0.64 \\ 0.34 \end{bmatrix}
-$
+```bash
+python -m src.main --run video_capture_linux
+```
 
-## 5. **Beinlängen bestimmen**
+### Simulation (RL oder PID) ausführen
 
-Länge des Beins $ i $:
+```bash
+python -m src.main --run ball_on_plate
+```
 
-$
-L_i = \|\mathbf{v}_i\| = \sqrt{v_{i_x}^2 + v_{i_y}^2 + v_{i_z}^2}
-$
+### Simulation (RL oder PID) ausführen/trainieren
 
-**Beispiel:**
+```bash
+python -m src.ball_on_plate.rl.v3.simulation.train
+```
 
-$
-L_1 = \sqrt{(-0.25)^2 + 0.64^2 + 0.34^2} \approx 0.76 \, \text{m}
-$
+oder
 
----
+```bash
+python -m src.ball_on_plate.pid.v2.simulation.agent
+```
 
-### **Wichtige Hinweise**
+### Physisch (RL oder PID) ausführen/trainieren
 
-- **Arbeitsraum prüfen:** Die berechneten Beinlängen müssen im zulässigen Bereich der Aktoren liegen.
-- **Numerische Berechnung:** Die Nutzen von Tools wie MATLAB oder Python für präzise Matrizenoperationen.
-- **Symmetrie:** Bei symmetrischen Plattformen vereinfachen sich die Winkel $ \theta_{b_i} $ und $ \theta_{p_i} $.
+```bash
+python -m src.ball_on_plate.rl.v3.physical.train
+```
 
-**Formelzusammenfassung:**
+oder
 
-$
-\boxed{L_i = \sqrt{( \mathbf{R} \cdot P_i + \mathbf{t} - B_i )^\top ( \mathbf{R} \cdot P_i + \mathbf{t} - B_i )}}
-$
+```bash
+python -m src.ball_on_plate.pid.v2.physical.agent
+```
+
+### Weboberfläche
+
+```bash
+python -m src.web.manage runserver 127.0.0.1:8000
+```
+
+## 🧾 Lizenz
+
+Dieses Projekt steht unter der ```MIT``` License.
+Details siehe LICENSE.

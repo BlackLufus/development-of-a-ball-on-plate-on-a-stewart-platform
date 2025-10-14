@@ -7,7 +7,7 @@ import logging
 from stable_baselines3 import A2C, DQN, PPO
 from stable_baselines3.common.callbacks import EvalCallback
 
-from src.ball_on_plate.v0 import environment
+from src.ball_on_plate.rl.v0.simulation import environment
 
 def train_sb3(env_id, id, sb3_model="PPO", use_existing_model=None, device='cpu', sequential_execution=False, iterations = 40, steps_per_iteration=5_000, logger=None):
     os.makedirs(f"./models/bop/{id}", exist_ok=True)
