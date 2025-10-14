@@ -141,7 +141,7 @@ ball-on-plate/
 │   ├── config.json
 │   ├── main.py
 │   ├── parser_manager.py
-│   ├── tensoboard/
+│   ├── tensorboard/
 │   │   ├── ...
 │   │   └── bop
 │   │       ├── ...
@@ -183,6 +183,27 @@ v4l2-ctl --device=/dev/video1 --list-formats-ext
 Replace `/dev/video1` with the device path of your camera. This will display all supported resolutions, frame rates, and pixel formats.
 
 > ⚠️ Note: `v4l2-ctl`is typically available on Linux systems. Windows users will need to use their system’s camera settings or other tools.
+
+## 📊 Viewing Logs with TensorBoard
+
+You can monitor training progress, metrics, and visualizations using TensorBoard.
+
+### 1. Start TensorBoard
+
+```bash
+tensorboard --logdir ./tensorboard/
+```
+
+This command starts a local TensorBoard server using the logs stored in `./tensorboard/`.
+
+### 2. Open in a browser
+
+fter starting, TensorBoard will provide a local URL (e.g., `http://localhost:6006`). Open this in your browser to explore your training metrics, graphs, and summaries.
+
+> ⚠️ Make sure TensorBoard is installed in your Python environment. You can install it with:
+> ```bash
+> pip install tensorboard
+> ```
 
 ## 🚀 Application
 
