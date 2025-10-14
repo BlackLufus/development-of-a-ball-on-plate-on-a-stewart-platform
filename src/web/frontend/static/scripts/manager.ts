@@ -1,7 +1,8 @@
-import BallOnPlate from './window/content/ball_on_plate.js';
+import BallOnPlate from './window/content/ball_on_plate_simulation.js';
 import VideoCam from './window/content/video_cam.js';
 import WebSocketHandler from './websocket_handler.js';
 import ControlPanel from './window/content/control_panel.js';
+import BallOnPlatePhysical from './window/content/ball_on_plate_physical.js';
 
 class ManagerError extends Error {
     constructor(message: string) {
@@ -20,7 +21,8 @@ class Manager {
         this.registerWebsocket();
         this.registerControlPanel();
         this.registerVideoCam();
-        this.registerBallOnPlate();
+        this.registerBallOnPlateSimulation();
+        this.registerBallOnPlatePhysical();
     }
 
     public static get(): Manager {
@@ -89,14 +91,27 @@ class Manager {
         }
     }
 
-    private registerBallOnPlate(): void {
-        const ball_on_plate = document.getElementById('ball_on_plate');
+    private registerBallOnPlateSimulation(): void {
+        const ball_on_plate = document.getElementById('ball_on_plate_simulation');
         if (!ball_on_plate) {
             throw new ManagerError('ball_on_plate not found');
         }
         else {
             ball_on_plate.addEventListener('click', () => {
                 const live_cam = BallOnPlate.get();
+                live_cam.show();
+            });
+        }
+    }
+
+    private registerBallOnPlatePhysical(): void {
+        const ball_on_plate = document.getElementById('ball_on_plate_physical');
+        if (!ball_on_plate) {
+            throw new ManagerError('ball_on_plate not found');
+        }
+        else {
+            ball_on_plate.addEventListener('click', () => {
+                const live_cam = BallOnPlatePhysical.get();
                 live_cam.show();
             });
         }

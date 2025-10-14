@@ -3,7 +3,8 @@ export enum TaskId {
     CIRCLE = 'circle',
     NUNCHUCK = 'nunchuck',
     VIDEO_CAM = 'video_cam',
-    BALL_ON_PLATE = 'ball_on_plate'
+    BALL_ON_PLATE = 'ball_on_plate',
+    BALL_ON_PLATE_PHYSICAL = 'ball_on_plate_physical'
 }
 
 export enum State {
