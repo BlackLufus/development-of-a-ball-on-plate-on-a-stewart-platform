@@ -37,6 +37,8 @@ class MenuBar {
         this.element = document.createElement('div');
 
         this.build(checked_index);
+
+        MenuBar.id += 1;
     }
 
     private build(checked_index: number): void {

@@ -253,8 +253,8 @@ class ControlPanel extends Frame {
         switch(this.selected_task) {
             case TaskId.SET:
                 this.buildContent(
-                    'Set the position and orientation of the steward platform',
-                    'Agrumente',
+                    'Set the position and orientation of the steward platform.',
+                    'Arguments',
                     [
                         new Input('x', 'X', this.values),
                         new Input('y', 'Y', this.values),
@@ -263,42 +263,42 @@ class ControlPanel extends Frame {
                         new Input('pitch', 'Pitch', this.values),
                         new Input('yaw', 'Yaw', this.values)
                     ],
-                    'Aktionen',
+                    'Actions',
                     [
-                        new ActionButton('Übertragen', () => this.connect())
+                        new ActionButton('Transmit', () => this.connect())
                     ]
                 );
                 break;
             case TaskId.CIRCLE:
                 this.buildContent(
-                    'Task description',
-                    'Agrumente',
+                    'Move the Stewart platform along a circular trajectory maintaining position and orientation.',
+                    'Arguments',
                     [
                         new Input('radius', 'Radius', this.values),
                         new Input('steps', 'Steps', this.values),
                         new Input('period', 'Period', this.values),
                         new Input('smooth','Smooth', this.values)
                     ],
-                    'Aktionen',
+                    'Actions',
                     [
-                        new ActionButton('Übertragen', () => this.connect()),
-                        new ActionButton('Unterbrechen', () => this.disconnect())
+                        new ActionButton('Transmit', () => this.connect()),
+                        new ActionButton('Interrupt', () => this.disconnect())
                     ]
                 );
                 break;
             case TaskId.NUNCHUCK:
                 this.buildContent(
-                    'Task description',
-                    'Agrumente',
+                    "Control the Stewart platform's position using a Nunchuck controller.",
+                    'Arguments',
                     [
                         new Input('radius', 'Radius', this.values),
                         new Input('period', 'Period', this.values),
                         new Input('use_accelerometer','Accelerometer', this.values)
                     ],
-                    'Aktionen',
+                    'Actions',
                     [
-                        new ActionButton('Übertragen', () => this.connect()),
-                        new ActionButton('Unterbrechen', () => this.disconnect())
+                        new ActionButton('Transmit', () => this.connect()),
+                        new ActionButton('Interrupt', () => this.disconnect())
                     ]
                 );
                 break;
@@ -351,8 +351,11 @@ class ControlPanel extends Frame {
         action_header.innerText = action_header_name;
         actions_div.appendChild(action_header);
 
+        const actions_button_div = document.createElement('div');
+        actions_div.appendChild(actions_button_div);
+
         actions_list.forEach(action => {
-            actions_div.appendChild(action.element);
+            actions_button_div.appendChild(action.element);
         });
     }
 
