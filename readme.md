@@ -135,6 +135,28 @@ ball-on-plate/
 
 ```parser_manager.py``` – Configuration management via **config.json**
 
+## 🎥 Checking Connected Cameras
+
+Before using the recorder, you can verify which camera is connected and what settings are available.
+
+### 1. List all connected video devices
+
+```bash
+v4l2-ctl --list-devices
+```
+
+This command shows all cameras detected by your system along with their device paths (e.g., `/dev/video0`, `/dev/video1`).
+
+### 2. Check supported formats and options for a specific device
+
+```bash
+v4l2-ctl --device=/dev/video1 --list-formats-ext
+```
+
+Replace `/dev/video1` with the device path of your camera. This will display all supported resolutions, frame rates, and pixel formats.
+
+> ⚠️ Note: `v4l2-ctl`is typically available on Linux systems. Windows users will need to use their system’s camera settings or other tools.
+
 ## 🚀 Application
 
 Some functions can be executed directly via main:
@@ -195,6 +217,12 @@ or
 
 ```bash
 python -m src.ball_on_plate.pid.v3.physical.agent
+```
+
+### Web interface
+
+```bash
+python -m src.main --run image_recorder -f 15 -t 200 --os 'linux'
 ```
 
 ### Web interface

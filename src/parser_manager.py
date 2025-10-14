@@ -15,7 +15,8 @@ class ParserManager:
         'ball_on_plate_rl',
         'train_ball_on_plate_rl',
         'video_capture_linux',
-        'video_capture_windows'
+        'video_capture_windows',
+        'image_recorder'
     ]
 
     def __init__(self, base_radius, base_angle, platform_radius, platform_angle):
@@ -275,6 +276,12 @@ class ParserManager:
         elif self.operation == 'video_capture_windows':
                 from src.video_capture.task import VideoCaptureWindows
                 model = VideoCaptureWindows()
+                model.parse()
+                self.setup_logger()
+                model.run(self.logger)
+        elif self.operation == 'image_recorder':
+                from src.video_capture.recorder.task import ImageRecorder
+                model = ImageRecorder()
                 model.parse()
                 self.setup_logger()
                 model.run(self.logger)

@@ -7,7 +7,7 @@ from src.video_capture.video_capture import CameraThreadWithAV
 
 import cv2
 
-class FrameRecognition:
+class ImageRecorder:
 
     def crop(self, frame):
         # 640x640 aus Bildmitte zuschneiden
@@ -19,32 +19,43 @@ class FrameRecognition:
         return frame[start_y:end_y, start_x:end_x]
 
 
-    def __init__(self, fps:int, amount:int) -> None:
-        print(f"fps: {fps}", f"amount: {amount}")
+    def __init__(self, fps:int, total_frames:int, operator_system:str='linux', logger=None) -> None:
+        print(f"fps: {fps}", f"amount: {total_frames}")
         if not os.path.exists('./record_images'):
             os.makedirs('./record_images')
 
-        cam = CameraThreadWithAV(
-            device_name='/dev/video0',
-            options={
-                "video_size": '1152x648',
-                "framerate": str(fps),
-                "input_format": "mjpeg"
-            },
-            format="v4l2",
-            logger=None
-        )
+        if operator_system == 'linux':
+            cam = CameraThreadWithAV(
+                device_name='/dev/video0',
+                options={
+                    "video_size": '1152x648',
+                    "framerate": str(fps),
+                    "input_format": "mjpeg"
+                },
+                format="v4l2",
+                logger=logger
+            )
+        else:
+            cam = CameraThreadWithAV(
+                device_name = f"video=Logitech BRIO", 
+                options = {
+                    "video_size": "1920x1080",
+                    "framerate": "30"
+                },
+                format = "dshow",
+                logger=None
+            )
 
         last_frame_num = cam.frame_num
         try:
             print("Enter loop")
-            while amount > 0 and cam.running:
+            while total_frames > 0 and cam.running:
                 if last_frame_num != cam.frame_num:
                     last_frame_num = cam.frame_num
 
                     frame, fps, frame_num = cam.read()
                     if frame is not None:
-                        amount -= 1
+                        total_frames -= 1
                         print("save Image:")
                         file_path = f'./record_images/{datetime.now().strftime("%Y%m%d-%H%M%S%f")}.jpg'
 
@@ -62,5 +73,5 @@ class FrameRecognition:
 
 if __name__ == "__main__":
     print("Start Recognition")
-    FrameRecognition(15, 400)
+    ImageRecorder(15, 400)
 
