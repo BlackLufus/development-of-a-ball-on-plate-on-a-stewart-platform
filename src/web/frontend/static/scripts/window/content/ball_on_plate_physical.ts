@@ -134,7 +134,8 @@ class BallOnPlatePhysical extends Frame {
                 new MenuBarItem('virtual', 'Physical'),
                 new MenuBarItem('stream', 'Stream'),
             ],
-            this.task_changed
+            this.task_changed,
+            1
         );
         container.appendChild(menu_bar.element);
         this.setContent();
