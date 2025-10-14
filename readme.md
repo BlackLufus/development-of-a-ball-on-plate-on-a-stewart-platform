@@ -56,22 +56,30 @@ npx tsc
 
 ```bash
 ball-on-plate/
+├── models/
+│   └── bop
+│       ├── ...
+│       └── 4_0
+├── node_modules/
+├── recorded_images/
 ├── src/
 │   ├── ball_on_plate/
 │   │   ├── pid/
 │   │   │   ├── ...
-│   │   │   ├── v2/
-│   │   │   │   ├── physical/
-│   │   │   │   │   ├── images/
-│   │   │   │   │   └── agent.py
-│   │   │   │   ├── simulation/
-│   │   │   │   │   ├── images/
-│   │   │   │   │   └── agent.py
-│   │   ├── rl/
-│   │   │   ├── ...
 │   │   │   ├── v3/
 │   │   │   │   ├── physical/
 │   │   │   │   │   ├── images/
+│   │   │   │   │   └── agent.py
+│   │   │   │   ├── simulation/
+│   │   │   │   │   ├── images/
+│   │   │   │   │   └── agent.py
+│   │   │   │   └── pid_simulate_ball_on_plate_v3.ipynb
+│   │   │   └── task.py
+│   │   ├── rl/
+│   │   │   ├── ...
+│   │   │   ├── v4/
+│   │   │   │   ├── physical/
+│   │   │   │   │   ├── images/
 │   │   │   │   │   ├── agent.py
 │   │   │   │   │   ├── environment.py
 │   │   │   │   │   └── training.py
@@ -80,15 +88,18 @@ ball-on-plate/
 │   │   │   │   │   ├── agent.py
 │   │   │   │   │   ├── environment.py
 │   │   │   │   │   └── training.py
-│   │   ├── task.py
+│   │   │   └── task.py
+│   │   └── README.md
 │   ├── detection/
 │   │   ├── opencv/
-│   │   │   ├── ...
+│   │   │   ├── images/
+│   │   │   ├── ball_tracker copy.py
+│   │   │   ├── ball_tracker_approach_1.ipynb
+│   │   │   ├── ball_tracker_approach_2.ipynb
 │   │   │   └── ball_tracker.py
-│   │   ├── yolo/
-│   │   │   ├── ac_detection.py
-│   │   │   ├── cv_detection.py
-│   │   │   └── recorder.py
+│   │   └── yolo/
+│   │       ├── ac_detection.py
+│   │       └── cv_detection.py
 │   ├── nunchuck/
 │   │   ├── nunchuck.py
 │   │   └── task.py
@@ -119,7 +130,13 @@ ball-on-plate/
 │   │   └── manager.py
 │   ├── config.json
 │   ├── main.py
-│   └── parser_manager.py
+│   ├── parser_manager.py
+│   ├── tensoboard/
+│   │   ├── ...
+│   │   └── bop
+│   │       ├── ...
+│   │       └── 4_0
+│   └── venv/
 ├── requirements.txt
 ├── tsconfig.json
 └── README.md
