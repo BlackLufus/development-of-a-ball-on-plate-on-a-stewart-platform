@@ -21,8 +21,8 @@ class ImageRecorder:
 
     def __init__(self, fps:int, total_frames:int, operator_system:str='linux', logger=None) -> None:
         print(f"fps: {fps}", f"amount: {total_frames}")
-        if not os.path.exists('./record_images'):
-            os.makedirs('./record_images')
+        if not os.path.exists('./recorded_images'):
+            os.makedirs('./recorded_images')
 
         if operator_system == 'linux':
             cam = CameraThreadWithAV(
@@ -57,7 +57,7 @@ class ImageRecorder:
                     if frame is not None:
                         total_frames -= 1
                         print("save Image:")
-                        file_path = f'./record_images/{datetime.now().strftime("%Y%m%d-%H%M%S%f")}.jpg'
+                        file_path = f'./recorded_images/{datetime.now().strftime("%Y%m%d-%H%M%S%f")}.jpg'
 
                         cropped_frame = self.crop(frame)
                         # Anzeige des Bildes
