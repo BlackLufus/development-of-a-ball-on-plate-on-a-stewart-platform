@@ -11,8 +11,9 @@ class ParserManager:
         'set',
         'circle',
         'nunchuck',
-        'ball_on_plate',
-        'train_ball_on_plate',
+        'ball_on_plate_pid',
+        'ball_on_plate_rl',
+        'train_ball_on_plate_rl',
         'video_capture_linux',
         'video_capture_windows'
     ]
@@ -247,15 +248,21 @@ class ParserManager:
                 model.parser()
                 self.setup_logger()
                 model.run(self.logger)
-        elif self.operation == 'ball_on_plate':
-                from src.ball_on_plate.task import RunBallOnPlate
-                model = RunBallOnPlate()
+        elif self.operation == 'ball_on_plate_pid':
+                from src.ball_on_plate.pid.task import RunBallOnPlatePID
+                model = RunBallOnPlatePID()
                 model.parse()
                 self.setup_logger()
                 model.run(self.logger)
-        elif self.operation == 'train_ball_on_plate':
-                from src.ball_on_plate.task import TrainBallOnPlate
-                model = TrainBallOnPlate()
+        elif self.operation == 'ball_on_plate_rl':
+                from src.ball_on_plate.rl.task import RunBallOnPlateRL
+                model = RunBallOnPlateRL()
+                model.parse()
+                self.setup_logger()
+                model.run(self.logger)
+        elif self.operation == 'train_ball_on_plate_rl':
+                from src.ball_on_plate.rl.task import TrainBallOnPlateRL
+                model = TrainBallOnPlateRL()
                 model.parse()
                 self.setup_logger()
                 model.run(self.logger)

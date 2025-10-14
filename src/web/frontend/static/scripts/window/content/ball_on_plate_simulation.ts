@@ -88,8 +88,8 @@ class BallOnPlateSimulation extends Frame {
             TaskId.BALL_ON_PLATE,
             State.CONNECT,
             {
-                'env': 'BallOnPlate-v0',
-                'id': '0_9',
+                'env': 'BallOnPlate-v4',
+                'id': '4_0',
                 'model_name': 'best_model.zip',
                 'sb3_model': 'ppo',
                 'device': 'cpu',

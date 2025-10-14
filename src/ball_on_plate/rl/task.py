@@ -1,14 +1,8 @@
 import argparse
-import asyncio
-import base64
-from queue import Queue
-import io
-import threading
-import time
 
-import PIL
+import numpy as np
 
-class TrainBallOnPlate:
+class TrainBallOnPlateRL:
 
     def parse(self, parser=None):
         parser = argparse.ArgumentParser(
@@ -20,22 +14,22 @@ class TrainBallOnPlate:
         parser.add_argument(
             '-e',
             '--env',
-            help='',
+            help='Environment to use for reinforcement learning.',
             required=False,
             type=str,
-            choices=['BallOnPlate-v0'],
-            default='BallOnPlate-v0'
+            choices=['BallOnPlate-v4'],
+            default='BallOnPlate-v4'
         )
         parser.add_argument(
             '--dir',
-            help='',
+            help='Directory to save the results.',
             required=True,
             type=str
         )
         parser.add_argument(
             '-m',
             '--model',
-            help='',
+            help='RL model to train or use.',
             required=False,
             type=str,
             choices=['ppo', 'dqn', 'a2c'],
@@ -43,14 +37,14 @@ class TrainBallOnPlate:
         )
         parser.add_argument(
             '--use_existing_model_dir',
-            help='',
+            help='Path to an existing model directory to continue training.',
             required=False,
             type=str
         )
         parser.add_argument(
             '-d',
             '--device',
-            help='',
+            help='Device to run training on (CPU, CUDA, or auto-detect).',
             required=False,
             type=str,
             choices=['cpu', 'cuda', 'auto'],
@@ -58,7 +52,7 @@ class TrainBallOnPlate:
         )
         parser.add_argument(
             '--sequential_execution',
-            help='',
+            help='Run experiments sequentially instead of in parallel.',
             required=False,
             action='store_true',
             default=False,
@@ -66,7 +60,7 @@ class TrainBallOnPlate:
         parser.add_argument(
             '-i',
             '--iterations',
-            help='',
+            help='Number of training iterations to run.',
             required=False,
             type=int,
             default=40
@@ -74,7 +68,7 @@ class TrainBallOnPlate:
         parser.add_argument(
             '-s',
             '--steps_per_iteration',
-            help='',
+            help='Number of steps per iteration during training.',
             required=False,
             type=int,
             default=5_000
@@ -83,7 +77,7 @@ class TrainBallOnPlate:
         self.args, _ = parser.parse_known_args()
 
     def run(self, logger):
-        from src.ball_on_plate.rl.v0.simulation.training import train_sb3
+        from src.ball_on_plate.rl.v4.simulation.training import train_sb3
         train_sb3(
             self.args.env, 
             self.args.dir, 
@@ -96,7 +90,7 @@ class TrainBallOnPlate:
             logger
         )
 
-class RunBallOnPlate:
+class RunBallOnPlateRL:
 
     def parse(self, parser=None):
         parser = argparse.ArgumentParser(
@@ -108,22 +102,22 @@ class RunBallOnPlate:
         parser.add_argument(
             '-e',
             '--env',
-            help='',
+            help='Environment to run the model in.',
             required=False,
             type=str,
-            choices=['BallOnPlate-v0'],
-            default='BallOnPlate-v0'
+            choices=['BallOnPlate-v4'],
+            default='BallOnPlate-v4'
         )
         parser.add_argument(
             '--id',
-            help='',
+            help='Unique identifier to run a trained model',
             required=True,
             type=str
         )
         parser.add_argument(
             '-n',
             '--model_name',
-            help='',
+            help='Filename of the model to load.',
             required=False,
             type=str,
             default="best_model.zip"
@@ -131,7 +125,7 @@ class RunBallOnPlate:
         parser.add_argument(
             '-m',
             '--sb3_model',
-            help='',
+            help='Type of Stable-Baselines3 model to use.',
             required=False,
             type=str,
             choices=['ppo', 'dqn', 'a2c'],
@@ -140,7 +134,7 @@ class RunBallOnPlate:
         parser.add_argument(
             '-d',
             '--device',
-            help='',
+            help='Device to run the model on (CPU, CUDA, or auto-detect).',
             required=False,
             type=str,
             choices=['cpu', 'cuda', 'auto'],
@@ -149,21 +143,21 @@ class RunBallOnPlate:
         parser.add_argument(
             '-i',
             '--iterations',
-            help='',
+            help='Number of iterations to run the model.',
             required=False,
             type=int,
             default=10
         )
         parser.add_argument(
             '--simulation_mode',
-            help='',
+            help='Run the model in simulation mode without hardware.',
             required=False,
             action='store_true',
             default=False,
         )
         parser.add_argument(
             '--fps',
-            help='',
+            help='Frames per second for the simulation or visualization.',
             required=False,
             type=int,
             default=60
@@ -190,7 +184,7 @@ class RunBallOnPlate:
         self.fps = fps
 
     def run(self, logger, event=None, stop_event=None):
-        from src.ball_on_plate.rl.v0.simulation.training import run_sb3
+        from src.ball_on_plate.rl.v4.simulation.training import run_sb3
         run_sb3(
             self.env,
             self.id,

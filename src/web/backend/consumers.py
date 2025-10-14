@@ -282,7 +282,7 @@ class StewartPlatformConsumer(AsyncWebsocketConsumer):
         loop = asyncio.get_running_loop()
 
         def start_ball_on_plate(loop):
-            from src.ball_on_plate.task import RunBallOnPlate
+            from src.ball_on_plate.rl.task import RunBallOnPlateRL
 
             def raw_image_event(buffer):
                 if not self._run_ball_on_plate_stop_event.is_set():
@@ -294,7 +294,7 @@ class StewartPlatformConsumer(AsyncWebsocketConsumer):
                         loop
                     )
             try:
-                model = RunBallOnPlate()
+                model = RunBallOnPlateRL()
                 model.manual(
                     env,
                     id,
