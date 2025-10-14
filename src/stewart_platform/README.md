@@ -1,14 +1,12 @@
-# Mathematische Modellierung der Stewart-Plattform
+# Calculation of inverse kinematics
 
-Die Stewart-Plattform ist ein parallelkinematischer Mechanismus, der aus einer festen Basis und einer beweglichen Plattform besteht. Diese beiden Ebenen sind über sechs verstellbare Beine verbunden, die in der Länge verändert werden können. Durch die gezielte Steuerung dieser Beinlängen lässt sich die Position und Orientierung der oberen Plattform in sechs Freiheitsgraden (Translation und Rotation entlang aller Achsen) präzise kontrollieren. In diesem Dokument wird die Berechnung der Beinlängen sowie der Winkel von Servomotoren mathematisch beschrieben.
+The Stewart platform is a parallel kinematic mechanism consisting of a fixed base and a movable platform. These two planes are connected by six adjustable legs that can be changed in length. By precisely controlling the length of these legs, the position and orientation of the upper platform can be precisely controlled in six degrees of freedom (translation and rotation along all axes). This document provides a mathematical description of how to calculate the leg lengths and the angles of the servo motors.
 
-## Berechnung der Beinlängen
+The leg lengths of the Stewart platform are calculated using a mathematical derivation based on the spatial positions and orientations of the two platforms.
 
-Die Berechnung der Beinlängen der Stewart-Plattform erfolgt durch eine mathematische Herleitung, die auf den räumlichen Positionen und Orientierungen der beiden Plattformen basiert.
+## 1. Translation
 
-Zur eindeutigen Beschreibung der Position und Orientierung der Plattform werden zwei Größen verwendet:
-
-- Ein Translationsvektor \( \mathbf{t} \), der die lineare Verschiebung der beweglichen Plattform bezüglich der festen Basis definiert:
+The translation vector \( \mathbf{t} \) defines the linear displacement of the movable platform relative to the fixed base.
 
 ```math
 \mathbf{t} = \begin{bmatrix}
@@ -16,15 +14,18 @@ x \\ y \\ z
 \end{bmatrix}
 ```
 
-- Drei Winkel, sogenannte Eulerwinkel (Roll \( \alpha \), Pitch \( \beta \), Yaw \( \gamma \)), die die Orientierung der Plattform angeben. Diese Winkel werden von Grad in Radianten umgerechnet:
+## 2. Rotation
+
+Three Euler angles (roll \( \alpha \), pitch \( \beta \), yaw \( \gamma \)) specify the orientation of the platform. These angles are converted from degrees to radians:
 
 ```math
 \alpha = \frac{\pi}{180} \cdot \alpha, \quad \beta = \frac{\pi}{180} \cdot \beta, \quad \gamma = \frac{\pi}{180} \cdot \gamma
 ```
+## 3. Rotation matrix
 
-Die Rotationsmatrizen zur Beschreibung der Drehungen um die jeweiligen Achsen lauten:
+Using Euler angles, three rotation matrices R (as 3 × 3) are defined, which describe the rotations around the individual axes. Each individual matrix thus ensures that the platform rotates in only one direction.
 
-**Rotation um die x-Achse (Roll):**
+**Rotation around the x-axis (Roll):**
 ```math
 R_x = \begin{bmatrix}
 1 & 0 & 0 \\
@@ -33,7 +34,7 @@ R_x = \begin{bmatrix}
 \end{bmatrix}
 ```
 
-**Rotation um die y-Achse (Pitch):**
+**Rotation around the y-axis (Pitch):**
 ```math
 R_y = \begin{bmatrix}
 \cos\beta & 0 & \sin\beta \\
@@ -42,7 +43,7 @@ R_y = \begin{bmatrix}
 \end{bmatrix}
 ```
 
-**Rotation um die z-Achse (Yaw):**
+**Rotation around the z-axis (Yaw):**
 ```math
 R_z = \begin{bmatrix}
 \cos\gamma & -\sin\gamma & 0 \\
@@ -51,17 +52,19 @@ R_z = \begin{bmatrix}
 \end{bmatrix}
 ```
 
-**Gesamtrotationsmatrix:**
+**Total rotation matrix:**
 ```math
 R = R_z \cdot R_y \cdot R_x
 ```
 
-**Transformation der Plattformpunkte:**
+## 4. Transformation of platform points
+
 ```math
 \mathbf{P}_b^{(i)} = R \cdot \mathbf{P}_p^{(i)} + \mathbf{t}, \quad i = 1, \dots, 6
 ```
 
-**Berechnung der Beinvektoren und Beinlängen:**
+## 5. Calculation of vectors and linear actuators:
+
 ```math
 \mathbf{v}^{(i)} = \mathbf{P}_b^{(i)} - \mathbf{P}_B^{(i)}
 ```
@@ -70,44 +73,38 @@ R = R_z \cdot R_y \cdot R_x
 L_i = \| \mathbf{v}^{(i)} \| = \sqrt{(v_x^{(i)})^2 + (v_y^{(i)})^2 + (v_z^{(i)})^2}, \quad i = 1, \dots, 6
 ```
 
----
+# Calculation of servo angles
 
-## Berechnung der Servo-Winkel
+The angle calculation is based on three known quantities:
 
-Um die Plattform effektiv steuern zu können, ist zusätzlich die Berechnung der entsprechenden Servo-Winkel notwendig. Die Winkelberechnung basiert auf drei bekannten Größen:
+- the servo steering arm \( r \)
+- the fixed connecting rod \( l \)
+- previously calculated length of the actuator \( L_i \)
 
-- der Servo-Arm-Länge \( r \)
-- der festen Beinlänge \( l \)
-- den zuvor berechneten Beinlängen \( L_i \)
+## 1. Law of cosines
 
-Diese Formel ergibt sich aus der Betrachtung eines mechanischen Dreiecks, das durch den Servoarm, die feste Verbindungsstange (Pushrod) und die Strecke zwischen dem Servodrehpunkt und dem Befestigungspunkt auf der Plattform gebildet wird.
+The three sides form an equilateral triangle. The enclosed angle \( \theta_i \) can be determined using the cosine rule
 
-Dabei bilden:
-
-- \( a = r \) (Servo-Arm)
-- \( b = L_i \) (berechnete Beinlänge)
-- \( c = l \) (feste Verbindungsstange)
-
-die drei Seiten eines ebenen Dreiecks. Der eingeschlossene Winkel \( \theta_i \) lässt sich mithilfe des Kosinussatzes bestimmen:
-
-**Kosinussatz:**
 ```math
 \cos(\theta) = \frac{a^2 + b^2 - c^2}{2ab}
 ```
 
-**Angewandt auf das System ergibt sich:**
+## 2. Applied to the system
+
 ```math
 \cos(\theta_i) = \frac{r^2 + L_i^2 - l^2}{2 \cdot r \cdot L_i}, \quad i = 1, \dots, 6
 ```
 
-**Winkelberechnung:**
+## 3. Angle calculation
+
 ```math
 \theta_i = \arccos\left(\frac{r^2 + L_i^2 - l^2}{2 \cdot r \cdot L_i}\right) \cdot \frac{180}{\pi}, \quad i = 1, \dots, 6
 ```
 
-**Gültigkeitsprüfung des Wertebereichs:**
+## 4. Validity check of the value range
+
+Only if this range is observed is the configuration valid and mechanically feasible.
+
 ```math
 |r - l| \leq L_i \leq r + l
 ```
-
-Nur wenn dieser Bereich eingehalten wird, ist die Konfiguration gültig und mechanisch realisierbar.
