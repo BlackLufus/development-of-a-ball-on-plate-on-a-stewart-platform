@@ -85,7 +85,7 @@ ball-on-plate/
 │   │   ├── yolo/
 │   │   │   ├── ac_detection.py
 │   │   │   ├── cv_detection.py
-│   │   │   └── recognition.py
+│   │   │   └── recorder.py
 │   ├── nunchuck/
 │   │   ├── nunchuck.py
 │   │   └── task.py
