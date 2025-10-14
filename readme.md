@@ -99,7 +99,8 @@ ball-on-plate/
 │   │   │   └── ball_tracker.py
 │   │   └── yolo/
 │   │       ├── ac_detection.py
-│   │       └── cv_detection.py
+│   │       ├── cv_detection.py
+│   │       └── train_yolo_with_ball_on_plate.ipynb
 │   ├── nunchuck/
 │   │   ├── nunchuck.py
 │   │   └── task.py
