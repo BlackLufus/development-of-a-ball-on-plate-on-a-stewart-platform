@@ -8,7 +8,7 @@ Durch den Vergleich dieser beiden Ansätze sollen die Stärken und Schwächen vo
 
 ## 🛠️ Rahmenbedingungen
 
-Die Umsetzung diese Projekts baut vollständig auf bereits vorhandenen Komponenten auf.
+Die Umsetzung diese Projekts baut vollständig auf bereits vorhandenen Komponenten auf:
 
 - Stewart-Plattform mit 6 Aktuatoren
 - Sechs EMAX-ES09MD-Servomotoren
