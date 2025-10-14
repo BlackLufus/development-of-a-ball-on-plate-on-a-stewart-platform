@@ -176,25 +176,25 @@ python -m src.main --run ball_on_plate
 ### Execute/train simulation (RL or PID)
 
 ```bash
-python -m src.ball_on_plate.rl.v3.simulation.train
+python -m src.ball_on_plate.rl.v4.simulation.train
 ```
 
 or
 
 ```bash
-python -m src.ball_on_plate.pid.v2.simulation.agent
+python -m src.ball_on_plate.pid.v3.simulation.agent
 ```
 
 ### Perform/train physically (RL or PID)
 
 ```bash
-python -m src.ball_on_plate.rl.v3.physical.train
+python -m src.ball_on_plate.rl.v4.physical.train
 ```
 
 or
 
 ```bash
-python -m src.ball_on_plate.pid.v2.physical.agent
+python -m src.ball_on_plate.pid.v3.physical.agent
 ```
 
 ### Web interface
@@ -202,6 +202,10 @@ python -m src.ball_on_plate.pid.v2.physical.agent
 ```bash
 python -m src.web.manage runserver 127.0.0.1:8000
 ```
+
+## Download models
+
+> [rl_model_4_0](https://drive.google.com/file/d/1qXxIWzX0APrrYirxvvCHgpOYDEqDvQCG/view?usp=drive_link)
 
 ## 🧾 Lizenz
 
