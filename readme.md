@@ -54,6 +54,7 @@ npx tsc
 
 ## 📂 Projektstruktur
 
+```bash
 ball-on-plate/
 ├── src/
 │   ├── ball_on_plate/
@@ -119,6 +120,7 @@ ball-on-plate/
 ├── requirements.txt
 ├── tsconfig.json
 └── README.md
+```
 
 ## 🧩 Weitere Module
 
