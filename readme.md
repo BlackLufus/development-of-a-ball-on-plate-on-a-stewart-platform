@@ -199,7 +199,7 @@ This command starts a local TensorBoard server using the logs stored in `./tenso
 
 ### 2. Open in a browser
 
-fter starting, TensorBoard will provide a local URL (e.g., `http://localhost:6006`). Open this in your browser to explore your training metrics, graphs, and summaries.
+After starting, TensorBoard will provide a local URL (e.g., `http://localhost:6006`). Open this in your browser to explore your training metrics, graphs, and summaries.
 
 > ⚠️ Make sure TensorBoard is installed in your Python environment. You can install it with:
 > ```bash
@@ -268,7 +268,7 @@ or
 python -m src.ball_on_plate.pid.v3.physical.agent
 ```
 
-### Web interface
+### Image recorder
 
 ```bash
 python -m src.main --run image_recorder -f 15 -t 200 --os 'linux'
