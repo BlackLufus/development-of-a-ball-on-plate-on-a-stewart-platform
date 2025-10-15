@@ -141,13 +141,13 @@ ball-on-plate/
 │   │   └── manager.py
 │   ├── config.json
 │   ├── main.py
-│   ├── parser_manager.py
-│   ├── tensorboard/
-│   │   ├── ...
-│   │   └── bop
-│   │       ├── ...
-│   │       └── 4_0
-│   └── venv/
+│   └── parser_manager.py
+├── tensorboard/
+│   ├── ...
+│   └── bop
+│       ├── ...
+│       └── 4_0
+├── venv/
 ├── requirements.txt
 ├── tsconfig.json
 └── README.md
